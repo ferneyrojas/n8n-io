@@ -1,0 +1,297 @@
+{
+  "createdAt": "2025-10-02T20:48:09.320Z",
+  "updatedAt": "2025-10-02T22:11:54.162Z",
+  "id": "F4AkO2OxwpqpKUSf",
+  "name": "Cargue DOAJ-2",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -288
+      ],
+      "id": "71aece4d-a891-4671-aaa7-bff84228f8b5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://doaj.org/api/v2/search/articles/biology",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -288
+      ],
+      "id": "405adba8-8e81-484f-9c8d-f9cd80068997",
+      "name": "Consultar info"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.first().json.results.filter(item => {\n  const data = item.id;\n  return data; // validamos que tenga email y nombre\n});\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -288
+      ],
+      "id": "e4b598b8-34b0-4886-839c-491839ce1680",
+      "name": "convertir en Array"
+    },
+    {
+      "parameters": {
+        "jsCode": "  return {\n    id: $input.first().json.id,\n    title: $input.first().json.bibjson.title,\n    doi: $input.first().json.bibjson.identifier.find(item => item.type === \"doi\").id\n  };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -288
+      ],
+      "id": "2aa3f379-18cf-4a0e-8e0c-e4fa9a1e20f6",
+      "name": "Extraer info del Item"
+    },
+    {
+      "parameters": {
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/bibliotecaVirtual?_end=10&_start=0&bc_apa_doi={{ $json.doi }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        -288
+      ],
+      "id": "6a1cbd72-e00c-4d2b-bc1e-a363a947d45d",
+      "name": "Validar si ya se cargo o no",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b265f7a2-774c-4c62-8940-f45565693fd6",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        -288
+      ],
+      "id": "f76e0e7c-2d02-4140-bc2f-adecefe7b357",
+      "name": "Ajustar campos",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1920,
+        -288
+      ],
+      "id": "0bdd50dd-a983-482c-a06c-c364bfa0976d",
+      "name": "Enviar a Vpro"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f949bafe-5c18-45fe-970d-f85de82b4d66",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        -288
+      ],
+      "id": "b64e3f1b-d67f-4030-9b92-170f847c9578",
+      "name": "Validar por DOI"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Extraer info del Item').item.json.title }}",
+        "options": {
+          "systemMessage": "traduce a español y retorna la respuesta en texto plano"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1568,
+        -288
+      ],
+      "id": "bfb88ad1-15eb-41b5-b215-73d2a7685812",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        -64
+      ],
+      "id": "6232cab2-e8b7-4813-af56-1e9347ffa1b1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SJ4SD3J6zPU2u06t",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Consultar info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar info": {
+      "main": [
+        [
+          {
+            "node": "convertir en Array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convertir en Array": {
+      "main": [
+        [
+          {
+            "node": "Extraer info del Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer info del Item": {
+      "main": [
+        [
+          {
+            "node": "Validar si ya se cargo o no",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar si ya se cargo o no": {
+      "main": [
+        [
+          {
+            "node": "Validar por DOI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajustar campos": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar por DOI": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Ajustar campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Enviar a Vpro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "db059cba-9bda-4b5f-a739-cbb0dfc24a51",
+  "triggerCount": 0,
+  "tags": []
+}
