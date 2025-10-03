@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-03T17:00:19.446Z",
-  "updatedAt": "2025-10-03T17:00:19.446Z",
+  "updatedAt": "2025-10-03T17:09:21.636Z",
   "id": "PltwlU6hkXZaBxEB",
   "name": "BackupWorkflows",
   "active": false,
@@ -69,15 +69,15 @@
         "operation": "list",
         "owner": {
           "__rl": true,
-          "value": "n8n-io",
+          "value": "ferneyrojas",
           "mode": "name"
         },
         "repository": {
           "__rl": true,
-          "value": "n8n",
+          "value": "n8n-io",
           "mode": "list",
-          "cachedResultName": "n8n",
-          "cachedResultUrl": "https://github.com/n8n-io/n8n"
+          "cachedResultName": "n8n-io",
+          "cachedResultUrl": "https://github.com/ferneyrojas/n8n-io"
         },
         "filePath": "="
       },
@@ -100,18 +100,19 @@
     },
     {
       "parameters": {
-        "authentication": "oAuth2",
         "resource": "file",
         "operation": "edit",
         "owner": {
           "__rl": true,
-          "mode": "name",
-          "value": ""
+          "value": "ferneyrojas",
+          "mode": "name"
         },
         "repository": {
           "__rl": true,
+          "value": "n8n-io",
           "mode": "list",
-          "value": ""
+          "cachedResultName": "n8n-io",
+          "cachedResultUrl": "https://github.com/ferneyrojas/n8n-io"
         },
         "filePath": "={{ $('Retrieve workflows').item.json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $('Retrieve workflows').item.json.tags[0].name }}.json",
         "fileContent": "={{ $('To base64').item.json.data }}",
@@ -125,21 +126,28 @@
         64
       ],
       "webhookId": "27218087-8df7-474d-a39f-70cfa9c34ec8",
-      "typeVersion": 1
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "AdFvUvurFNS3uQtr",
+          "name": "GitHub account"
+        }
+      }
     },
     {
       "parameters": {
-        "authentication": "oAuth2",
         "resource": "file",
         "owner": {
           "__rl": true,
-          "mode": "name",
-          "value": ""
+          "value": "ferneyrojas",
+          "mode": "name"
         },
         "repository": {
           "__rl": true,
+          "value": "n8n-io",
           "mode": "list",
-          "value": ""
+          "cachedResultName": "n8n-io",
+          "cachedResultUrl": "https://github.com/ferneyrojas/n8n-io"
         },
         "filePath": "={{ $('Retrieve workflows').item.json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $('Retrieve workflows').item.json.tags[0].name }}.json",
         "fileContent": "={{ $('To base64').item.json.data }}",
@@ -153,7 +161,13 @@
         224
       ],
       "webhookId": "ce4b561b-acb9-4cd8-b76f-4928dada9674",
-      "typeVersion": 1
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "AdFvUvurFNS3uQtr",
+          "name": "GitHub account"
+        }
+      }
     },
     {
       "parameters": {
@@ -386,9 +400,11 @@
     "executionOrder": "v1"
   },
   "staticData": null,
-  "meta": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "pinData": {},
-  "versionId": "28d6ddcc-855f-4916-b086-c872f2094f36",
+  "versionId": "21e07542-3a17-40f4-837a-f9746baa5140",
   "triggerCount": 0,
   "tags": []
 }
