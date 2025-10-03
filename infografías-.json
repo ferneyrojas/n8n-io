@@ -1,0 +1,1435 @@
+{
+  "createdAt": "2025-10-03T17:36:52.347Z",
+  "updatedAt": "2025-10-03T17:36:52.347Z",
+  "id": "0wdM5XsUjMm0XCJ6",
+  "name": "Infografías",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        -64
+      ],
+      "id": "67ee8ac7-dd07-499f-9ba6-502775519bc6",
+      "name": "When chat message received",
+      "webhookId": "dec7970d-f9d8-4614-b775-c26798b8cae7"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Eres un generador de datos jerárquicos. \nSiempre debes devolver la información en formato JSON válido, sin explicaciones ni texto fuera del JSON.\n\nLa estructura que debes seguir es la siguiente:\n\n{\n  \"temas\": [\n    {\n      \"nombre\": \"Tema 1\",\n      \"subtemas\": [\n        {\n          \"nombre\": \"Subtema 1\",\n          \"contenido\": [\n            \"Párrafo 1\",\n            \"Párrafo 2\"\n          ]\n        },\n        {\n          \"nombre\": \"Subtema 2\",\n          \"contenido\": [\n            \"Párrafo 1\"\n          ]\n        }\n      ]\n    }\n  ]\n}\n\nRegla especial:\n- Debes añadir siempre dos nodos fijos, la portada al inicio el cual tenga la siguiente estructura\n{\n  \"nombre\": \"Portada\",\n  \"prompt\" : \"\", /* Ej. Genera una imagen en formato PNG, no texto, solo imagen, sobre el tema ${temática del usuario}. No incluyas ninguna descripción, solo devuelve la imagen. */\n  \"subtemas\": [\n    {\n      \"nombre\": \"portada\",\n      \"titulo\": \"\" /* Aquí debe ir la temática que ingresó el usuario */\n    }\n  ]\n}\n\ny la trivia al final la cual tenga esta estructura:\n{\n  \"nombre\": \"Trivia\",\n  \"subtemas\": [\n    {\n      \"nombre\": \"Trivia\"\n    }\n  ]\n}\n\nReglas:\n- Genera el número exacto de temas principales para el área de estudio que te de el usuario.\n- Para cada tema genera entre 1 y 3 subtemas.\n- Para cada subtema genera entre 1 y 3 párrafos explicativos.\n- Nunca incluyas texto adicional fuera del JSON.\n- Respeta estrictamente la jerarquía y el formato indicado.\n- Genera párrafos bien elaborados, que no sean muy extensos pero tampoco tan cortos, que aporten una información clara y valiosa.\n\nDebes generar el contenido según el área de estudio proporcionada por el usuario.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -64
+      ],
+      "id": "9e40fa98-6bca-451b-ab05-55dc371372c8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        368,
+        144
+      ],
+      "id": "829d1c4a-35fc-4af2-a4f1-5f8e9f7f58af",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        528,
+        144
+      ],
+      "id": "c45ffded-0706-4b20-b6c5-2d26f9faf8e3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function node (Parse JSON) - pega esto en el nodo Function\nconst out = [];\n\n/** Recopila todos los strings dentro del objeto (busca en keys/arrays) */\nfunction collectStrings(obj, acc = []) {\n  if (obj == null) return acc;\n  if (typeof obj === 'string') { acc.push(obj); return acc; }\n  if (Array.isArray(obj)) {\n    for (const v of obj) collectStrings(v, acc);\n  } else if (typeof obj === 'object') {\n    for (const k of Object.keys(obj)) collectStrings(obj[k], acc);\n  }\n  return acc;\n}\n\n/** Extrae una subcadena JSON balanceada (soporta { ... } y [ ... ]).\n *  Devuelve null si no encuentra cierre balanceado. */\nfunction extractBalanced(s) {\n  const start = s.search(/[{[]/);\n  if (start === -1) return null;\n  const open = s[start];\n  const close = open === '{' ? '}' : ']';\n  let depth = 0;\n  let inString = false;\n  let prev = '';\n  for (let i = start; i < s.length; i++) {\n    const ch = s[i];\n    if (ch === '\"' && prev !== '\\\\') inString = !inString;\n    if (!inString) {\n      if (ch === open) depth++;\n      else if (ch === close) {\n        depth--;\n        if (depth === 0) return s.slice(start, i + 1);\n      }\n    }\n    prev = ch;\n  }\n  // Si aquí no está balanceado, intenta devolver hasta la última llave/corchete\n  const lastClose = s.lastIndexOf(close);\n  if (lastClose > start) return s.slice(start, lastClose + 1);\n  return null;\n}\n\n/** Intento de parse seguro */\nfunction tryJSONParse(s) {\n  try { return JSON.parse(s); } catch (e) { return null; }\n}\n\n// ---- comienzo ----\nconst item = items[0] ? items[0].json : {};\nconst candidates = collectStrings(item);\n\n// Si no hay strings, usa la representación JSON del objeto\nconst rawCandidate = (candidates.length ? candidates : [JSON.stringify(item)]).sort((a,b) => {\n  // Prioriza candidatos que contengan \"temas\" y llaves\n  const score = s => (s.includes('\"temas\"') ? 10 : 0) + (s.includes('{') ? 1 : 0);\n  return score(b) - score(a);\n})[0];\n\nlet parsed = null;\n\n// 1) intenta extraer bloque balanceado y parsear\nconst balanced = extractBalanced(rawCandidate);\nif (balanced) parsed = tryJSONParse(balanced);\n\n// 2) si falla, intenta \"unescape\" de \\n y \\\"\nif (!parsed) {\n  const unesc = rawCandidate.replace(/\\\\n/g, '\\n').replace(/\\\\\"/g, '\"');\n  const balanced2 = extractBalanced(unesc) || unesc;\n  parsed = tryJSONParse(balanced2);\n}\n\n// 3) si aún falla, busca la clave \"temas\" y recorta desde la llave previa\nif (!parsed) {\n  const keyIdx = rawCandidate.search(/\"temas\"\\s*:/);\n  if (keyIdx !== -1) {\n    const braceIdx = rawCandidate.lastIndexOf('{', keyIdx);\n    if (braceIdx !== -1) {\n      const substr = rawCandidate.slice(braceIdx);\n      const balanced3 = extractBalanced(substr) || substr;\n      parsed = tryJSONParse(balanced3);\n    }\n  }\n}\n\n// 4) salida: si parseó, devuelve el objeto; si no, devuelve raw para debug\nif (!parsed) {\n  out.push({\n    json: {\n      success: false,\n      error: 'No se pudo parsear JSON. Revisa el campo raw para depuración.',\n      raw: rawCandidate\n    }\n  });\n  return out;\n}\n\n// Si parseó correctamente, devolvemos el objeto (ej: { temas: [...] })\nout.push({ json: parsed });\nreturn out[0].json.temas.map(t => ({ json: t }));\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        -64
+      ],
+      "id": "84a5c3d9-514b-4a6a-853f-b438dd3c2e24",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/seccionInfografia",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sec_id_infografia",
+              "value": "171"
+            },
+            {
+              "name": "sec_nombre",
+              "value": "={{ $json.nombre }}"
+            },
+            {
+              "name": "sec_descripcion",
+              "value": "={{ $json.nombre }}"
+            },
+            {
+              "name": "sec_orden",
+              "value": "={{$itemIndex + 1}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1408,
+        -64
+      ],
+      "id": "f12b4a99-90f1-44d5-82a8-b445c6c0a4b4",
+      "name": "HTTP Request",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "sec_nombre",
+              "field2": "nombre"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1408,
+        192
+      ],
+      "id": "bf602e5d-1a07-4898-8ff7-d74ef223fb86",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\n\nfor (const item of items) {\n  const temaId = item.json.sec_id;\n  const subtemas = item.json.subtemas || [];\n\n  subtemas.forEach((st, idx) => {\n    out.push({\n      json: {\n        idTema: temaId,\n        nombre: st.nombre,\n        contenido: st.contenido || \"\", // array de párrafos\n        orden: idx + 1,\n        titulo: st.titulo || st.nombre\n      }\n    });\n  });\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        192
+      ],
+      "id": "e0ecf050-cb7c-4e81-85d2-3c4edfdae0ef",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/subSeccionInfografia",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sub_id_seccion",
+              "value": "={{ $json.idTema }}"
+            },
+            {
+              "name": "sub_nombre",
+              "value": "={{ $json.nombre }}"
+            },
+            {
+              "name": "sub_descripcion",
+              "value": "={{ $json.nombre }}"
+            },
+            {
+              "name": "sub_orden",
+              "value": "={{$itemIndex + 1}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1984,
+        192
+      ],
+      "id": "0bfa5284-2b1d-41b9-b26d-8ca3c8faa0e4",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "sub_nombre",
+              "field2": "nombre"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1984,
+        448
+      ],
+      "id": "80837fac-ab5e-480e-a7ae-6b1195b72acd",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\n\nfor (const item of items) {\n  const subId = item.json.sub_id;\n  const nombre = item.json.nombre || \"\";\n  const parrafos = Array.isArray(item.json.contenido) ? item.json.contenido : [item.json.contenido];\n\n  // Determinar plantilla\n  let plantilla = 2; // valor por defecto\n  if (nombre.toLowerCase() === \"portada\") {\n    plantilla = 8;\n  } else if (nombre.toLowerCase() === \"trivia\") {\n    plantilla = 10;\n  }\n\n  parrafos.forEach((texto, idx) => {\n    out.push({\n      json: {\n        sld_activo: true,\n        sld_id_subseccion: subId,\n        sld_nombre: nombre,\n        sld_orden: idx + 1,\n        sld_plantilla: plantilla,\n        sld_texto1: texto ? `<p>${texto}</p>` : \"\", // si no hay texto, vacío\n        sld_titulo: item.json.titulo || nombre\n      }\n    });\n  });\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        416
+      ],
+      "id": "2d98c6d1-9f1d-434e-9102-a1d44e8def39",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/slideInfografia",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sld_activo",
+              "value": "={{ $json.sld_activo }}"
+            },
+            {
+              "name": "sld_id_subseccion",
+              "value": "={{ $json.sld_id_subseccion }}"
+            },
+            {
+              "name": "sld_nombre",
+              "value": "={{ $json.sld_nombre }}"
+            },
+            {
+              "name": "sld_orden",
+              "value": "={{ $json.sld_orden }}"
+            },
+            {
+              "name": "sld_plantilla",
+              "value": "={{ $json.sld_plantilla }}"
+            },
+            {
+              "name": "sld_texto1",
+              "value": "={{ $json.sld_texto1 }}"
+            },
+            {
+              "name": "sld_titulo",
+              "value": "={{ $json.sld_titulo }}"
+            },
+            {
+              "name": "sld_fondo",
+              "value": "={{ $json.sld_fondo }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4544,
+        640
+      ],
+      "id": "abb00546-9d5b-42c0-8e51-00837e17947d",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/publicar/infografia/171",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9600,
+        1408
+      ],
+      "id": "19e05ffc-5e1f-434f-bded-55dbaf901af3",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        9392,
+        1408
+      ],
+      "id": "deaf7cff-1e44-4674-89b0-212f2de54ed7",
+      "name": "Wait",
+      "webhookId": "3e432c8e-310f-4121-b95c-7e7ff39ff252"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2496,
+        720
+      ],
+      "id": "91b5a1c0-f468-404a-b010-548333ba23c1",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Busca el primer item que tenga prompt definido\nconst promptItem = items.find(i => i.json.prompt);\n\nreturn [\n  {\n    json: {\n      model: \"google/gemini-2.5-flash-image-preview\",\n      max_tokens: 256, // ✅ esta es la clave correcta\n      messages: [\n        {\n          role: \"user\",\n          content: [\n            {\n              type: \"text\",\n              text: promptItem ? promptItem.json.prompt : \"Genera una imagen sencilla\"\n            }\n          ]\n        }\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        720
+      ],
+      "id": "0872b874-0613-478a-95b2-3912cfa85f76",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Accedemos al mensaje de la primera choice\nconst choice = $json.choices?.[0];\nconst image = choice?.message?.images?.[0];\n\nif (!image) {\n  throw new Error(\"No se encontró ninguna imagen en la respuesta.\");\n}\n\n// Obtenemos el Data URL de la respuesta\nconst dataUrl = image.image_url.url;\n\n// Extraemos solo la parte base64 (quitamos el prefijo data:image/png;base64,)\nconst base64 = dataUrl.split(\",\")[1];\n\n// Convertimos a Buffer\nconst buffer = Buffer.from(base64, \"base64\");\n\n// Retornamos en formato que n8n entiende como archivo binario\nreturn {\n  json: {\n    filename: \"imagen.png\",\n  },\n  binary: {\n    data: {\n      data: buffer.toString(\"base64\"), // n8n espera base64 en binarios\n      mimeType: \"image/png\",\n      fileName: \"imagen.png\",\n    },\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2784,
+        720
+      ],
+      "id": "ba7a177d-f357-4d83-8d88-d88985b7c192",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8f52103-c505-4280-bd83-e6e2f2e32d20",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        624
+      ],
+      "id": "af9a78bf-4f91-440f-a688-996d7143a910",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "let prompt = null;\n\n// Recorremos todos los items\nfor (const item of items) {\n  if (item.json.prompt) { \n    prompt = item.json.prompt;\n    break; // salimos apenas lo encontramos\n  }\n}\n\nreturn [{ json: { prompt } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        624
+      ],
+      "id": "6c3abbf5-27f0-4e2a-97e8-008b3cc089cb",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2400,
+        464
+      ],
+      "id": "e78fad13-feb2-422f-af95-97c0d9b5b9a5",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/recursoInfografia",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "rec_activo",
+              "value": "true"
+            },
+            {
+              "name": "rec_id_infografia",
+              "value": "171"
+            },
+            {
+              "name": "rec_nombre",
+              "value": "portada"
+            },
+            {
+              "name": "rec_tipo",
+              "value": "img"
+            },
+            {
+              "name": "rec_descripcion",
+              "value": "portada"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3040,
+        464
+      ],
+      "id": "f0ea11f8-8759-4517-a0e7-d6347016e677",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/recursoInfografia/{{ $json.rec_id }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "rec_nombre_recurso",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3712,
+        640
+      ],
+      "id": "031dc386-d1d3-4420-9ebc-20b2e5ff8843",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3264,
+        704
+      ],
+      "id": "7a23e45c-90f1-4c74-889b-8b1ecf77558b",
+      "name": "Merge2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// items[0] → salida del HTTP anterior (solo json)\n// items[1] → salida del nodo que generó el binario\n\nreturn [\n  {\n    json: items[0].json,     // el json del HTTP\n    binary: items[1].binary  // el archivo de la imagen\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3472,
+        640
+      ],
+      "id": "3c662af8-3b6c-41bf-9442-426f00eed6b5",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4112,
+        80
+      ],
+      "id": "968d40f2-ebb3-4345-8735-d3b987e88110",
+      "name": "Merge4"
+    },
+    {
+      "parameters": {
+        "jsCode": "let recursoId = null;\n\n// Buscar el recurso (el item que contiene campos rec_)\nfor (const it of items) {\n  const j = it.json || {};\n  const hasRec = Object.keys(j).some(k => k.startsWith(\"rec_\"));\n  if (hasRec && j.id !== undefined) {\n    recursoId = j.id;\n    break; // asumimos que solo hay uno\n  }\n}\n\n// Filtramos los items que no son recurso y que no tengan \"prompt\"\nconst filtered = items.filter(it => {\n  const j = it.json || {};\n  const hasRec = Object.keys(j).some(k => k.startsWith(\"rec_\"));\n  const hasPrompt = \"prompt\" in j;\n  return !hasRec && !hasPrompt;\n});\n\n// Agrupamos por sld_nombre\nconst grouped = {};\nfor (const it of filtered) {\n  const j = { ...it.json };\n\n  if (!j.sld_nombre) continue;\n\n  if (!grouped[j.sld_nombre]) {\n    grouped[j.sld_nombre] = { ...j, sld_texto1: j.sld_texto1 || \"\" };\n  } else {\n    grouped[j.sld_nombre].sld_texto1 += (grouped[j.sld_nombre].sld_texto1 ? \"\\n\\n\" : \"\") + (j.sld_texto1 || \"\");\n    // mantener el menor orden para representar el primero\n    if (j.sld_orden < grouped[j.sld_nombre].sld_orden) {\n      grouped[j.sld_nombre].sld_orden = j.sld_orden;\n    }\n  }\n}\n\n// Convertimos a array y añadimos sld_fondo si es portada\nconst out = Object.values(grouped).map(j => {\n  if (j.sld_nombre && j.sld_nombre.toLowerCase() === \"portada\" && recursoId) {\n    j.sld_fondo = recursoId;\n  }\n  return { json: j };\n});\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        640
+      ],
+      "id": "9b635648-0cb6-4801-a08b-612e0d2f389e",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        6160,
+        1040
+      ],
+      "id": "df7448b4-36ac-463a-b0c0-144973cce67f",
+      "name": "AI Agent1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/trivia",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "tri_tipo_trivia",
+              "value": "1"
+            },
+            {
+              "name": "tri_nombre",
+              "value": "={{ $('Code in JavaScript1').first().json.titulo }}"
+            },
+            {
+              "name": "tri_numPreguntas",
+              "value": "10"
+            },
+            {
+              "name": "tri_activo",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4960,
+        640
+      ],
+      "id": "c759fbca-b2ab-482e-803c-7e8081266b65",
+      "name": "HTTP Request7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        6128,
+        1216
+      ],
+      "id": "e31d7dcd-6895-47b2-880a-0ecd0e3e03dc",
+      "name": "Google Gemini Chat Model1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        5376,
+        640
+      ],
+      "id": "b6c5b52e-a063-4736-a21a-610d322fa275",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items();\nconst datos = items.map(i => i.json);\n\nconst prompt = `\nGenera una trivia de 10 preguntas en formato JSON usando la siguiente información de subtemas y contenidos:\n\n${JSON.stringify(datos, null, 2)}\n\nReglas IMPORTANTES:\n- Cada pregunta debe tener exactamente 4 opciones de respuesta.\n- Solo UNA de las opciones puede ser válida (correcta = true).\n- Aunque el texto contenga varias posibles respuestas correctas, debes escoger **únicamente una** como la válida.\n- Las demás opciones deben ser distractores: incorrectas pero **coherentes** y **plausibles** dentro del tema.\n- Los distractores NO deben ser también correctos según el texto original.\n- Si el tema es especializado (ej. medicina), los distractores pueden basarse en términos médicos reales o relacionados, pero no deben coincidir con la respuesta válida.\n\nEl formato de salida debe ser estrictamente un JSON como este:\n\n[\n  {\n    \"pregunta\": \"texto de la pregunta\",\n    \"respuestas\": [\n      { \"texto\": \"opción 1\", \"correcta\": false },\n      { \"texto\": \"opción 2\", \"correcta\": true },\n      { \"texto\": \"opción 3\", \"correcta\": false },\n      { \"texto\": \"opción 4\", \"correcta\": false }\n    ]\n  }\n]\n`;\n\nreturn [{\n  chatInput: prompt\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5584,
+        640
+      ],
+      "id": "8f410724-c062-48b6-81c5-ef768d232ebd",
+      "name": "Code in JavaScript9"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        6688,
+        1184
+      ],
+      "id": "798ea88c-c97d-4c72-bd00-5cbb81abf2cb",
+      "name": "Merge6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomamos todos los items que vienen al nodo\nconst items = $items();\n\n// Buscamos el que trae output y el que trae tri_id\nconst outputItem = items.find(i => i.json.output);\nconst idItem = items.find(i => i.json.tri_id);\n\n// Limpiamos el JSON dentro del output\nlet clean = outputItem.json.output\n  .replace(/```json\\n?/g, '')\n  .replace(/```/g, '');\n\n// Parseamos\nlet trivia;\ntry {\n  trivia = JSON.parse(clean);\n} catch (err) {\n  throw new Error('Error parseando la trivia: ' + err.message + '\\nTexto:\\n' + clean);\n}\n\n// Devolvemos un solo objeto que combine ambas cosas\nreturn [{\n  json: {\n    tri_id: idItem.json.tri_id,\n    trivia: trivia\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6896,
+        1184
+      ],
+      "id": "090d9abc-69b3-491c-8964-8f33f9fceb79",
+      "name": "Code in JavaScript10"
+    },
+    {
+      "parameters": {
+        "jsCode": "const tri_id = $json.tri_id;\nconst trivia = $json.trivia;\n\nconst items = trivia.map(q => {\n  return {\n    json: {\n      tri_id: tri_id,\n      pregunta: `<p>${q.pregunta}</p>`,\n      respuestas: q.respuestas\n    }\n  };\n});\n\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7104,
+        1184
+      ],
+      "id": "3168c7ee-05e3-486b-97dc-e16143140b48",
+      "name": "Code in JavaScript11"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/triviaPregunta",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "trp_id_trivia",
+              "value": "={{ $json.tri_id }}"
+            },
+            {
+              "name": "trp_pregunta",
+              "value": "={{ $json.pregunta }}"
+            },
+            {
+              "name": "trp_activo",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7312,
+        1184
+      ],
+      "id": "d3760849-232e-47c5-9b9d-72a144f58fd8",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        7520,
+        1408
+      ],
+      "id": "62692ba7-23b9-4ae8-a33e-a145f1976b46",
+      "name": "Merge7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(); // todos los items que entran al nodo\nconst data = items.map(i => i.json); // extraemos el JSON de cada item\nconst result = [];\n\n(data || []).forEach(p => {\n  (p.respuestas || []).forEach(r => {\n    result.push({\n      json: {\n        trr_id_pregunta: p.trp_id,          // ID de la pregunta\n        trr_respuesta: `<p>${r.texto}</p>`, // respuesta envuelta en <p>\n        correcta: r.correcta\n      }\n    });\n  });\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7728,
+        1408
+      ],
+      "id": "1dabf8ba-2f34-4566-902f-88af62ef71fd",
+      "name": "Code in JavaScript12"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/triviaRespuesta",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "trr_id_pregunta",
+              "value": "={{ $json.trr_id_pregunta }}"
+            },
+            {
+              "name": "trr_respuesta",
+              "value": "={{ $json.trr_respuesta }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7936,
+        1408
+      ],
+      "id": "f174c1be-f800-4657-a3f4-fd8de582baea",
+      "name": "HTTP Request9"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        8144,
+        1408
+      ],
+      "id": "c47f3699-c5a2-4bdd-b177-19a602655ef2",
+      "name": "Merge8"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function node en n8n\n// Filtra solo los items cuya propiedad correcta === true\n\nreturn items.filter(item => item.json.correcta === true);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8352,
+        1408
+      ],
+      "id": "4f098609-fc1b-4378-b1de-d9addabedd22",
+      "name": "Code in JavaScript13"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/triviaPregunta/{{ $json.trr_id_pregunta }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $json.trr_id_pregunta }}"
+            },
+            {
+              "name": "trp_respuesta",
+              "value": "={{ $json.trr_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8560,
+        1408
+      ],
+      "id": "c505593d-e27d-47ee-a2c4-acc6aa45936b",
+      "name": "HTTP Request10"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/slideInfografia/{{ $('Slide Trivia').first().json.sld_id }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Slide Trivia').first().json.sld_id }}"
+            },
+            {
+              "name": "sld_trivia",
+              "value": "={{ $('ID Trivia').first().json.tri_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8752,
+        1408
+      ],
+      "id": "9ac03f41-bc91-4116-baef-0f9a11064e2f",
+      "name": "HTTP Request11"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Suponemos que \"items\" contiene el array que muestras\nconst lastItem = items[items.length - 1]; // el último objeto\nconst sldId = lastItem.json?.sld_id;      // accedemos a la propiedad\n\nreturn [\n  {\n    json: {\n      sld_id: sldId,\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4752,
+        640
+      ],
+      "id": "49f12fc3-17fc-41fa-9eee-089d13cb9037",
+      "name": "Slide Trivia"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6f17d682-10e6-4aab-8255-19f8e8114700",
+              "name": "tri_id",
+              "value": "={{ $json.tri_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5168,
+        640
+      ],
+      "id": "1c950121-bef4-4f18-97a6-baba5815e8be",
+      "name": "ID Trivia"
+    },
+    {
+      "parameters": {
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/publicar/trivia/{{ $('ID Trivia').first().json.tri_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9168,
+        1408
+      ],
+      "id": "ea1a77c8-a3f6-474f-8718-46cc29ebfdc0",
+      "name": "HTTP Request12"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        8960,
+        1408
+      ],
+      "id": "3209999c-e18b-4251-89c0-b8bf2c6e7686",
+      "name": "Wait1",
+      "webhookId": "de6cac56-6de3-4b1e-9cd9-66660906f2c1"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Slide Trivia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "ID Trivia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript9": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge6": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript10": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript11": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge7",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "Merge7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge7": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript12": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request9",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge8",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request9": {
+      "main": [
+        [
+          {
+            "node": "Merge8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge8": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript13": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request10": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slide Trivia": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ID Trivia": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request11": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request12": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "be10ee62-7705-4027-bb4b-112557ffbd89",
+  "triggerCount": 0,
+  "tags": []
+}
