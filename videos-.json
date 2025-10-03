@@ -1,0 +1,483 @@
+{
+  "createdAt": "2025-10-02T20:36:00.049Z",
+  "updatedAt": "2025-10-02T20:39:06.865Z",
+  "id": "I9kbvaHo8kRqxsg0",
+  "name": "Videos",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Accept\": \"application/json\",\n  \"Content-Type\": \"application/json\",\n  \"X-Api-Key\": \"MjU4YjA0OGY4Y2Y3NGJiNWE2MDQ0MzMzMzY0YTExMDUtMTc1NzUyMzY1Ng==\"\n}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_inputs[0].character.type",
+              "value": "avatar"
+            },
+            {
+              "name": "video_inputs[0].character.avatar_id",
+              "value": "Abigail_expressive_2024112501"
+            },
+            {
+              "name": "video_inputs[0].character.avatar_style",
+              "value": "normal"
+            },
+            {
+              "name": "video_inputs[0].voice.type",
+              "value": "text"
+            },
+            {
+              "name": "video_inputs[0].voice.input_text",
+              "value": "={{$json[\"script\"]}}"
+            },
+            {
+              "name": "video_inputs[0].voice.voice_id",
+              "value": "119caed25533477ba63822d5d1552d25"
+            },
+            {
+              "name": "video_inputs[0].voice.speed",
+              "value": "1.0"
+            },
+            {
+              "name": "dimension.width",
+              "value": "1280"
+            },
+            {
+              "name": "dimension.height",
+              "value": "720"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "65de3e78-85aa-4d05-8ad0-eb5f00bdcc8a",
+      "name": "HeyGen Crear Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const textos = $json.data.data.dialogo.textos;\n\nconst guion = textos.map(t => t.text).join(\"\\n\\n\");\n\nreturn [{ script: guion }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        240
+      ],
+      "id": "32c2b110-b10b-4cb7-bb06-91c899781278",
+      "name": "Extraer texto"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1eroutKvAU4TaTfZZaPE5IiXQp37jJ6Y0",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1eroutKvAU4TaTfZZaPE5IiXQp37jJ6Y0"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        96
+      ],
+      "id": "3a87de90-7f77-4cad-80a6-11dccb44c58d",
+      "name": "Verificar cambios carpeta n8n",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fcqZlM5tkyqHJJFs",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3f2a98a9-9e92-4e6a-9cbf-d439db20ca1d",
+      "name": "Convertir binario a JSON"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0648c534-0d77-436d-955b-0c255a26e3c6",
+      "name": "Descargar archivo",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fcqZlM5tkyqHJJFs",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.heygen.com/v1/video_status.get?video_id={{ $json.video_id ? $json.video_id : $json.data.id }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Accept\": \"application/json\",\n  \"X-Api-Key\": \"MjU4YjA0OGY4Y2Y3NGJiNWE2MDQ0MzMzMzY0YTExMDUtMTc1NzUyMzY1Ng==\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        240
+      ],
+      "id": "f9b0e198-b993-44dc-a999-af618f504db4",
+      "name": "HeyGen Verificar disponibilidad"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "43c0de56-f96e-4968-8b3a-bcd636bb434a",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1088,
+        240
+      ],
+      "id": "eb883b08-d321-4f79-81fe-93dc369ce325",
+      "name": "Verificar si el video está listo"
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        512
+      ],
+      "id": "6589e76e-4b36-4215-8721-a3ee23ae7eb3",
+      "name": "Esperar 1 minuto",
+      "webhookId": "2f77a563-0f7b-4c0f-9728-cbd7dcd652f1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2d773666-515c-4527-9fe3-de2b6a623f97",
+              "leftValue": "={{ $json.fileExtension }}",
+              "rightValue": "json",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "07f75409-270b-4b8f-bacd-da9a85d9ee6f",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "dialog",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        96
+      ],
+      "id": "c5ad73cc-ac9d-4893-8398-2e3a4ac2b012",
+      "name": "Verificar si es archivo JSON y es diálogo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75a81078-6573-444b-a94b-5619be76b686",
+              "name": "video_id",
+              "value": "={{ $json.data.video_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        240
+      ],
+      "id": "522af15c-7a7b-4df6-81cc-0ca2a79b03b6",
+      "name": "Obtener ID del video"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.video_url }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Accept\": \"application/json\",\n  \"X-Api-Key\": \"MjU4YjA0OGY4Y2Y3NGJiNWE2MDQ0MzMzMzY0YTExMDUtMTc1NzUyMzY1Ng==\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1296,
+        144
+      ],
+      "id": "23629eac-3d60-47f2-b48b-7922a5ddf8b8",
+      "name": "Descargar video"
+    },
+    {
+      "parameters": {
+        "name": "={{ \"video_\" + $now.format(\"yyyy-MM-dd_HH-mm-ss\") + \".mp4\" }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1eroutKvAU4TaTfZZaPE5IiXQp37jJ6Y0",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1eroutKvAU4TaTfZZaPE5IiXQp37jJ6Y0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1536,
+        144
+      ],
+      "id": "beb92914-5484-4179-9cfb-674922eea6fa",
+      "name": "Guardar en drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fcqZlM5tkyqHJJFs",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "HeyGen Crear Video": {
+      "main": [
+        [
+          {
+            "node": "Obtener ID del video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer texto": {
+      "main": [
+        [
+          {
+            "node": "HeyGen Crear Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar cambios carpeta n8n": {
+      "main": [
+        [
+          {
+            "node": "Verificar si es archivo JSON y es diálogo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convertir binario a JSON": {
+      "main": [
+        [
+          {
+            "node": "Extraer texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar archivo": {
+      "main": [
+        [
+          {
+            "node": "Convertir binario a JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HeyGen Verificar disponibilidad": {
+      "main": [
+        [
+          {
+            "node": "Verificar si el video está listo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar si el video está listo": {
+      "main": [
+        [
+          {
+            "node": "Descargar video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Esperar 1 minuto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Esperar 1 minuto": {
+      "main": [
+        [
+          {
+            "node": "HeyGen Verificar disponibilidad",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar si es archivo JSON y es diálogo": {
+      "main": [
+        [
+          {
+            "node": "Descargar archivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener ID del video": {
+      "main": [
+        [
+          {
+            "node": "HeyGen Verificar disponibilidad",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar video": {
+      "main": [
+        [
+          {
+            "node": "Guardar en drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "aea11620-5358-4d36-bd37-ea5aede7592f",
+  "triggerCount": 0,
+  "tags": []
+}
