@@ -1,9 +1,9 @@
 {
   "createdAt": "2025-10-03T17:00:19.446Z",
-  "updatedAt": "2025-10-03T17:09:21.636Z",
+  "updatedAt": "2025-10-15T19:43:39.487Z",
   "id": "PltwlU6hkXZaBxEB",
   "name": "BackupWorkflows",
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
@@ -399,12 +399,16 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "staticData": null,
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
   "meta": {
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
   "versionId": "21e07542-3a17-40f4-837a-f9746baa5140",
-  "triggerCount": 0,
+  "triggerCount": 1,
   "tags": []
 }
