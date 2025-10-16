@@ -1,0 +1,687 @@
+{
+  "createdAt": "2025-10-02T21:54:59.249Z",
+  "updatedAt": "2025-10-04T23:47:48.525Z",
+  "id": "0lQG8r65OZW1eadd",
+  "name": "Clasificador de Leads (Platzy-1)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "=6957598767",
+        "text": "=Hola equipo, buenas noticias\n\nNombre: {{ $('Normalizar datos').item.json.nombre }}\nEmail: {{ $('Normalizar datos').item.json.email }}\nMensaje: {{ $('Normalizar datos').item.json.mensaje }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0829dfdb-66b8-48d5-aa20-2d6c6ce4ce02",
+      "name": "Send a text message",
+      "webhookId": "27b93f72-f76c-4566-aebb-8ea6fefa82c4"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Normalizar datos').item.json.email }}",
+        "subject": "Gracias",
+        "message": "=Hola {{ $('Normalizar datos').item.json.nombre }}\n\nGracias por su interes, aquí tiene la información \n\nhttps://www.virtualpro.co",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "c370f305-c3c3-426d-9f07-c4f7afc8e0c7",
+      "name": "Send a message",
+      "webhookId": "0dc1d4a2-ede0-4e29-a985-4c54a7d674d7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Normalizar datos').item.json.mensaje }}",
+        "options": {
+          "systemMessage": "cataloga este mensaje en una de destas opción: info, demo, compra y soporte.\n\nLa respuesta tiene que user una categoría en minúscula"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -640,
+        384
+      ],
+      "id": "e230e248-a482-4440-bccc-9fc02861f380",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        608
+      ],
+      "id": "c0a4bdd2-1d98-4788-8ef6-8507c36fc0ab",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "sendTo": "=ferney.rojas@lugnia.com",
+        "subject": "Gracias",
+        "message": "=<html>\n\n<body>\n<h1>Lugnia</h1>\n{{ $json.output }}\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        480
+      ],
+      "id": "6c143101-a34d-4c51-b303-32e01678caf4",
+      "name": "Send a message1",
+      "webhookId": "0dc1d4a2-ede0-4e29-a985-4c54a7d674d7"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $('Normalizar datos').item.json.mensaje }}",
+        "options": {
+          "categories": "Positive, Negative"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1.1,
+      "position": [
+        -64,
+        384
+      ],
+      "id": "c9ec5294-1d15-40b0-bcec-e9e41c55aafb",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "chatId": "=6957598767",
+        "text": "=Hola equipo, atender la siguiente petición\n\nNombre: {{ $('Normalizar datos').item.json.nombre }}\nEmail: {{ $('Normalizar datos').item.json.email }}\nMensaje: {{ $('Normalizar datos').item.json.mensaje }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        288
+      ],
+      "id": "1149d06e-4ee7-4571-98ae-d99c2b72bc2b",
+      "name": "Send a text message1",
+      "webhookId": "27b93f72-f76c-4566-aebb-8ea6fefa82c4"
+    },
+    {
+      "parameters": {
+        "chatId": "=6957598767",
+        "text": "=Hola equipo, Se ha hecho una venta\n\nNombre: {{ $('Normalizar datos').item.json.nombre }}\nEmail: {{ $('Normalizar datos').item.json.email }}\nMensaje: {{ $('Normalizar datos').item.json.mensaje }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        768
+      ],
+      "id": "6bab8786-bcf9-4117-a6ef-d6193ad35bb2",
+      "name": "Send a text message2",
+      "webhookId": "27b93f72-f76c-4566-aebb-8ea6fefa82c4"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Normalizar datos').item.json.email }}",
+        "subject": "Bienvenido a nuestro servicio",
+        "message": "=Hola {{ $('Normalizar datos').item.json.nombre }}\n\nGracias por su intere\n\nhttps://www.virtualpro.co",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        576
+      ],
+      "id": "8cf603f4-204d-495b-9c62-17709a9334e3",
+      "name": "Send a message2",
+      "webhookId": "0dc1d4a2-ede0-4e29-a985-4c54a7d674d7"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        352,
+        768
+      ],
+      "id": "3dde89a8-bc15-437e-8cfd-f55a0d40d213",
+      "name": "Wait",
+      "webhookId": "cc6c6e73-b665-4e44-9f54-06ef3a5fa7a5"
+    },
+    {
+      "parameters": {
+        "chatId": "=6957598767",
+        "text": "=Hola equipo, No olvidar el seguimiento",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        768
+      ],
+      "id": "4f962fb2-0e98-432e-9ad7-adecddd7ebee",
+      "name": "Send a text message3",
+      "webhookId": "27b93f72-f76c-4566-aebb-8ea6fefa82c4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Normalizar datos').item.json.mensaje }}",
+        "options": {
+          "systemMessage": "Genera una respuesta en modo texto html que solucione el problema del cliente. Si es genérico, preguntale como le podemos ayudar y que dé más detalles"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        480
+      ],
+      "id": "0935f2d9-b420-4eb1-a12b-cfe7a3da305b",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1cgHPNtp8FWm0qilzMqMbxwglnfboNPe1d7C92RqRmkU",
+          "mode": "list",
+          "cachedResultName": "Soporte N8N",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cgHPNtp8FWm0qilzMqMbxwglnfboNPe1d7C92RqRmkU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cgHPNtp8FWm0qilzMqMbxwglnfboNPe1d7C92RqRmkU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nombre": "={{ $('Normalizar datos').item.json.nombre }}",
+            "mensaje": "={{ $('Normalizar datos').item.json.mensaje }}",
+            "email": "={{ $('Normalizar datos').item.json.email }}",
+            "fecha": "={{ $('Trigger formulario').item.json.submittedAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        864,
+        480
+      ],
+      "id": "88234946-bc54-47c0-bc69-0ff8ca1b1c9f",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -1312,
+        384
+      ],
+      "id": "cc030e87-8d1e-49c7-8514-bdce33dcab99",
+      "name": "Trigger formulario",
+      "webhookId": "d21b90d9-3ea8-4e8b-ac95-1ef816eac8a5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6bbdf56-0f92-4181-bf48-fa2aa1a65c24",
+              "name": "nombre",
+              "value": "={{ $json.Nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "635ef599-4fbc-409c-a891-1c7e55b3063a",
+              "name": "email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "3a8702d9-2dfc-43e8-8758-e4dc46eb9609",
+              "name": "mensaje",
+              "value": "={{ $json.Mensaje }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        384
+      ],
+      "id": "48453091-adb4-4b29-ab75-a0123545177f",
+      "name": "Normalizar datos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b2ca254a-d03c-487d-824a-3e606706892a",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "@platzi",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -864,
+        384
+      ],
+      "id": "90f01c0c-662a-45f4-a422-942f5d6a408b",
+      "name": "Excluir Platzy"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "demo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7bf349e4-8351-476f-85d6-0a20881a99d7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "demo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d0b48287-b09b-4eda-b631-fb1fa9224b06",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "info",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "info"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "acea1734-069b-4753-8e1b-66a46ca5f14e",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "soporte",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "soporte"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2e3622fa-266a-4e61-bade-cce205243bf2",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "compra",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "compra"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -288,
+        352
+      ],
+      "id": "38fff21e-3125-4022-8f33-1b02f608df4f",
+      "name": "Ruta por intención"
+    },
+    {
+      "parameters": {
+        "height": 256,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1376,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "2c63d8c7-322e-4580-a921-9c3640958b2e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Filtrar\nFiltro que el correo no se ade el dominio de Platzy",
+        "height": 256,
+        "width": 192,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -912,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "4873e3ee-2066-4ad5-a901-d2182822bc8e",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Ruta por intención",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar datos": {
+      "main": [
+        [
+          {
+            "node": "Excluir Platzy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Excluir Platzy": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ruta por intención": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Trigger formulario": [
+      {
+        "json": {
+          "Nombre": "Ferney",
+          "Email": "ferney.rojas@lugnia.com",
+          "Mensaje": "Hola, me agrada su producto, podrían por favor indicarme como exporto a PDF la práctica de molienda ?",
+          "submittedAt": "2025-09-13T21:09:11.731-05:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "versionId": "4e3fcb25-8b13-4374-b7f7-bb315efcee34",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-10-02T21:54:51.663Z",
+      "updatedAt": "2025-10-02T21:54:51.663Z",
+      "id": "i8WNCqyHUGXOJwNq",
+      "name": "Ventas"
+    }
+  ]
+}
