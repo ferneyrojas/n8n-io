@@ -1,0 +1,154 @@
+{
+  "createdAt": "2025-10-06T16:19:58.719Z",
+  "updatedAt": "2025-10-06T17:04:40.202Z",
+  "id": "9BnnrsYmhRs7gQXx",
+  "name": "Copy Noticias",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -48
+      ],
+      "id": "b18b705f-3f7b-4b8f-a984-af65b0e23f19",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://www.sciencenews.org/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        -48
+      ],
+      "id": "bb5b8b6d-d61c-4df6-b9ef-9a636d6fa228",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "h3[class^=\"featured-secondary__title\"] a",
+              "returnArray": true
+            },
+            {
+              "key": "url",
+              "cssSelector": "h3[class^=\"featured-secondary__title\"] a",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            },
+            {
+              "key": "img",
+              "cssSelector": "a[class^=\"featured-secondary__thumbnail\"] img",
+              "returnValue": "attribute",
+              "attribute": "src",
+              "returnArray": true
+            },
+            {
+              "key": "autor",
+              "cssSelector": "span[class^=\"featured-secondary__byline\"] a",
+              "returnArray": true
+            },
+            {
+              "key": "date",
+              "cssSelector": "time[class^=\"featured-secondary__date\"]",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        -48
+      ],
+      "id": "6f5ceca5-ae8d-4718-9ad8-13bb372fc1a7",
+      "name": "Extarer Elementos Noticias"
+    },
+    {
+      "parameters": {
+        "jsCode": "const {title, url, img, autor, date} = $input.first().json;\n\nconst data = [];\nfor(const index of title.keys()){\n\n  const fecha = new Date(date[index]);\n  const year = fecha.getFullYear();\n  const month = String(fecha.getMonth() + 1).padStart(2, \"0\"); // meses 0-11\n  const day = String(fecha.getDate()).padStart(2, \"0\");\n  const formatted = `${year}-${month}-${day}`;\n  \n  data.push({\n    title: title[index],\n    url: img[index],\n    autor: autor[index],\n    date: formatted\n  })\n}\n\n/*\nconst data = title.map((val, index) => ({\n  title: val,\n  url: img[index],\n  autor: autor[index],\n  date: date[index]\n}));\n*/\n\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -48
+      ],
+      "id": "7a02665e-647d-45bb-8a75-5dcb48a5f62c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "### Agrupar en 1 array los atributos",
+        "height": 240,
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        176,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "83c24323-45b4-4461-ba31-9662f8cac044",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Extarer Elementos Noticias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extarer Elementos Noticias": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "637ce0d1-9185-46a1-9987-b9ec89d96db3",
+  "triggerCount": 0,
+  "tags": []
+}
