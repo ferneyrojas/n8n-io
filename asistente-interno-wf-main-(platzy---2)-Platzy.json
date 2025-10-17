@@ -1,0 +1,515 @@
+{
+  "createdAt": "2025-10-15T13:19:38.321Z",
+  "updatedAt": "2025-10-17T00:56:55.093Z",
+  "id": "LAepEIinoI18IkEQ",
+  "name": "Asistente interno WF Main (Platzy - 2)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "asistente-interno",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        272
+      ],
+      "id": "3744cacc-4449-48d0-95f5-7864e8aabb2b",
+      "name": "Webhook",
+      "webhookId": "1e08def0-c5cd-4bac-87ae-adb2659ce778"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"estado\": \"recibido\",\n  \"usuario\": \"{{ $('Edit Fields').item.json.usuario }}\",\n  \"mensaje\": \"{{ $('Edit Fields').item.json.mensaje }}\",\n  \"prioridad\": \"{{ $('Edit Fields').item.json.prioridad }}\",\n  \"fecha\": \"{{ $('Edit Fields').item.json.fecha }}\",\n  \"flujo\": \"{{ $('Edit Fields').item.json.flujo }}\",\n  \"ejecucion_id\": {{ $('Edit Fields').item.json.ejecucion }},\n  \"categoria\": \"{{ $json.categoria }}\",\n  \"confianza\" : \"{{ $json.confianza }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -160,
+        -144
+      ],
+      "id": "b1a0ce7d-f85a-4928-af32-869de2388017",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "742cb869-6039-4ad5-8b55-142a66282fd5",
+              "name": "usuario",
+              "value": "={{ $json.body.usuario }}",
+              "type": "string"
+            },
+            {
+              "id": "bea18e4a-8e50-40b8-bbfd-a072f45d6c23",
+              "name": "mensaje",
+              "value": "={{ $json.body.mensaje }}",
+              "type": "string"
+            },
+            {
+              "id": "e5fa6981-c620-4675-9e53-d5e0c49cbc58",
+              "name": "prioridad",
+              "value": "={{ $json.body.mensaje.includes(\"urgente\")?\"Alta\":\"Normal\" }}",
+              "type": "string"
+            },
+            {
+              "id": "d2699d9e-18f0-40f5-8ece-b9437b69508f",
+              "name": "fecha",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "6b344a9f-d31c-41b5-9a1f-dab5d82bcfb5",
+              "name": "flujo",
+              "value": "={{ $workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "cc3fa2d9-9207-45fc-9bae-804bd2cc0f38",
+              "name": "ejecucion",
+              "value": "={{ $execution.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        272
+      ],
+      "id": "acaba297-7e28-4bd2-8083-279a2862d9f8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51eba1fd-382f-424b-bae5-648847d621c8",
+              "leftValue": "={{ $json.mensaje }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "54185049-dabd-47a1-8549-988c233ac030",
+              "leftValue": "={{ $json.mensaje.length }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        272
+      ],
+      "id": "5176ab3a-a65b-462c-b637-a72bafb71279",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"estado\": \"error\",\n  \"detalle\": \"Mensaje vacio o demasiado corto\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        512,
+        368
+      ],
+      "id": "53134787-1ef2-4df7-a55e-b8e7ac663996",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "8Mdnf4EgP8oqoffP",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mensaje": "={{ $json.mensaje }}"
+          },
+          "matchingColumns": [
+            "mensaje"
+          ],
+          "schema": [
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        176
+      ],
+      "id": "0097d228-314c-4790-893c-8af48df53b3a",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "it",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91320ed2-6574-4629-a089-822972d7f7b5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IT"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7be0902e-3fb8-464a-b433-6c847632bd49",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "legal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Legal"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "22d2290d-ed2d-4f41-a8ff-d4727f975743",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "facilities",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Facilities"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        144
+      ],
+      "id": "efba29c6-5c32-4a71-84de-27fe0869b008",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "6957598767",
+        "text": "=Solicitud de {{ $('Edit Fields').item.json.usuario }}\nCategoria {{ $json.categoria }}\nMensaje: {{ $('Edit Fields').item.json.mensaje }}\nPrioridad: {{ $('Edit Fields').item.json.prioridad }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        80
+      ],
+      "id": "12f493d0-7b80-41ca-a30a-5653ce5d910b",
+      "name": "Send a text message",
+      "webhookId": "fbcd6989-98ca-42f7-9d87-5f8dc4849b48",
+      "credentials": {
+        "telegramApi": {
+          "id": "rOOSfezTBGWLluyQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "28f4f862-bdc5-80ce-9afa-f420605f788e",
+          "mode": "list",
+          "cachedResultName": "Legal Request",
+          "cachedResultUrl": "https://www.notion.so/28f4f862bdc580ce9afaf420605f788e"
+        },
+        "title": "={{ $('Edit Fields').item.json.ejecucion }} - {{ $('Edit Fields').item.json.usuario }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {},
+            {
+              "key": "Estado|rich_text",
+              "textContent": "En tramite"
+            },
+            {
+              "key": "Fecha|date",
+              "date": "={{ $('Edit Fields').item.json.fecha }}"
+            },
+            {
+              "key": "Mensaje|rich_text",
+              "textContent": "={{ $('Edit Fields').item.json.mensaje }}"
+            },
+            {
+              "key": "Usuario|title",
+              "title": "={{ $('Edit Fields').item.json.usuario }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        272
+      ],
+      "id": "368acae2-5592-4662-bb76-523c8e1b0906",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "HCcFryD2DFLzmkYM",
+          "name": "Notion account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Edit Fields": [
+      {
+        "json": {
+          "usuario": "ferneyrojas@gmail.com",
+          "mensaje": "Quiero que me envies un contrato para llamar a mi abogado y que lo revise",
+          "prioridad": "Normal",
+          "fecha": "2025-10-16T20:19:20.160-04:00",
+          "flujo": "Asistente interno WF Main (Platzy - 2)",
+          "ejecucion": 137
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "hpa.lugnia.com",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+            "content-length": "128",
+            "accept": "*/*",
+            "accept-encoding": "deflate, gzip",
+            "content-type": "application/json",
+            "x-forwarded-for": "64.227.21.251",
+            "x-forwarded-host": "hpa.lugnia.com",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "615e421da338",
+            "x-real-ip": "64.227.21.251"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "usuario": "ferneyrojas@gmail.com",
+            "mensaje": "Quiero que me envies un contrato para llamar a mi abogado y que lo revise"
+          },
+          "webhookUrl": "https://hpa.lugnia.com/webhook-test/asistente-interno",
+          "executionMode": "test"
+        }
+      }
+    ],
+    "If": [
+      {
+        "json": {
+          "usuario": "ferneyrojas@gmail.com",
+          "mensaje": "Quiero que me envies un contrato para llamar a mi abogado y que lo revise",
+          "prioridad": "Normal",
+          "fecha": "2025-10-16T20:19:20.160-04:00",
+          "flujo": "Asistente interno WF Main (Platzy - 2)",
+          "ejecucion": 137
+        }
+      }
+    ],
+    "Execute Workflow": [
+      {
+        "json": {
+          "categoria": "legal",
+          "confianza": "alta"
+        }
+      }
+    ]
+  },
+  "versionId": "695b461f-169d-4a4a-9d7b-29db5525f446",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:07:22.937Z",
+      "updatedAt": "2025-10-16T23:07:22.937Z",
+      "id": "vugXK8hV7SNDYAY1",
+      "name": "Platzy"
+    },
+    {
+      "createdAt": "2025-10-16T23:07:44.513Z",
+      "updatedAt": "2025-10-16T23:07:44.513Z",
+      "id": "0VHKeCbKbkm8xl1K",
+      "name": "Capacitacion"
+    }
+  ]
+}
