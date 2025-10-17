@@ -1,0 +1,82 @@
+{
+  "createdAt": "2025-10-16T14:48:03.725Z",
+  "updatedAt": "2025-10-16T23:14:11.730Z",
+  "id": "6X10p2VMk8oR4uhy",
+  "name": "Generar BV All",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1b6eed6a-e0d0-4045-ba53-13c72921f602",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate/biblioteca",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e4c42af0-0a87-4906-bb0d-c3451a050ec9",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "4290e18d-6439-4df9-ac87-fd407c30606a",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-16T23:06:39.012Z",
+      "updatedAt": "2025-10-16T23:06:39.012Z",
+      "id": "fzfZ6RTJMNdkI8SO",
+      "name": "BV"
+    }
+  ]
+}
