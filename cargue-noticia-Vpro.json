@@ -1,0 +1,188 @@
+{
+  "createdAt": "2025-10-04T23:50:18.639Z",
+  "updatedAt": "2025-10-16T23:11:03.110Z",
+  "id": "akk8b324rRchbxAK",
+  "name": "Cargue noticia",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Noticia",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "url"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "05035406-bd5d-48f4-bcc9-ed6f912d1df7",
+      "name": "On form submission",
+      "webhookId": "3c44d8f9-47b3-43f0-8627-6ece993f41ca"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "title"
+            },
+            {
+              "key": "abstract",
+              "cssSelector": "p[class^=\"header-default__deck\"]"
+            },
+            {
+              "key": "img",
+              "cssSelector": "div[class^=\"header-default__thumbnail\"] img",
+              "returnValue": "attribute",
+              "attribute": "src"
+            },
+            {
+              "key": "content",
+              "cssSelector": "div.rich-text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "2e47d4d2-fecc-4ff6-bf7a-be58e97f2d78",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6582238a-c200-4c51-88a3-8484b25cf56c",
+      "name": "Consultar 1 Noticia"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        528,
+        224
+      ],
+      "id": "4253c9fd-4eb3-4698-b831-c7284d61dd0f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SJ4SD3J6zPU2u06t",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "traduce a español el texto y retornalo en texto plano",
+        "options": {
+          "systemMessage": "={{ $json.title }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "922acafc-193d-40dd-8fc2-e49aa42d19a5",
+      "name": "Traducir titulo"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Consultar 1 Noticia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar 1 Noticia": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Traducir titulo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Traducir titulo",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "62ae3637-167e-4845-812a-fd4ca3547d28",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-16T23:11:00.439Z",
+      "updatedAt": "2025-10-16T23:11:00.439Z",
+      "id": "XvkmlVtGLvLHZM4J",
+      "name": "Noticias"
+    }
+  ]
+}
