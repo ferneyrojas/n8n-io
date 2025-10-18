@@ -1,0 +1,135 @@
+{
+  "createdAt": "2025-10-17T12:36:35.940Z",
+  "updatedAt": "2025-10-17T22:23:56.439Z",
+  "id": "SOkYQbd0Lnx0vio0",
+  "name": "Genera BV",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        64
+      ],
+      "id": "a50f2b69-855d-4bc6-895e-871ff4d7fd68",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=subcategorias",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -32
+      ],
+      "id": "7595cbca-f56d-455c-8552-0b89921c1fd4",
+      "name": "BV SubCategorias"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=categorias",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -32
+      ],
+      "id": "5819e3fe-dc08-4251-883b-9a39cb1b8abc",
+      "name": "BV Categorias"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtMinute": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -128
+      ],
+      "id": "fc1aa662-7d42-4098-a54f-89b47c2ea393",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "BV SubCategorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BV SubCategorias": {
+      "main": [
+        [
+          {
+            "node": "BV Categorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "BV SubCategorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "81b22f86-8c11-4560-9f76-ca58f544e7fd",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-16T23:06:39.012Z",
+      "updatedAt": "2025-10-16T23:06:39.012Z",
+      "id": "fzfZ6RTJMNdkI8SO",
+      "name": "BV"
+    },
+    {
+      "createdAt": "2025-10-17T12:06:39.474Z",
+      "updatedAt": "2025-10-17T12:06:39.474Z",
+      "id": "na6teB8DTwGbGRWQ",
+      "name": "Generacion Json"
+    }
+  ]
+}
