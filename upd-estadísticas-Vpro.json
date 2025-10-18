@@ -1,0 +1,148 @@
+{
+  "createdAt": "2025-10-17T12:01:37.597Z",
+  "updatedAt": "2025-10-17T12:06:53.643Z",
+  "id": "l8fsRgeCJk8CEJ1P",
+  "name": "Upd Estadísticas",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        48
+      ],
+      "id": "82cec14d-b6b2-4338-856d-7cb9db3c388f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=artstats",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -176
+      ],
+      "id": "509b34ef-8eac-475e-a31d-cbe870c48033",
+      "name": "Estadsiticas de Artículos"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=homestats",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "b238948a-7ed0-4932-a79f-49566884b4a9",
+      "name": "Estadisticas de Home"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=paraStats",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        -176
+      ],
+      "id": "d4ee46f5-200c-4d89-b5ee-87a256af5488",
+      "name": "Estadisticas de Inf Universidades"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 11
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -176
+      ],
+      "id": "35854b41-aa8e-4de9-8394-5d13fca79b50",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Estadsiticas de Artículos": {
+      "main": [
+        [
+          {
+            "node": "Estadisticas de Home",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estadisticas de Home": {
+      "main": [
+        [
+          {
+            "node": "Estadisticas de Inf Universidades",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Estadsiticas de Artículos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "25125b1f-e271-4004-967a-fb478db3476f",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-17T12:06:39.474Z",
+      "updatedAt": "2025-10-17T12:06:39.474Z",
+      "id": "na6teB8DTwGbGRWQ",
+      "name": "Generacion Json"
+    }
+  ]
+}
