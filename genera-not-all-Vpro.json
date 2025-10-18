@@ -1,0 +1,104 @@
+{
+  "createdAt": "2025-10-17T22:27:14.843Z",
+  "updatedAt": "2025-10-17T22:28:05.101Z",
+  "id": "Y2T7k3xaxDF7fZNo",
+  "name": "Genera Not All",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        16
+      ],
+      "id": "d5a61adc-7499-4a35-9434-c757b6b55760",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=notall",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -80
+      ],
+      "id": "96123864-64b4-4852-b35e-08263a24b3f7",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -176
+      ],
+      "id": "e1d8b4b6-c3b5-4ea5-bee4-d4ea14c75a6f",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "ec38ca3d-c207-4226-b301-d75110b728f9",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-16T23:11:00.439Z",
+      "updatedAt": "2025-10-16T23:11:00.439Z",
+      "id": "XvkmlVtGLvLHZM4J",
+      "name": "Noticias"
+    }
+  ]
+}
