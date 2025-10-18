@@ -1,0 +1,186 @@
+{
+  "createdAt": "2025-10-17T12:21:04.245Z",
+  "updatedAt": "2025-10-17T12:25:01.253Z",
+  "id": "Zon1xSqjthzavNhb",
+  "name": "Genera catalogos",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0e9f4614-2c51-4783-9c75-e13d5c5dbe61",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 23,
+              "triggerAtMinute": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        192
+      ],
+      "id": "3c9abb29-9508-46d1-b000-32e79dbe7861",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=catalogosLib",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        96
+      ],
+      "id": "01919c4a-3e5f-432b-ae0d-c70a72888f34",
+      "name": "Catalogo libros"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=catalogosShow",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        96
+      ],
+      "id": "42f6f60e-60c3-412b-b2e9-0f2b077cb0cf",
+      "name": "Catalogo Showroom"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=catalogosLab",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        96
+      ],
+      "id": "cb43b532-e1f4-4c73-9630-8f11c53b82de",
+      "name": "Catalogo Labs"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=catalogosInfo",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        96
+      ],
+      "id": "38c4ad6a-487c-4956-afae-3da5c30c3ca0",
+      "name": "Catalogo Infos"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Catalogo libros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Catalogo libros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catalogo libros": {
+      "main": [
+        [
+          {
+            "node": "Catalogo Showroom",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catalogo Showroom": {
+      "main": [
+        [
+          {
+            "node": "Catalogo Labs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catalogo Labs": {
+      "main": [
+        [
+          {
+            "node": "Catalogo Infos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "44c910a5-224a-474b-9f72-9aa09187301c",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-17T12:06:39.474Z",
+      "updatedAt": "2025-10-17T12:06:39.474Z",
+      "id": "na6teB8DTwGbGRWQ",
+      "name": "Generacion Json"
+    },
+    {
+      "createdAt": "2025-10-17T12:22:24.898Z",
+      "updatedAt": "2025-10-17T12:22:24.898Z",
+      "id": "nXUQGvlry7UfNrof",
+      "name": "Catalogos"
+    }
+  ]
+}
