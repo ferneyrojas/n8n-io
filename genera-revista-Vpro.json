@@ -1,0 +1,154 @@
+{
+  "createdAt": "2025-10-17T12:08:27.320Z",
+  "updatedAt": "2025-10-17T12:18:56.386Z",
+  "id": "RsN9GPEZq2ZzKMUx",
+  "name": "Genera revista",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "29a62c78-6b80-4cee-bf1b-42a906196832",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=catalogos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "3c9799fe-0324-4deb-baf3-0b0500b443b6",
+      "name": "Catalogos"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=revistas",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "a929df83-8f5d-49d6-88d2-7f319cb34a20",
+      "name": "Revistas"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=revistasheader",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        -96
+      ],
+      "id": "fe1d5fec-ff7f-4794-8aa3-648f500610e3",
+      "name": "Revistas Header"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 23
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        -192
+      ],
+      "id": "37feb365-5274-4299-89b2-b79968297a5c",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Revistas Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revistas": {
+      "main": [
+        [
+          {
+            "node": "Catalogos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revistas Header": {
+      "main": [
+        [
+          {
+            "node": "Revistas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Revistas Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "f5bb0406-26d3-47ac-8283-3507af24d952",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-17T12:06:39.474Z",
+      "updatedAt": "2025-10-17T12:06:39.474Z",
+      "id": "na6teB8DTwGbGRWQ",
+      "name": "Generacion Json"
+    }
+  ]
+}
