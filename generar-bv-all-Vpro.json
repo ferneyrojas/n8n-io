@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-16T14:48:03.725Z",
-  "updatedAt": "2025-10-16T23:14:11.730Z",
+  "updatedAt": "2025-10-17T12:07:15.745Z",
   "id": "6X10p2VMk8oR4uhy",
   "name": "Generar BV All",
   "active": true,
@@ -11,7 +11,7 @@
         "rule": {
           "interval": [
             {
-              "daysInterval": 3
+              "daysInterval": 2
             }
           ]
         }
@@ -37,7 +37,8 @@
         0
       ],
       "id": "e4c42af0-0a87-4906-bb0d-c3451a050ec9",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -58,12 +59,14 @@
   },
   "staticData": {
     "node:Schedule Trigger": {
-      "recurrenceRules": []
+      "recurrenceRules": [
+        290
+      ]
     }
   },
   "meta": null,
   "pinData": {},
-  "versionId": "4290e18d-6439-4df9-ac87-fd407c30606a",
+  "versionId": "7393ea7d-bd78-4187-b393-0db1c27d602d",
   "triggerCount": 1,
   "tags": [
     {
@@ -77,6 +80,12 @@
       "updatedAt": "2025-10-16T23:06:39.012Z",
       "id": "fzfZ6RTJMNdkI8SO",
       "name": "BV"
+    },
+    {
+      "createdAt": "2025-10-17T12:06:39.474Z",
+      "updatedAt": "2025-10-17T12:06:39.474Z",
+      "id": "na6teB8DTwGbGRWQ",
+      "name": "Generacion Json"
     }
   ]
 }
