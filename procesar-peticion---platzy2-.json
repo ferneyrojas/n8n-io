@@ -1,0 +1,542 @@
+{
+  "createdAt": "2025-10-18T02:02:05.926Z",
+  "updatedAt": "2025-10-18T02:02:05.926Z",
+  "id": "9g7gIPiVA73Aqss6",
+  "name": "Procesar-peticion - Platzy2",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1C1W6bNEqo8O34ztZA0En-sRgHLSpY_KwuFa9EW2-lhg",
+          "mode": "list",
+          "cachedResultName": "N8N - test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C1W6bNEqo8O34ztZA0En-sRgHLSpY_KwuFa9EW2-lhg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C1W6bNEqo8O34ztZA0En-sRgHLSpY_KwuFa9EW2-lhg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "usuario",
+              "displayName": "usuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        960,
+        880
+      ],
+      "id": "dcb490ea-5232-4135-b7ed-76bb71d92f3a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hoomMsbe86TuHEgC",
+          "name": "Google Sheets - ferneyrojas@gmail.com"
+        }
+      },
+      "issues": {}
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "ferneyrojas@gmail.com",
+        "subject": "hola",
+        "emailType": "html",
+        "message": "={{ $('Start').item.json.mensaje }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        688
+      ],
+      "id": "ca25fdec-2361-46a9-a539-50c1105b3dfd",
+      "name": "Gmail",
+      "webhookId": "767858c4-6978-408f-8115-9c2ac84cce4f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "oevFrYBN2i94SId7",
+          "name": "Gmail - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "it",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91320ed2-6574-4629-a089-822972d7f7b5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IT"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7be0902e-3fb8-464a-b433-6c847632bd49",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "legal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Legal"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "22d2290d-ed2d-4f41-a8ff-d4727f975743",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "facilities",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Facilities"
+            }
+          ]
+        },
+        "looseTypeValidation": false,
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        560
+      ],
+      "id": "efba29c6-5c32-4a71-84de-27fe0869b008",
+      "name": "Switch x Categoría"
+    },
+    {
+      "parameters": {
+        "notionNotice": "",
+        "Credentials": "",
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": {
+          "__rl": true,
+          "value": "28f4f862-bdc5-80ce-9afa-f420605f788e",
+          "mode": "list",
+          "cachedResultName": "Legal Request",
+          "cachedResultUrl": "https://www.notion.so/28f4f862bdc580ce9afaf420605f788e"
+        },
+        "title": "={{ $('Start').item.json.ejecucion }} - {{ $('Start').item.json.usuario }}",
+        "simple": true,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Estado|rich_text",
+              "type": "={{$parameter[\"&key\"].split(\"|\")[1]}}",
+              "title": "",
+              "richText": false,
+              "textContent": "En tramite",
+              "text": {},
+              "phoneValue": "",
+              "multiSelectValue": [],
+              "selectValue": "",
+              "statusValue": "",
+              "emailValue": "",
+              "ignoreIfEmpty": false,
+              "urlValue": "",
+              "peopleValue": [],
+              "relationValue": [],
+              "checkboxValue": false,
+              "numberValue": 0,
+              "range": false,
+              "includeTime": true,
+              "date": "",
+              "timezone": "default",
+              "fileUrls": {}
+            },
+            {
+              "key": "Fecha|date",
+              "type": "={{$parameter[\"&key\"].split(\"|\")[1]}}",
+              "title": "",
+              "richText": false,
+              "textContent": "",
+              "text": {},
+              "phoneValue": "",
+              "multiSelectValue": [],
+              "selectValue": "",
+              "statusValue": "",
+              "emailValue": "",
+              "ignoreIfEmpty": false,
+              "urlValue": "",
+              "peopleValue": [],
+              "relationValue": [],
+              "checkboxValue": false,
+              "numberValue": 0,
+              "range": false,
+              "includeTime": true,
+              "date": "={{ $('Start').item.json.fecha }}",
+              "timezone": "default",
+              "fileUrls": {}
+            },
+            {
+              "key": "Mensaje|rich_text",
+              "type": "={{$parameter[\"&key\"].split(\"|\")[1]}}",
+              "title": "",
+              "richText": false,
+              "textContent": "={{ $('Start').item.json.mensaje }}",
+              "text": {},
+              "phoneValue": "",
+              "multiSelectValue": [],
+              "selectValue": "",
+              "statusValue": "",
+              "emailValue": "",
+              "ignoreIfEmpty": false,
+              "urlValue": "",
+              "peopleValue": [],
+              "relationValue": [],
+              "checkboxValue": false,
+              "numberValue": 0,
+              "range": false,
+              "includeTime": true,
+              "date": "",
+              "timezone": "default",
+              "fileUrls": {}
+            },
+            {
+              "key": "Usuario|title",
+              "type": "={{$parameter[\"&key\"].split(\"|\")[1]}}",
+              "title": "={{ $('Start').item.json.usuario }}",
+              "richText": false,
+              "textContent": "",
+              "text": {},
+              "phoneValue": "",
+              "multiSelectValue": [],
+              "selectValue": "",
+              "statusValue": "",
+              "emailValue": "",
+              "ignoreIfEmpty": false,
+              "urlValue": "",
+              "peopleValue": [],
+              "relationValue": [],
+              "checkboxValue": false,
+              "numberValue": 0,
+              "range": false,
+              "includeTime": true,
+              "date": "",
+              "timezone": "default",
+              "fileUrls": {}
+            }
+          ]
+        },
+        "blockUi": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        496
+      ],
+      "id": "368acae2-5592-4662-bb76-523c8e1b0906",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "HCcFryD2DFLzmkYM",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1184,
+        496
+      ],
+      "id": "081ed59f-1de0-4efb-a34e-97d42988cf08",
+      "name": "Ver quien respondió",
+      "disabled": false,
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7849a7d1-256d-441f-9f36-f8538e0ab62b",
+              "name": "=resolutor",
+              "value": "={{ $prevNode.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "6957598767",
+        "text": "=Solicitud de {{ $('Start').item.json.usuario }}\nCategoria {{ $json.categoria }}\nMensaje: {{ $('Start').item.json.mensaje }}\nPrioridad: {{ $('Start').item.json.prioridad }}",
+        "replyMarkup": "none",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        304
+      ],
+      "id": "12f493d0-7b80-41ca-a30a-5653ce5d910b",
+      "name": "Telegram",
+      "webhookId": "fbcd6989-98ca-42f7-9d87-5f8dc4849b48",
+      "credentials": {
+        "telegramApi": {
+          "id": "rOOSfezTBGWLluyQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "ee4d684e-464e-4eff-a36b-fb6dac84de9a",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        528,
+        560
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "prioridad",
+              "type": "any"
+            },
+            {
+              "name": "usuario",
+              "type": "any"
+            },
+            {
+              "name": "mensaje",
+              "type": "any"
+            },
+            {
+              "name": "ejecucion",
+              "type": "any"
+            },
+            {
+              "name": "fecha",
+              "type": "any"
+            },
+            {
+              "name": "categoria",
+              "type": "any"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Ver quien respondió",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Ver quien respondió",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Ver quien respondió",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Ver quien respondió",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch x Categoría": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ver quien respondió": {
+      "main": [
+        []
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Switch x Categoría",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "6d758a5d-c6b8-459d-a47e-0283e0b497e7",
+  "triggerCount": 0,
+  "tags": []
+}
