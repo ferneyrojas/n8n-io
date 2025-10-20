@@ -1,0 +1,389 @@
+{
+  "createdAt": "2025-10-20T03:17:22.934Z",
+  "updatedAt": "2025-10-20T03:17:22.934Z",
+  "id": "TklBRIvfwiWsjNoE",
+  "name": "My workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5e59479d-dc52-437f-b876-8084c95835af"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "tema"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Input Tema",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "notesInFlow": true,
+      "id": "106f3140-f1c4-4bfb-ae1a-821a08e501a0",
+      "notes": "Aquí escribe manualmente el tema del showroom antes de avanzar"
+    },
+    {
+      "parameters": {},
+      "name": "OpenAI Generar Estructura",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ],
+      "id": "37ba2ec5-32b8-4759-81ff-e5cec2413f9e"
+    },
+    {
+      "parameters": {
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/contenido",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "name": "Crear Contenido",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        608,
+        0
+      ],
+      "id": "5f003260-26d3-4aa2-a693-33d47599fcbd"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { contenidoId: $json[\"con_id\"] } }];"
+      },
+      "name": "Set Contenido ID",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "a053f34c-0daf-46e3-9abb-8c0944915b7b"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Split Tabs",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "19279356-be9f-41d5-8439-9d72124adb18"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { tabNombre: $json[\"item\"][\"nombre\"], detalles: $json[\"item\"][\"detalles\"], contenidoId: $json[\"contenidoId\"] } }];"
+      },
+      "name": "Set Tab Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "ff1f0e2e-253b-4cbd-9feb-52acb4d5cbb1"
+    },
+    {
+      "parameters": {
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/contenidoTab",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "name": "Crear Tab",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        0
+      ],
+      "id": "0f8e5d71-45dd-43ed-8286-3266e484eab4"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { contenidoId: $json[\"contenidoId\"], tabId: $json[\"cot_id\"], detalles: $json[\"detalles\"] } }];"
+      },
+      "name": "Set Tab ID y Detalles",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        0
+      ],
+      "id": "7f005e70-3a20-47bd-9ccf-26f5d503a24e"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Split Detalles",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        0
+      ],
+      "id": "219cbcd1-cd26-4eef-8f7f-cfc6945345d0"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { contenidoId: $json[\"contenidoId\"], tabId: $json[\"tabId\"], title: $json[\"item\"][\"title\"], text: $json[\"item\"][\"text\"] } }];"
+      },
+      "name": "Set Detalle Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        0
+      ],
+      "id": "2b3d3ccc-59c2-4200-854f-4c6d918f4aff"
+    },
+    {
+      "parameters": {
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/contenidoDetalle",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "name": "Crear Detalle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        2208,
+        0
+      ],
+      "id": "c0e2718e-7876-4dd5-b3ff-83e48085299f"
+    },
+    {
+      "parameters": {
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/showRoom",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "name": "Crear Showroom",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        0
+      ],
+      "id": "86df27d1-52f9-4247-8e27-57dbdb210001"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { showroomId: $json[\"pra_id\"], contenidoId: $json[\"contenidoId\"] } }];"
+      },
+      "name": "Set Showroom ID",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        0
+      ],
+      "id": "a4063060-fe31-4354-9183-b6c69afa3101"
+    },
+    {
+      "parameters": {
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/showRoom/{{$json[\"showroomId\"]}}",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "name": "Asociar Contenido al Showroom",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        0
+      ],
+      "id": "5fe307b7-631a-450d-bd5b-0a95130f66da"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { mensaje: \"Showroom creado con éxito\", tema: $json[\"tema\"], contenidoId: $json[\"contenidoId\"], showroomId: $json[\"showroomId\"] } }];"
+      },
+      "name": "Resumen Final",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        3008,
+        0
+      ],
+      "id": "6cd37054-fa36-4acc-8d6b-8d2481f01356"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Input Tema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Contenido": {
+      "main": [
+        [
+          {
+            "node": "Set Contenido ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Contenido ID": {
+      "main": [
+        [
+          {
+            "node": "Split Tabs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Tabs": {
+      "main": [
+        [
+          {
+            "node": "Set Tab Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Tab Data": {
+      "main": [
+        [
+          {
+            "node": "Crear Tab",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Tab": {
+      "main": [
+        [
+          {
+            "node": "Set Tab ID y Detalles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Tab ID y Detalles": {
+      "main": [
+        [
+          {
+            "node": "Split Detalles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Detalles": {
+      "main": [
+        [
+          {
+            "node": "Set Detalle Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Detalle Data": {
+      "main": [
+        [
+          {
+            "node": "Crear Detalle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Detalle": {
+      "main": [
+        [
+          {
+            "node": "Crear Showroom",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Showroom": {
+      "main": [
+        [
+          {
+            "node": "Set Showroom ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Showroom ID": {
+      "main": [
+        [
+          {
+            "node": "Asociar Contenido al Showroom",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asociar Contenido al Showroom": {
+      "main": [
+        [
+          {
+            "node": "Resumen Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "04320401-9b51-480a-869d-8c431878beb9",
+  "triggerCount": 0,
+  "tags": []
+}
