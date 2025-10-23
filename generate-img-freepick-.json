@@ -1,0 +1,303 @@
+{
+  "createdAt": "2025-10-21T12:25:18.619Z",
+  "updatedAt": "2025-10-21T12:25:18.619Z",
+  "id": "yeRRCEJ8M1feSGNC",
+  "name": "Generate Img Freepick",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "be2f759f-956b-4af9-87b2-423a14974901",
+      "name": "Start Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -64,
+        848
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {}
+      },
+      "id": "acca0e34-84db-49df-bdfd-609b646403eb",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        1456,
+        752
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.freepik.com/v1/ai/text-to-image",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $json.Prompt }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d1830f9a-d9f9-48c5-ab64-d8370508de90",
+      "name": "Create Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        944,
+        752
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "id": "a3cb66d7-ff4e-406d-9f43-423bc62b96e2",
+      "name": "Split Responses",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        1216,
+        752
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "name": "=Image - {{ $('Get Prompt from Google Sheet').item.json.Name }} - {{ $('Double Output').item.json.run }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive",
+          "cachedResultName": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1TnDibwPPPUm3VbmETiqWDVhtaUTLJ6mn",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1TnDibwPPPUm3VbmETiqWDVhtaUTLJ6mn",
+          "cachedResultName": "n8n workflows"
+        },
+        "options": {}
+      },
+      "id": "fb3fba72-6669-4127-84db-50b6310b5462",
+      "name": "Upload Image to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        1712,
+        800
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1_u9IxEZINcwKQB15Rfx7C1hM71zeDST58Fz3nRHTCUY",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_u9IxEZINcwKQB15Rfx7C1hM71zeDST58Fz3nRHTCUY/edit?usp=drivesdk",
+          "cachedResultName": "freepik prompts"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_u9IxEZINcwKQB15Rfx7C1hM71zeDST58Fz3nRHTCUY/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "options": {}
+      },
+      "id": "d951d92b-0e28-4ac6-8615-0bd9b4b42bda",
+      "name": "Get Prompt from Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        128,
+        720
+      ],
+      "typeVersion": 4.7
+    },
+    {
+      "parameters": {
+        "jsCode": "const original = items[0].json;\n\nreturn [\n  { json: { ...original, run: 1 } },\n  { json: { ...original, run: 2 } },\n];\n"
+      },
+      "id": "5b3223bd-e7ae-44c8-a943-28b22b13e0fa",
+      "name": "Double Output",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        304,
+        864
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "27c65644-fa9f-4836-92e9-7d65c24aaade",
+      "name": "Loop",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        624,
+        768
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "content": "## 📬 Need Help or Want to Customize This?\n📧 [robert@ynteractive.com](mailto:robert@ynteractive.com)  \n🔗 [LinkedIn](https://www.linkedin.com/in/robert-breen-29429625/)",
+        "width": 2032
+      },
+      "id": "4d8df01f-a148-4b72-860c-7fc2ec760154",
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        -16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "\n#### Node Configuration Details:\n\n##### Start Workflow (Manual Trigger)\n- No configuration needed\n- Used to manually start the workflow\n\n##### Get Prompt from Google Sheet (Google Sheets)\n- **Document ID**: Your Google Sheet ID (from Step 3)\n- **Sheet Name**: `Sheet1` (or your sheet name)\n- **Operation**: Read\n- **Credentials**: Select your \"Google Sheets account\"\n\n##### Double Output (Code Node)\n- **Purpose**: Creates multiple variations of each prompt\n- **JavaScript Code**:\n```javascript\nconst original = items[0].json;\n\nreturn [\n  { json: { ...original, run: 1 } },\n  { json: { ...original, run: 2 } },\n];\n```\nGoogle sheet to copy: https://docs.google.com/spreadsheets/d/1_u9IxEZINcwKQB15Rfx7C1hM71zeDST58Fz3nRHTCUY/edit?usp=sharing",
+        "height": 860,
+        "width": 600,
+        "color": 5
+      },
+      "id": "7d45b945-fb5e-4944-a450-9b0c50c63f23",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "##### Create Image (HTTP Request)\n- **Method**: `POST`\n- **URL**: `https://api.freepik.com/v1/ai/text-to-image`\n- **Authentication**: Generic → HTTP Header Auth\n- **Credentials**: Select your \"Header Auth account\"\n- **Send Body**: `true`\n- **Body Parameters**:\n  - **Name**: `prompt`\n  - **Value**: `={{ $json.Prompt }}`\n\n##### Split Responses (Split Out)\n- **Field to Split Out**: `data`\n- **Purpose**: Separates multiple images from API response\n\n##### Convert to File (Convert to File)\n- **Operation**: `toBinary`\n- **Source Property**: `base64`\n- **Purpose**: Converts base64 image data to file format\n\n##### Upload Image to Google Drive (Google Drive)\n- **Operation**: Upload\n- **Name**: `=Image - {{ $('Get Prompt from Google Sheet').item.json.Name }} - {{ $('Double Output').item.json.run }}`\n- **Drive ID**: `My Drive`\n- **Folder ID**: Your Google Drive folder ID (from Step 4)\n- **Credentials**: Select your \"Google Drive account\"",
+        "height": 860,
+        "width": 1400,
+        "color": 6
+      },
+      "id": "7b38d071-b87c-4fe4-a2d1-c2d053e109db",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        496,
+        160
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Loop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Create Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Image": {
+      "main": [
+        [
+          {
+            "node": "Split Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Double Output": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Prompt from Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Upload Image to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Responses": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Prompt from Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Double Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "9a6aa113-82d0-448a-8df2-0fc2d552d6a4",
+  "triggerCount": 0,
+  "tags": []
+}
