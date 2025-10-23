@@ -1,0 +1,499 @@
+{
+  "createdAt": "2025-10-21T12:28:13.508Z",
+  "updatedAt": "2025-10-21T19:36:35.171Z",
+  "id": "yxQElu4tFsdqleRe",
+  "name": "validarDocBV",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1296,
+        -288
+      ],
+      "id": "7d2f1a88-5900-45a0-a3ed-ab2b30391a46",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "content": "## Validar Docs BV\nEste WorkFlow consulta documentos de la BV de VPro por el campo citación. Valida que los PDF estén en la ruta adecuada, sino es así intenta traerlos desde otra ruta (fecha de publicacion) y enviarlos a la carpeta de la Edición de la citación.",
+        "width": 368,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        608,
+        -576
+      ],
+      "typeVersion": 1,
+      "id": "a025f7d5-9c75-4ec6-9fa2-77637348c709",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        624,
+        -288
+      ],
+      "id": "71909729-def9-426d-8d83-e779f17ee0eb",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "content": "Establecer el perido a procesar",
+        "height": 256,
+        "width": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        816,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "9e0c89fb-0756-459a-bd95-0e9030504e9e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9fa434a3-6795-4271-9fc9-36c2eb2ae852",
+              "name": "periodo",
+              "value": "2023-10-01",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        848,
+        -288
+      ],
+      "id": "427162a4-e229-4400-86b2-94f6cbea0134",
+      "name": "SetPeriodo"
+    },
+    {
+      "parameters": {
+        "content": "Consultar Registros del periodo",
+        "height": 256,
+        "width": 160,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1040,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "3f03ad62-5a7a-42d9-926e-11219f3efa1b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://polifoniaeditores.com/v/verbo7api/public/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\"+ $json.periodo}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1072,
+        -288
+      ],
+      "id": "78930d23-ae0b-4f02-80dc-04b6d063db2e",
+      "name": "Consultar-Registros"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "216cdcb8-48d5-4ce0-9e82-529e5f383d53",
+              "name": "bv_dc_archivo",
+              "value": "={{ $json.bv_dc_archivo }}",
+              "type": "string"
+            },
+            {
+              "id": "4f609827-11d7-409f-a636-8202684c0f11",
+              "name": "bv_fecha_publicacion",
+              "value": "={{ $json.bv_fecha_publicacion }}",
+              "type": "string"
+            },
+            {
+              "id": "dcb04409-2eb9-4504-9a14-641ff80f0b6c",
+              "name": "bv_dc_citacion",
+              "value": "={{ $json.bv_dc_citacion }}",
+              "type": "string"
+            },
+            {
+              "id": "a4046248-6efa-4f24-93de-5933b9671819",
+              "name": "bv_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        -432
+      ],
+      "id": "577a0e5c-a9f0-480e-b60f-d0104a406c65",
+      "name": "Set-Variables"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2e63f1cb-59da-4e06-accf-60cb731d56c6",
+              "name": "url",
+              "value": "={{ \"https://bucketvirtualpro-private.s3.amazonaws.com/files-bv/\"+$json.bv_dc_citacion.replaceAll(\"-\",\"\")+\"/\"+$json.bv_dc_archivo }}",
+              "type": "string"
+            },
+            {
+              "id": "c6b1904e-a311-4eac-bbc6-479dfa161eee",
+              "name": "urlDocsBV",
+              "value": "={{ \"https://bucketvirtualpro-private.s3.us-east-1.amazonaws.com/files-bv/docs-bv/\"+ $json.bv_fecha_publicacion.replaceAll('-', '').substring(0,6) +\"/\" + $json.bv_dc_archivo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1744,
+        -432
+      ],
+      "id": "2137265f-9c4a-45f3-aa0d-0a25a635460d",
+      "name": "Armar-URLs"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1968,
+        -432
+      ],
+      "id": "a618ed24-e4b7-4b5e-8f5c-4795eabff257",
+      "name": "ConsultarDocumento",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6fd9d4df-1779-4b61-8a5c-3125df39b946",
+              "leftValue": "={{ $json.error.status }}",
+              "rightValue": 403,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2192,
+        -432
+      ],
+      "id": "6dbce43a-0c3b-4ad8-ab49-11620b6370f3",
+      "name": "Validar-Archivo-Existe",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "Consultar el PDF para validar si existe o no",
+        "height": 240,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1904,
+        -512
+      ],
+      "typeVersion": 1,
+      "id": "5f32fa66-38ac-4bc0-9a9f-9d99d4caeb7c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "Consultar el archivo en otro directorio y cargarlo",
+        "height": 256,
+        "width": 192,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2368,
+        -528
+      ],
+      "typeVersion": 1,
+      "id": "4289956e-882b-4521-9466-30d9286f2656",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Armar-URLs').item.json.urlDocsBV }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2416,
+        -432
+      ],
+      "id": "9df7e972-c65b-4007-83b7-56e5e758f9b5",
+      "name": "Consultar-Documento-DocsBV",
+      "alwaysOutputData": true,
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "content": "Enviar el archivo a S3 vía End point de Verbo8",
+        "height": 224,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2576,
+        -432
+      ],
+      "typeVersion": 1,
+      "id": "384d0e85-1331-405f-9890-36a9b710640a",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "No Ejecutar todos los registros sino procesar de a 1. **Sin esto se puede bloquear.**",
+        "height": 256,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "883726e8-d010-43c2-b92d-c4085a17e876",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ \"https://polifoniaeditores.com/v/verbo7api/public/api/bibliotecaVirtual/\"+ $('Set-Variables').item.json.bv_id}}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "bv_dc_archivo",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        -368
+      ],
+      "id": "ac53a501-c0ac-43ff-a00b-3d51f1207aec",
+      "name": "Enviar-PDF-a-S3"
+    }
+  ],
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Set-Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "SetPeriodo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SetPeriodo": {
+      "main": [
+        [
+          {
+            "node": "Consultar-Registros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar-Registros": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set-Variables": {
+      "main": [
+        [
+          {
+            "node": "Armar-URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar-URLs": {
+      "main": [
+        [
+          {
+            "node": "ConsultarDocumento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConsultarDocumento": {
+      "main": [
+        [
+          {
+            "node": "Validar-Archivo-Existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar-Archivo-Existe": {
+      "main": [
+        [
+          {
+            "node": "Consultar-Documento-DocsBV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar-Documento-DocsBV": {
+      "main": [
+        [
+          {
+            "node": "Enviar-PDF-a-S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar-PDF-a-S3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "50a31957-98b9-4c61-bc69-518dc6859ccc",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-16T23:06:39.012Z",
+      "updatedAt": "2025-10-16T23:06:39.012Z",
+      "id": "fzfZ6RTJMNdkI8SO",
+      "name": "BV"
+    },
+    {
+      "createdAt": "2025-10-21T19:34:19.514Z",
+      "updatedAt": "2025-10-21T19:34:19.514Z",
+      "id": "A2fuqdm1WL8dLRtP",
+      "name": "Revista"
+    }
+  ]
+}
