@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-03T17:00:19.446Z",
-  "updatedAt": "2025-10-16T23:15:33.782Z",
+  "updatedAt": "2025-10-21T19:40:47.078Z",
   "id": "PltwlU6hkXZaBxEB",
   "name": "BackupWorkflows",
   "active": true,
@@ -10,7 +10,10 @@
       "parameters": {
         "rule": {
           "interval": [
-            {}
+            {
+              "field": "hours",
+              "hoursInterval": 8
+            }
           ]
         }
       },
@@ -19,7 +22,7 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "position": [
         -144,
-        144
+        160
       ],
       "typeVersion": 1.2
     },
@@ -32,8 +35,8 @@
       "name": "Retrieve workflows",
       "type": "n8n-nodes-base.n8n",
       "position": [
-        352,
-        144
+        528,
+        160
       ],
       "typeVersion": 1,
       "credentials": {
@@ -58,8 +61,8 @@
       "name": "Aggregate",
       "type": "n8n-nodes-base.aggregate",
       "position": [
-        192,
-        144
+        304,
+        160
       ],
       "typeVersion": 1
     },
@@ -85,8 +88,8 @@
       "name": "List files from repo",
       "type": "n8n-nodes-base.github",
       "position": [
-        32,
-        144
+        80,
+        160
       ],
       "webhookId": "354d699e-44b0-4444-9d31-af7fd4ff5561",
       "typeVersion": 1,
@@ -122,7 +125,7 @@
       "name": "Update file",
       "type": "n8n-nodes-base.github",
       "position": [
-        1152,
+        1648,
         64
       ],
       "webhookId": "27218087-8df7-474d-a39f-70cfa9c34ec8",
@@ -157,8 +160,8 @@
       "name": "Upload file",
       "type": "n8n-nodes-base.github",
       "position": [
-        1152,
-        224
+        1648,
+        256
       ],
       "webhookId": "ce4b561b-acb9-4cd8-b76f-4928dada9674",
       "typeVersion": 1,
@@ -185,8 +188,8 @@
       "name": "Check if file exists",
       "type": "n8n-nodes-base.if",
       "position": [
-        992,
-        144
+        1424,
+        160
       ],
       "typeVersion": 1
     },
@@ -202,8 +205,8 @@
       "name": "Json file",
       "type": "n8n-nodes-base.convertToFile",
       "position": [
-        512,
-        144
+        752,
+        160
       ],
       "typeVersion": 1.1
     },
@@ -216,8 +219,8 @@
       "name": "To base64",
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
-        672,
-        144
+        976,
+        160
       ],
       "typeVersion": 1
     },
@@ -232,8 +235,8 @@
       "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        0,
-        0
+        90,
+        -60
       ],
       "typeVersion": 1
     },
@@ -261,8 +264,8 @@
       "name": "Commit date & file name",
       "type": "n8n-nodes-base.set",
       "position": [
-        832,
-        144
+        1200,
+        160
       ],
       "typeVersion": 3.4
     },
@@ -277,8 +280,8 @@
       "name": "Sticky Note2",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        320,
-        0
+        570,
+        -60
       ],
       "typeVersion": 1
     },
@@ -293,8 +296,8 @@
       "name": "Sticky Note3",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        800,
-        0
+        1242,
+        36
       ],
       "typeVersion": 1
     }
@@ -401,14 +404,16 @@
   },
   "staticData": {
     "node:Schedule Trigger": {
-      "recurrenceRules": []
+      "recurrenceRules": [
+        16
+      ]
     }
   },
   "meta": {
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "21e07542-3a17-40f4-837a-f9746baa5140",
+  "versionId": "260fdca0-2a53-481f-9a5f-1425597f0390",
   "triggerCount": 1,
   "tags": []
 }
