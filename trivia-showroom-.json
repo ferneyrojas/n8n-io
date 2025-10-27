@@ -1,0 +1,19 @@
+{
+  "createdAt": "2025-10-20T03:17:22.934Z",
+  "updatedAt": "2025-10-27T19:24:05.385Z",
+  "id": "TklBRIvfwiWsjNoE",
+  "name": "Trivia Showroom",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "fb9af7cc-53a3-4564-a257-738888ea5709",
+  "triggerCount": 0,
+  "tags": []
+}
