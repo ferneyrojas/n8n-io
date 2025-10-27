@@ -1,0 +1,514 @@
+{
+  "createdAt": "2025-10-21T11:27:53.771Z",
+  "updatedAt": "2025-10-27T19:23:28.870Z",
+  "id": "U3SLteDeCKtbvxEA",
+  "name": "Showroom",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un generador estructurado de contenido para showrooms.\n\nEntrada: un tema llamado \"{{ $json.tema }}\".\n\nTu tarea es crear un contenido atractivo basado en ese tema.\n\nDevuelve **únicamente un JSON válido**, sin texto adicional, sin comentarios, sin formato de código ni bloques de Markdown.\n\nEl JSON debe tener exactamente esta estructura:\n\n{\n  \"contenido\": {\n    \"nombre\": \"Nombre corto del contenido\",\n    \"titulo\": \"Título para el showroom\",\n    \"descripcion\": \"Descripción corta del contenido\"\n  },\n  \"tabs\": [\n    {\n      \"nombre\": \"Introducción\",\n      \"detalles\": [\n        { \"tipo\": \"slider\", \"titulo\": \"Slide 1\", \"texto\": \"<p>Texto HTML</p>\" },\n        { \"tipo\": \"slider\", \"titulo\": \"Slide 2\", \"texto\": \"<p>Texto HTML</p>\" }\n      ]\n    },\n    {\n      \"nombre\": \"Conceptos\",\n      \"detalles\": [\n        { \"tipo\": \"slider\", \"titulo\": \"Slide 1\", \"texto\": \"<p>Texto HTML</p>\" }\n      ]\n    }\n  ]\n}\n\nReglas:\n- Genera entre **3 y 5 tabs** (por ejemplo: Introducción, Conceptos, Aplicaciones, Ejemplos, Futuro).\n- Cada tab debe tener entre **2 y 4 detalles (sliders)**.\n- Cada \"texto\" debe estar dentro de etiquetas HTML `<p></p>`.\n- Todos los textos deben estar en **español**.\n- No incluyas explicaciones, texto libre ni encabezados fuera del JSON.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "30aec274-ad9f-4047-aa9c-89cf950edd30",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        160
+      ],
+      "id": "a7121300-9891-4292-a441-d5eb4622db21",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Ab63gjkvzxRd1IIA",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4a30e35f-afae-4ec6-b22d-04fd69ed0ee1",
+              "name": "tema",
+              "value": "Energías Renovables",
+              "type": "string"
+            },
+            {
+              "id": "c53a74ae-6e6a-4d19-85b6-489e50e986f4",
+              "name": "pra_id_proyecto",
+              "value": 2,
+              "type": "number"
+            },
+            {
+              "id": "c4c49f65-a8ae-41c5-a735-d44ad4e1288e",
+              "name": "pra_tipo_practica",
+              "value": 2,
+              "type": "number"
+            },
+            {
+              "id": "81512a63-f877-4fdf-8052-24de6b8ee391",
+              "name": "pra_id_estado",
+              "value": 1,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "73d354f7-1d98-4f1c-a9f2-acf446be02a6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "85becbe6-38e2-428b-b81d-26371bb5175f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos todos los items de entrada\nconst items = $input.all();\n\n// Tomamos el primer item (el que trae la respuesta de ChatGPT)\nlet text = items[0].json.output;\n\n// Si el contenido viene como array, tomamos el primer elemento\nif (Array.isArray(items[0].json) && items[0].json[0]?.output) {\n  text = items[0].json[0].output;\n}\n\n// Limpiamos saltos de línea y caracteres escapados\ntext = text.trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(text);\n} catch (err) {\n  // Segundo intento si el JSON viene escapado o con ```json\n  try {\n    parsed = JSON.parse(\n      text\n        .replace(/^```json/, \"\")\n        .replace(/```$/, \"\")\n        .replace(/\\n/g, \"\")\n        .replace(/\\\\\"/g, '\"')\n        .replace(/\\\\n/g, \"\")\n    );\n  } catch (e) {\n    throw new Error(\"❌ No se pudo parsear el JSON. Contenido recibido: \" + text);\n  }\n}\n\n// Retornamos el JSON ya parseado como un nuevo item\nreturn [{ json: parsed }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "799db4d4-4f85-4d8d-a198-a6ea6256b3d4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/contenido",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "con_nombre",
+              "value": "={{ $json.contenido.nombre }}"
+            },
+            {
+              "name": "con_titulo",
+              "value": "={{ $json.contenido.titulo }}"
+            },
+            {
+              "name": "con_descripcion",
+              "value": "={{ $json.contenido.descripcion }}"
+            },
+            {
+              "name": "con_activo",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        976,
+        0
+      ],
+      "id": "5731a4eb-6b02-4785-b86e-00ae7f9d663e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be2c0291-b336-4f96-aba8-59faeb273dd7",
+              "name": "tabs",
+              "value": "={{ $('Code').item.json.tabs }}",
+              "type": "string"
+            },
+            {
+              "id": "86db0d4f-5857-49e9-9498-ad91337f9ae6",
+              "name": "contenidoId",
+              "value": "={{ $json.con_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "8b2e4902-6b16-434a-81ce-888c54c2bf34",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Lee todos los items que entran al nodo (compatible con \"Run Once for All Items\")\nconst inputs = $input.all();\n\nconst results = [];\n\nfor (const entry of inputs) {\n  const data = entry.json;\n\n  // tabs puede venir como string (JSON) o ya como array; manejamos ambos casos\n  let tabs;\n  if (typeof data.tabs === 'string') {\n    try {\n      tabs = JSON.parse(data.tabs);\n    } catch (e) {\n      throw new Error('Error al parsear data.tabs: ' + e.message + '\\nContenido: ' + data.tabs);\n    }\n  } else {\n    tabs = data.tabs || [];\n  }\n\n  // contenidoId puede estar en con_id o en contenidoId según tu flujo\n  const contenidoId = data.con_id ?? data.contenidoId ?? null;\n\n  for (const tab of tabs) {\n    results.push({\n      json: {\n        nombre: tab.nombre,\n        detalles: tab.detalles,\n        contenidoId: contenidoId\n      }\n    });\n  }\n}\n\n// Devolver un array de items (uno por cada tab)\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        0
+      ],
+      "id": "2d59749d-43e8-49f0-851c-4950d75cdda3",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\nconst results = [];\n\nfor (const tab of inputs) {\n  const data = tab.json;\n  const { nombre, detalles, contenidoId } = data;\n\n  if (Array.isArray(detalles)) {\n    for (const detalle of detalles) {\n      results.push({\n        json: {\n          tabNombre: nombre,\n          contenidoId,\n          tipo: detalle.tipo,\n          titulo: detalle.titulo,\n          texto: detalle.texto\n        }\n      });\n    }\n  }\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        0
+      ],
+      "id": "89b45fed-7520-4a6d-9113-190bc15523b7",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\n\n/** @type {Record<string, any>} */\nconst grouped = {};\n\nfor (const entry of inputs) {\n  const data = entry.json;\n  const tabNombre = data.tabNombre;\n  const contenidoId = data.contenidoId;\n\n  if (!grouped[tabNombre]) {\n    grouped[tabNombre] = {\n      tabNombre: tabNombre,\n      contenidoId: contenidoId,\n      detalles: []\n    };\n  }\n\n  grouped[tabNombre].detalles.push({\n    tipo: data.tipo,\n    titulo: data.titulo,\n    texto: data.texto\n  });\n}\n\nconst results = Object.keys(grouped).map(key => ({ json: grouped[key] }));\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        0
+      ],
+      "id": "059da659-4e1e-4fa6-80c3-634b152163f9",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// @ts-ignore\nconst rawTabs = $node[\"HTTP Request — Crear Tab\"].json;\n\n// Asegurar que siempre tengamos un array limpio\nconst tabsCreados = Array.isArray(rawTabs)\n  ? rawTabs.map(t => t.json || t)\n  : [rawTabs.json || rawTabs];\n\n// Tomar el primer item de Code3 (asumiendo que todo viene en un solo nodo)\nconst code3Tab = $('Code3').first().json;\n\nif (!code3Tab || !Array.isArray(code3Tab.detalles)) {\n  return [{\n    json: { log: \"⚠️ No hay items en el nodo Code3\" }\n  }];\n}\n\nconst tabNombre = code3Tab.tabNombre;\nconst contenidoId = code3Tab.contenidoId;\n\nconst tabEncontrado = tabsCreados.find(t => t.cot_nombre_tab === tabNombre);\n\nif (!tabEncontrado) {\n  return [{\n    json: {\n      log: `⚠️ No se encontró un tab con el nombre \"${tabNombre}\"`,\n      tabNombre,\n    }\n  }];\n}\n\nconst tabId = tabEncontrado.cot_id;\n\nconst results = [];\n\n// Recorremos todos los detalles sin repetir\nfor (const detalle of code3Tab.detalles) {\n  results.push({\n    json: {\n      log: `✅ Tab encontrado: ${tabNombre} (ID ${tabId})`,\n      tabNombre,\n      contenidoId,\n      tabId,\n      titulo: detalle.titulo,\n      texto: detalle.texto\n    }\n  });\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2224,
+        0
+      ],
+      "id": "4dea7d16-20ee-494b-9685-99929c127b5a",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/contenidoTab",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"cot_id_contenido\": {{$json[\"contenidoId\"]}},\n  \"cot_nombre_tab\": \"{{$json[\"tabNombre\"]}}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        0
+      ],
+      "id": "9de81cb0-6bf6-4da6-a216-ad70cb7281fb",
+      "name": "HTTP Request — Crear Tab"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/contenidoDetalle",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"cod_id_contenido\": \"{{ $json.contenidoId }}\",\n  \"cod_id_tab\": \"{{ $json.tabId }}\",\n  \"cod_title\": \"{{ $json.titulo }}\",\n  \"cod_activo\": true,\n  \"cod_text\": \"{{ $json.texto }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2416,
+        0
+      ],
+      "id": "59c3a622-df16-43c5-8d04-c3620df413ad",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/showRoom",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "pra_tipo_practica",
+              "value": "=2"
+            },
+            {
+              "name": "pra_id_proyecto",
+              "value": "2"
+            },
+            {
+              "name": "pra_id_estado",
+              "value": "1"
+            },
+            {
+              "name": "pra_name",
+              "value": "=Energías Renovables Prueba"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2848,
+        0
+      ],
+      "id": "b0605cb4-1f82-44bc-8a19-bc83d63f91be",
+      "name": "HTTP Request2",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/showRoom/{{$json.pra_id}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"pra_id_contenido_principal\": \"{{ $('HTTP Request1').item.json.cod_id_contenido }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3056,
+        0
+      ],
+      "id": "fc9aa883-d755-4b3b-b633-a7eb406478a3",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/publicar/contenido/{{ $json.cod_id_contenido }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2624,
+        0
+      ],
+      "id": "a9986722-3797-409d-9e48-5716a8177751",
+      "name": "HTTP Request4"
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request — Crear Tab",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request — Crear Tab": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2bb728e2-5a6e-4858-8a3a-8e1be34f7de1",
+  "triggerCount": 0,
+  "tags": []
+}
