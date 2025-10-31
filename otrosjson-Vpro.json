@@ -1,0 +1,207 @@
+{
+  "createdAt": "2025-10-31T16:53:23.729Z",
+  "updatedAt": "2025-10-31T16:56:45.773Z",
+  "id": "l5o0VqKOgGWF63jx",
+  "name": "OtrosJson",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4a572a5d-86f7-47ae-beb8-f52caae5b04e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=faq",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "0778e3a5-4c10-466e-a3ac-788295a97718",
+      "name": "FAQ"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=notmostread",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "75d84c8b-660d-4bea-9a54-c7541cdc0e61",
+      "name": "NoticiasMasLeidas"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=temas",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "57aa7a55-124e-4e7f-8682-d9145ebe0417",
+      "name": "Temas"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=ceo",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "ab27dee8-a54b-49ea-8880-ad30e5adca90",
+      "name": "CEO"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=temasvpro",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "f02fa290-5603-44a7-b621-678c8f78f1e5",
+      "name": "TemasVpro"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=modules",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "fb969a3b-e76c-4251-8d7d-c3911125e808",
+      "name": "Modulos"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Temas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQ": {
+      "main": [
+        [
+          {
+            "node": "NoticiasMasLeidas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Temas": {
+      "main": [
+        [
+          {
+            "node": "CEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEO": {
+      "main": [
+        [
+          {
+            "node": "TemasVpro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TemasVpro": {
+      "main": [
+        [
+          {
+            "node": "Modulos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modulos": {
+      "main": [
+        [
+          {
+            "node": "FAQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "00499b1f-ddae-467e-8b8b-57713d4b6f9f",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-17T12:06:39.474Z",
+      "updatedAt": "2025-10-17T12:06:39.474Z",
+      "id": "na6teB8DTwGbGRWQ",
+      "name": "Generacion Json"
+    }
+  ]
+}
