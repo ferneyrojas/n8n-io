@@ -1,0 +1,97 @@
+{
+  "createdAt": "2025-10-30T13:56:55.310Z",
+  "updatedAt": "2025-10-31T16:58:05.039Z",
+  "id": "NGhqOp17qlA668om",
+  "name": "Genera all JSON",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "45035792-1da0-4c84-a582-7991bda281af",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=show,info,lab,esc,proc,vid,per,not,bv,lib",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "781aa325-d6f9-4568-90d7-0d4b9c95fabb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "content": "Genera los encabezados y json de los diferentes módulos ",
+        "height": 240,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -88,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "54d67ced-37c3-4363-ab08-9b9ee5ca9986",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "7acc21d9-3d74-46ac-b98e-7ff5a96f06b4",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-10-16T23:06:34.218Z",
+      "updatedAt": "2025-10-16T23:06:34.218Z",
+      "id": "NuCR0N2VGgWjiZJi",
+      "name": "Vpro"
+    },
+    {
+      "createdAt": "2025-10-17T12:06:39.474Z",
+      "updatedAt": "2025-10-17T12:06:39.474Z",
+      "id": "na6teB8DTwGbGRWQ",
+      "name": "Generacion Json"
+    }
+  ]
+}
