@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-17T12:36:35.940Z",
-  "updatedAt": "2025-10-17T22:23:56.439Z",
+  "updatedAt": "2025-10-31T16:53:07.492Z",
   "id": "SOkYQbd0Lnx0vio0",
   "name": "Genera BV",
   "active": true,
@@ -63,6 +63,20 @@
       ],
       "id": "fc1aa662-7d42-4098-a54f-89b47c2ea393",
       "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/data/json/bvstats.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        656,
+        -32
+      ],
+      "id": "5a3298cc-ae7c-40f1-b42d-48ac538fce5c",
+      "name": "Estadisticas-TipoRec"
     }
   ],
   "connections": {
@@ -98,6 +112,17 @@
           }
         ]
       ]
+    },
+    "BV Categorias": {
+      "main": [
+        [
+          {
+            "node": "Estadisticas-TipoRec",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -110,7 +135,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "81b22f86-8c11-4560-9f76-ca58f544e7fd",
+  "versionId": "ae270c78-d2af-4496-8904-a4f674485af3",
   "triggerCount": 1,
   "tags": [
     {
