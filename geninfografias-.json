@@ -1,0 +1,215 @@
+{
+  "createdAt": "2025-10-31T20:11:38.121Z",
+  "updatedAt": "2025-10-31T20:45:21.037Z",
+  "id": "dE7cyxwRj5vULEd7",
+  "name": "genInfografias",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        72
+      ],
+      "id": "8c8b8837-fa92-4491-894c-95100b19a3d3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6b47d6b1-1645-411b-9617-0ec11811c3ed",
+              "name": "infografias",
+              "value": "1153|1154|1155",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        72
+      ],
+      "id": "86b892d4-e967-4006-a62c-bb6d8e5cae8d",
+      "name": "setInfografias"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "07004b99-e3c5-49f9-915a-71a6bba207b3",
+              "name": "idInfografias",
+              "value": "={{ $('setInfografias').item.json.infografias.split('|') }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        72
+      ],
+      "id": "2f099b19-8a62-4de4-b628-e95bd0aef2b0",
+      "name": "setArrayInfografias",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "idInfografias",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        672,
+        72
+      ],
+      "id": "9574b3ce-bb2d-4a59-b570-ab1edf74460a",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        896,
+        72
+      ],
+      "id": "fcca0b96-30fb-4644-8284-da4cb6900459",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://polifoniaeditores.com/v/verbo7api/public/api/publicar/infografia/'+$json.idInfografias }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "859f7481-06bd-47e7-a78d-6ae87861f73f",
+      "name": "GenerarInfografia",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        72
+      ],
+      "id": "9b546877-5df5-45b4-b222-707e06d1225d",
+      "name": "Wait",
+      "webhookId": "9f04b4f3-df4b-4d9f-9d3b-84f3a56bdd6d"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "setInfografias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setInfografias": {
+      "main": [
+        [
+          {
+            "node": "setArrayInfografias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setArrayInfografias": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "GenerarInfografia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GenerarInfografia": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e9c57f86-cb3e-498c-962a-577a24e90500",
+  "triggerCount": 0,
+  "tags": []
+}
