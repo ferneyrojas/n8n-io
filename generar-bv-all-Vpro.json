@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-16T14:48:03.725Z",
-  "updatedAt": "2025-10-17T12:07:15.745Z",
+  "updatedAt": "2025-11-06T22:07:09.508Z",
   "id": "6X10p2VMk8oR4uhy",
   "name": "Generar BV All",
   "active": true,
@@ -39,6 +39,28 @@
       "id": "e4c42af0-0a87-4906-bb0d-c3451a050ec9",
       "name": "HTTP Request",
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "6957598767",
+        "text": "Termino BV",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a88b9579-8a1f-4ad2-badc-d6c1b8d31451",
+      "name": "Send a text message",
+      "webhookId": "c3458fe3-f758-4270-9e37-acb743f638ad",
+      "credentials": {
+        "telegramApi": {
+          "id": "rOOSfezTBGWLluyQ",
+          "name": "Telegram account"
+        }
+      }
     }
   ],
   "connections": {
@@ -47,6 +69,17 @@
         [
           {
             "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
             "type": "main",
             "index": 0
           }
@@ -64,9 +97,11 @@
       ]
     }
   },
-  "meta": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "pinData": {},
-  "versionId": "7393ea7d-bd78-4187-b393-0db1c27d602d",
+  "versionId": "fc051689-7006-47b5-b3d9-36b278b3875f",
   "triggerCount": 1,
   "tags": [
     {
