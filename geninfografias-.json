@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-31T20:11:38.121Z",
-  "updatedAt": "2025-10-31T20:45:21.037Z",
+  "updatedAt": "2025-11-05T13:39:58.293Z",
   "id": "dE7cyxwRj5vULEd7",
   "name": "genInfografias",
   "active": false,
@@ -12,7 +12,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        72
+        -88
       ],
       "id": "8c8b8837-fa92-4491-894c-95100b19a3d3",
       "name": "When clicking ‘Execute workflow’"
@@ -34,8 +34,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        224,
-        72
+        0,
+        136
       ],
       "id": "86b892d4-e967-4006-a62c-bb6d8e5cae8d",
       "name": "setInfografias"
@@ -59,8 +59,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        448,
-        72
+        224,
+        136
       ],
       "id": "2f099b19-8a62-4de4-b628-e95bd0aef2b0",
       "name": "setArrayInfografias",
@@ -74,8 +74,8 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        672,
-        72
+        448,
+        136
       ],
       "id": "9574b3ce-bb2d-4a59-b570-ab1edf74460a",
       "name": "Split Out"
@@ -87,22 +87,22 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        896,
-        72
+        448,
+        -88
       ],
       "id": "fcca0b96-30fb-4644-8284-da4cb6900459",
       "name": "Loop Over Items"
     },
     {
       "parameters": {
-        "url": "={{ 'https://polifoniaeditores.com/v/verbo7api/public/api/publicar/infografia/'+$json.idInfografias }}",
+        "url": "={{ 'https://polifoniaeditores.com/v/verbo7api/public/api/publicar/infografia/'+$('getInfografias').item.json.id_info }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1120,
-        0
+        672,
+        -160
       ],
       "id": "859f7481-06bd-47e7-a78d-6ae87861f73f",
       "name": "GenerarInfografia",
@@ -110,17 +110,59 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "amount": 2
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
         1344,
-        72
+        -88
       ],
       "id": "9b546877-5df5-45b4-b222-707e06d1225d",
       "name": "Wait",
       "webhookId": "9f04b4f3-df4b-4d9f-9d3b-84f3a56bdd6d"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=infoTmp",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -88
+      ],
+      "id": "a803c389-146e-4a3b-957f-b94e21c4f015",
+      "name": "getInfografias"
+    },
+    {
+      "parameters": {
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/publicar/trivia/{{ $('getInfografias').item.json.id_trivia }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -160
+      ],
+      "id": "347f824c-9fd3-49b4-a421-eac89b041abe",
+      "name": "GenerarTrivia"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        -160
+      ],
+      "id": "a8d5f512-07fd-42ce-ad8e-febc44d64aa6",
+      "name": "Wait1",
+      "webhookId": "15c0c92d-8458-401e-87b5-0b5e752c98e0"
     }
   ],
   "connections": {
@@ -128,7 +170,7 @@
       "main": [
         [
           {
-            "node": "setInfografias",
+            "node": "getInfografias",
             "type": "main",
             "index": 0
           }
@@ -159,13 +201,7 @@
     },
     "Split Out": {
       "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Loop Over Items": {
@@ -184,7 +220,7 @@
       "main": [
         [
           {
-            "node": "Wait",
+            "node": "Wait1",
             "type": "main",
             "index": 0
           }
@@ -201,6 +237,39 @@
           }
         ]
       ]
+    },
+    "getInfografias": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GenerarTrivia": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "GenerarTrivia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -209,7 +278,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "e9c57f86-cb3e-498c-962a-577a24e90500",
+  "versionId": "b704f0a4-73a6-4bbd-9a7d-91cf8e7e0894",
   "triggerCount": 0,
   "tags": []
 }
