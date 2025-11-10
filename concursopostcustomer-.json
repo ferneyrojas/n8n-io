@@ -1,0 +1,115 @@
+{
+  "createdAt": "2025-11-05T22:48:41.458Z",
+  "updatedAt": "2025-11-06T02:53:57.053Z",
+  "id": "DsN3bXszdnsB2Fod",
+  "name": "concursoPostCustomer",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "concursoPost",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        -32
+      ],
+      "id": "35ef50b0-1daf-4dae-bae8-9ab4a0edfd95",
+      "name": "Webhook",
+      "webhookId": "166c2ccd-67c0-46f0-859d-37bed1e60579",
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Formulario con Validación</title>\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n<body class=\"min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center\">\n\n  <div class=\"bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md transition-all hover:shadow-xl\">\n    <h2 class=\"text-2xl font-semibold text-center text-gray-800 mb-6\">\n      Registro de Correo\n    </h2>\n\n    <form id=\"formulario\" method=\"POST\" class=\"space-y-5\" action=\"https://hpa.lugnia.com/webhook/concursoPost\">\n      <!-- Campo ID (solo lectura, cargado desde la URL) -->\n      <div>\n        <label for=\"idPost\" class=\"block text-sm font-medium text-gray-700\">ID del Post</label>\n        <input type=\"text\" id=\"idPost\" name=\"idPost\" readonly\n          class=\"mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400\">\n      </div>\n\n      <!-- Campo Correo -->\n      <div>\n        <label for=\"email\" class=\"block text-sm font-medium text-gray-700\">Correo electrónico</label>\n        <input type=\"email\" id=\"email\" name=\"email\" required\n          class=\"mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400\">\n      </div>\n\n      <!-- Campo Confirmar Correo -->\n      <div>\n        <label for=\"emailConfirm\" class=\"block text-sm font-medium text-gray-700\">Confirmar correo</label>\n        <input type=\"email\" id=\"emailConfirm\" name=\"emailConfirm\" required\n          class=\"mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400\">\n      </div>\n\n      <!-- Mensaje de error -->\n      <p id=\"errorMsg\" class=\"text-red-600 text-sm hidden\">Los correos no coinciden o no son válidos.</p>\n\n      <!-- Botón -->\n      <button type=\"submit\"\n        class=\"w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all focus:ring-4 focus:ring-blue-300\">\n        Enviar\n      </button>\n    </form>\n\n    <!-- Mensaje de éxito -->\n    <p id=\"successMsg\" class=\"text-green-600 text-center text-sm mt-4 hidden\">\n      ¡Formulario enviado correctamente!\n    </p>\n  </div>\n\n  <script>\n    const urlPadre = window.parent.location.href;\n    // Cargar idPost desde la URL\n    const params = new URLSearchParams(new URL(urlPadre).search);\n    const idPost = params.get('idPost') || '';\nalert(window.location.search);\nalert(idPost);\n    document.getElementById('idPost').value = idPost;\n\n    const form = document.getElementById('formulario');\n    const errorMsg = document.getElementById('errorMsg');\n    const successMsg = document.getElementById('successMsg');\n\n    form.addEventListener('submit', function(e) {\n      e.preventDefault();\n      errorMsg.classList.add('hidden');\n      successMsg.classList.add('hidden');\n\n      const email = document.getElementById('email').value.trim();\n      const emailConfirm = document.getElementById('emailConfirm').value.trim();\n      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\n      // Validaciones\n      if (!emailRegex.test(email) || email !== emailConfirm) {\n        errorMsg.classList.remove('hidden');\n        return;\n      }\n\n      // Envío por POST a la misma URL\n      const formData = new FormData(form);\n      fetch(\"https://hpa.lugnia.com/webhook/concursoPost\", {\n        method: 'POST',\n        body: formData\n      })\n      .then(res => {\n        if (res.ok) {\n          successMsg.classList.remove('hidden');\n          form.reset();\n        } else {\n          throw new Error('Error en el envío');\n        }\n      })\n      .catch(() => {\n        errorMsg.textContent = 'Error al enviar el formulario.';\n        errorMsg.classList.remove('hidden');\n      });\n    });\n  </script>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        16,
+        -144
+      ],
+      "id": "521f145f-a27f-4c11-b7dc-a372ba93d7a2",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.virtualpro.co/api/bigquery/consultar_query?param1={{ $json.body.email }}&param2={{ $json.body.idPost }}&consulta=concursoPOST",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        64,
+        32
+      ],
+      "id": "16deebfb-a65a-4c81-9c12-b30dda909f2d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Gracias por tu voto</title>\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n<body class=\"min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center\">\n\n  <div class=\"bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md text-center transition-all hover:shadow-xl\">\n    <!-- Ícono de check animado -->\n    <div class=\"flex justify-center mb-6\">\n      <svg class=\"w-20 h-20 text-green-500 animate-bounce\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" viewBox=\"0 0 24 24\">\n        <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M5 13l4 4L19 7\" />\n      </svg>\n    </div>\n\n    <!-- Mensaje principal -->\n    <h1 class=\"text-3xl font-semibold text-gray-800 mb-4\">¡Gracias por tu voto!</h1>\n    <p class=\"text-gray-600 text-base mb-8\">\n      Tu participación ha sido registrada exitosamente.  \n      Apreciamos el tiempo que dedicaste para compartir tu opinión.\n    </p>\n\n    <!-- Botón de regreso -->\n    <!-- <a href=\"/\" \n       class=\"inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all focus:ring-4 focus:ring-blue-300\">\n      Volver al inicio\n    </a> -->\n\n    <!-- Mensaje sutil al pie -->\n    <p class=\"text-xs text-gray-400 mt-6\">© 2025 - Lugnia.com</p>\n  </div>\n\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        320,
+        32
+      ],
+      "id": "33e31858-277b-47b4-a02a-39dd8e2fc90c",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "8868211e-1b7f-4c7a-9a24-664d855ea820",
+  "triggerCount": 1,
+  "tags": []
+}
