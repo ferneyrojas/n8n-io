@@ -1,0 +1,86 @@
+{
+  "createdAt": "2025-11-11T20:54:51.851Z",
+  "updatedAt": "2025-11-11T20:58:51.293Z",
+  "id": "H4i1nsF5xQvx78NC",
+  "name": "createUser",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Crear Usuario",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre",
+              "placeholder": "Nombre",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "placeholder": "xxxxxx@xxxx.xxx",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "581cd745-ee2e-4f08-a000-2cc01803d2db",
+      "name": "On form submission",
+      "webhookId": "d604afb4-5b86-4472-bc17-ddb854bdf38f"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.virtualpro.co/api/bigquery/consultar_query?cli_id=30500&param1={{ $json.Nombre }}&param2={{ $json.Email }}&consulta=userVplant",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "eea24df0-4c2b-43e0-8f59-df96bb977dc3",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Nombre": "Freed Castillo Moya",
+          "Email": "fcastillom@uned.ac.cr",
+          "submittedAt": "2025-11-11T15:58:00.227-05:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "versionId": "167c5ccb-3fe3-4fe3-9da8-73a29a169cfb",
+  "triggerCount": 0,
+  "tags": []
+}
