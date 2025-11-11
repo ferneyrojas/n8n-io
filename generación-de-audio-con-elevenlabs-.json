@@ -1,0 +1,184 @@
+{
+  "createdAt": "2025-11-11T14:33:58.495Z",
+  "updatedAt": "2025-11-11T19:59:33.412Z",
+  "id": "jcN1FJHFrnbm2cAu",
+  "name": "Generación de audio con ElevenLabs",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "elevenlabsform",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7ab592b7-d488-44b5-9729-546eb8fbc76d",
+      "name": "Webhook",
+      "webhookId": "c0b9fc27-24ea-4cac-b85e-6d86827c6923"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"voices\": [\n    { \n      \"name\": \"femenina\", \n      \"id\": \"2Lb1en5ujrODDIqmp7F3\", \n      \"text\": \"{{ $json.body.field_long_text_p437rbmkbd }}\" \n    },\n    { \n      \"name\": \"masculina\", \n      \"id\": \"HJAIwgFDzw3Kk9aW7RYr\", \n      \"text\": \"{{ $json.body.field_long_text_p437rbmkbd }}\" \n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "e69a8496-019c-430d-bfae-31158326dc51",
+      "name": "Asignar datos del formulario"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "voices",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "9e57cae0-f03a-49b8-995a-80934e9f7688",
+      "name": "Generar 2 objetos"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/text-to-speech/{{ $json.id }}/with-timestamps",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_c540362331ed533a924a96134d99b1c604af8d5b8cdca9b8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "model_id",
+              "value": "={{ $json.model_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        656,
+        0
+      ],
+      "id": "bde8cee2-c02b-4b05-af48-8973557785ef",
+      "name": "Generar audio"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1️⃣ Extraer los datos del resultado de ElevenLabs\nconst audioBase64 = $input.first().json.audio_base64;\nconst alignment = $input.first().json.alignment || $input.first().json.normalized_alignment;\n\n// 2️⃣ Combinar los arrays de caracteres con sus tiempos\nconst chars = alignment.characters;\nconst starts = alignment.character_start_times_seconds;\nconst ends = alignment.character_end_times_seconds;\n\nconst combined = chars.map((c, i) => ({\n  char: c,\n  start: starts[i],\n  end: ends[i],\n}));\n\n// 3️⃣ Agrupar caracteres en palabras con tiempos promedio\nconst words = [];\nlet currentWord = '';\nlet startTime = null;\nlet endTime = null;\n\nfor (let i = 0; i < combined.length; i++) {\n  const { char, start, end } = combined[i];\n\n  // Detectar si es parte de una palabra (letras o números)\n  if (char.match(/[^\\s.,!?;:]/)) {\n    if (currentWord === '') startTime = start;\n    currentWord += char;\n    endTime = end;\n  }\n\n  // Si es un separador o fin del texto, guardar palabra\n  const nextChar = combined[i + 1]?.char ?? ' ';\n  if (char.match(/\\s/) || nextChar.match(/\\s/) || i === combined.length - 1) {\n    if (currentWord.trim().length > 0) {\n      words.push({\n        word: currentWord.trim(),\n        start: startTime,\n        end: endTime\n      });\n      currentWord = '';\n      startTime = null;\n      endTime = null;\n    }\n  }\n}\n\n// 4️⃣ Convertir el array de palabras a texto JSON\nconst wordsJson = JSON.stringify(words, null, 2);\n\n// 5️⃣ Devolver ambos archivos: audio (.mp3) y timestamps (.json)\nreturn [\n  {\n    json: {\n      message: \"Archivos generados correctamente\",\n      wordCount: words.length\n    },\n    binary: {\n      audio: {\n        data: audioBase64,\n        mimeType: 'audio/mpeg',\n        fileName: `voz_${Date.now()}.mp3`\n      },\n      timestamps: {\n        data: btoa(unescape(encodeURIComponent(wordsJson))), // asegura compatibilidad total\n        mimeType: 'application/json',\n        fileName: `timestamps_${Date.now()}.json`\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        0
+      ],
+      "id": "6081c4ef-2327-4930-bc8d-97a8865c7785",
+      "name": "Convertir respuesta a binarios"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputBinary = $input.first().binary || {};\n\nreturn [\n  {\n    json: { fileType: 'audio' },\n    binary: { data: inputBinary.audio }\n  },\n  {\n    json: { fileType: 'timestamps' },\n    binary: { data: inputBinary.timestamps }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        0
+      ],
+      "id": "c1a298b5-7e51-4a6e-9cf0-21b90f9cddd6",
+      "name": "Convertir cada binario a un item por separado"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Asignar datos del formulario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignar datos del formulario": {
+      "main": [
+        [
+          {
+            "node": "Generar 2 objetos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar 2 objetos": {
+      "main": [
+        [
+          {
+            "node": "Generar audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar audio": {
+      "main": [
+        [
+          {
+            "node": "Convertir respuesta a binarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convertir respuesta a binarios": {
+      "main": [
+        [
+          {
+            "node": "Convertir cada binario a un item por separado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "83e84e8b-5d69-41c0-abca-a04b33929567",
+  "triggerCount": 0,
+  "tags": []
+}
