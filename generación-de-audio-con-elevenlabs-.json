@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-11T14:33:58.495Z",
-  "updatedAt": "2025-11-11T19:59:33.412Z",
+  "updatedAt": "2025-11-12T00:53:33.348Z",
   "id": "jcN1FJHFrnbm2cAu",
   "name": "Generación de audio con ElevenLabs",
   "active": false,
@@ -21,21 +21,6 @@
       "id": "7ab592b7-d488-44b5-9729-546eb8fbc76d",
       "name": "Webhook",
       "webhookId": "c0b9fc27-24ea-4cac-b85e-6d86827c6923"
-    },
-    {
-      "parameters": {
-        "mode": "raw",
-        "jsonOutput": "={\n  \"voices\": [\n    { \n      \"name\": \"femenina\", \n      \"id\": \"2Lb1en5ujrODDIqmp7F3\", \n      \"text\": \"{{ $json.body.field_long_text_p437rbmkbd }}\" \n    },\n    { \n      \"name\": \"masculina\", \n      \"id\": \"HJAIwgFDzw3Kk9aW7RYr\", \n      \"text\": \"{{ $json.body.field_long_text_p437rbmkbd }}\" \n    }\n  ]\n}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        224,
-        0
-      ],
-      "id": "e69a8496-019c-430d-bfae-31158326dc51",
-      "name": "Asignar datos del formulario"
     },
     {
       "parameters": {
@@ -90,7 +75,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1️⃣ Extraer los datos del resultado de ElevenLabs\nconst audioBase64 = $input.first().json.audio_base64;\nconst alignment = $input.first().json.alignment || $input.first().json.normalized_alignment;\n\n// 2️⃣ Combinar los arrays de caracteres con sus tiempos\nconst chars = alignment.characters;\nconst starts = alignment.character_start_times_seconds;\nconst ends = alignment.character_end_times_seconds;\n\nconst combined = chars.map((c, i) => ({\n  char: c,\n  start: starts[i],\n  end: ends[i],\n}));\n\n// 3️⃣ Agrupar caracteres en palabras con tiempos promedio\nconst words = [];\nlet currentWord = '';\nlet startTime = null;\nlet endTime = null;\n\nfor (let i = 0; i < combined.length; i++) {\n  const { char, start, end } = combined[i];\n\n  // Detectar si es parte de una palabra (letras o números)\n  if (char.match(/[^\\s.,!?;:]/)) {\n    if (currentWord === '') startTime = start;\n    currentWord += char;\n    endTime = end;\n  }\n\n  // Si es un separador o fin del texto, guardar palabra\n  const nextChar = combined[i + 1]?.char ?? ' ';\n  if (char.match(/\\s/) || nextChar.match(/\\s/) || i === combined.length - 1) {\n    if (currentWord.trim().length > 0) {\n      words.push({\n        word: currentWord.trim(),\n        start: startTime,\n        end: endTime\n      });\n      currentWord = '';\n      startTime = null;\n      endTime = null;\n    }\n  }\n}\n\n// 4️⃣ Convertir el array de palabras a texto JSON\nconst wordsJson = JSON.stringify(words, null, 2);\n\n// 5️⃣ Devolver ambos archivos: audio (.mp3) y timestamps (.json)\nreturn [\n  {\n    json: {\n      message: \"Archivos generados correctamente\",\n      wordCount: words.length\n    },\n    binary: {\n      audio: {\n        data: audioBase64,\n        mimeType: 'audio/mpeg',\n        fileName: `voz_${Date.now()}.mp3`\n      },\n      timestamps: {\n        data: btoa(unescape(encodeURIComponent(wordsJson))), // asegura compatibilidad total\n        mimeType: 'application/json',\n        fileName: `timestamps_${Date.now()}.json`\n      }\n    }\n  }\n];\n"
+        "jsCode": "const inputs = $input.all(); // Los dos resultados (femenina y masculina)\n\n// Intentar obtener la información de voces desde cualquier nodo anterior\nlet voicesInfo = [];\ntry {\n  const vocesRaw = $('Generar 2 objetos').first().json;\n  if (Array.isArray(vocesRaw.voices)) {\n    voicesInfo = vocesRaw.voices;\n  } else if (Array.isArray(vocesRaw)) {\n    // En caso de que la estructura sea [{voices: [...]}]\n    voicesInfo = vocesRaw[0]?.voices || [];\n  }\n} catch (e) {\n  console.log('No se pudo leer voces del nodo anterior:', e.message);\n}\n\n// Fallback por si voicesInfo está vacío\nif (!voicesInfo.length) {\n  voicesInfo = inputs.map((_, i) => ({\n    name: `voz_${i + 1}`,\n    libro: 'desconocido',\n    subseccion: 'desconocido'\n  }));\n}\n\nconst results = inputs.map((input, index) => {\n  const audioBase64 = input.json.audio_base64;\n  const alignment = input.json.alignment || input.json.normalized_alignment;\n\n  if (!alignment) throw new Error(`Falta alignment en input ${index}`);\n\n  const chars = alignment.characters;\n  const starts = alignment.character_start_times_seconds;\n  const ends = alignment.character_end_times_seconds;\n\n  const combined = chars.map((c, i) => ({\n    char: c,\n    start: starts[i],\n    end: ends[i],\n  }));\n\n  const words = [];\n  let currentWord = '';\n  let startTime = null;\n  let endTime = null;\n\n  for (let i = 0; i < combined.length; i++) {\n    const { char, start, end } = combined[i];\n\n    if (char.match(/[^\\s.,!?;:]/)) {\n      if (currentWord === '') startTime = start;\n      currentWord += char;\n      endTime = end;\n    }\n\n    const nextChar = combined[i + 1]?.char ?? ' ';\n    if (char.match(/\\s/) || nextChar.match(/\\s/) || i === combined.length - 1) {\n      if (currentWord.trim().length > 0) {\n        words.push({ word: currentWord.trim(), start: startTime, end: endTime });\n        currentWord = '';\n        startTime = null;\n        endTime = null;\n      }\n    }\n  }\n\n  const wordsJson = JSON.stringify(words, null, 2);\n\n  const { name, libro, subseccion } = voicesInfo[index] || {};\n  const safeName = name || `voz_${index + 1}`;\n  const safelibro = $('Generar 2 objetos').first().json.libro; \n  const safesubseccion = $('Generar 2 objetos').first().json.subseccion;\n\n  return {\n    json: {\n      message: `Archivo ${safeName} generado correctamente`,\n      voice: safeName,\n      wordCount: words.length\n    },\n    binary: {\n      audio: {\n        data: audioBase64,\n        mimeType: 'audio/mpeg',\n        fileName: `audio_${safeName}_${safelibro}_${safesubseccion}.mp3`\n      },\n      timestamps: {\n        data: btoa(unescape(encodeURIComponent(wordsJson))),\n        mimeType: 'application/json',\n        fileName: `audio_${safeName}_${safelibro}_${safesubseccion}.json`\n      }\n    }\n  };\n});\n\nreturn results;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -103,7 +88,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const inputBinary = $input.first().binary || {};\n\nreturn [\n  {\n    json: { fileType: 'audio' },\n    binary: { data: inputBinary.audio }\n  },\n  {\n    json: { fileType: 'timestamps' },\n    binary: { data: inputBinary.timestamps }\n  }\n];\n"
+        "jsCode": "const inputs = $input.all(); // 2 items: femenina y masculina\nconst output = [];\n\nfor (const item of inputs) {\n  const audioBinary = item.binary?.audio;\n  const timestampsBinary = item.binary?.timestamps;\n  const voice = item.json?.voice || 'voz';\n  const libro = item.json?.libro || 'X';\n  const subseccion = item.json?.subseccion || 'Y';\n\n  if (audioBinary) {\n    output.push({\n      json: {\n        fileType: 'audio',\n        voice,\n        libro,\n        subseccion\n      },\n      binary: {\n        data: audioBinary\n      }\n    });\n  }\n\n  if (timestampsBinary) {\n    output.push({\n      json: {\n        fileType: 'timestamps',\n        voice,\n        libro,\n        subseccion\n      },\n      binary: {\n        data: timestampsBinary\n      }\n    });\n  }\n}\n\nreturn output;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -113,6 +98,53 @@
       ],
       "id": "c1a298b5-7e51-4a6e-9cf0-21b90f9cddd6",
       "name": "Convertir cada binario a un item por separado"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.virtualpro.co/api/uploadFile",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "bucket",
+              "value": "bucketvisualizadorlibros"
+            },
+            {
+              "name": "directory",
+              "value": "=HT5/publications/0/{{$(\"Generar 2 objetos\").first().json.libro}}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        0
+      ],
+      "id": "21d0567c-9a45-4002-aa9a-fb7f7de51d3d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      voices: [\n        {\n          name: \"femenina\",\n          id: \"2Lb1en5ujrODDIqmp7F3\",\n          text: $json.body.field_long_text_p437rbmkbd,\n          subseccion: $json.body.field_number_1uftd4hkuk7,\n          libro: $json.body.field_number_ufr0dc83ebc,\n        },\n        {\n          name: \"masculina\",\n          id: \"HJAIwgFDzw3Kk9aW7RYr\",\n          text: $json.body.field_long_text_p437rbmkbd,\n          subseccion: $json.body.field_number_1uftd4hkuk7,\n          libro: $json.body.field_number_ufr0dc83ebc,\n        },\n      ],\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fd43e5f7-27bf-4e2c-8f2f-c351b95dad54",
+      "name": "Code"
     }
   ],
   "connections": {
@@ -120,18 +152,7 @@
       "main": [
         [
           {
-            "node": "Asignar datos del formulario",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Asignar datos del formulario": {
-      "main": [
-        [
-          {
-            "node": "Generar 2 objetos",
+            "node": "Code",
             "type": "main",
             "index": 0
           }
@@ -170,6 +191,28 @@
           }
         ]
       ]
+    },
+    "Convertir cada binario a un item por separado": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Generar 2 objetos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -178,7 +221,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "83e84e8b-5d69-41c0-abca-a04b33929567",
+  "versionId": "7bb6c9ba-aa75-4d01-b8b6-a7fef0f690c3",
   "triggerCount": 0,
   "tags": []
 }
