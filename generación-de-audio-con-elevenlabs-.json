@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-11T14:33:58.495Z",
-  "updatedAt": "2025-11-12T00:53:33.348Z",
+  "updatedAt": "2025-11-12T13:54:33.987Z",
   "id": "jcN1FJHFrnbm2cAu",
   "name": "Generación de audio con ElevenLabs",
   "active": false,
@@ -100,6 +100,31 @@
       "name": "Convertir cada binario a un item por separado"
     },
     {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1712,
+        0
+      ],
+      "id": "c15e645b-7279-4fc7-9515-efa130c18272",
+      "name": "Wait",
+      "webhookId": "bb650e88-76e4-4cd3-8588-aa87b57abf7c"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      voices: [\n        {\n          name: \"femenina\",\n          id: \"2Lb1en5ujrODDIqmp7F3\",\n          text: $json.body.field_long_text_p437rbmkbd,\n          subseccion: $json.body.field_number_1uftd4hkuk7,\n          libro: $json.body.field_number_ufr0dc83ebc,\n        },\n        {\n          name: \"masculina\",\n          id: \"HJAIwgFDzw3Kk9aW7RYr\",\n          text: $json.body.field_long_text_p437rbmkbd,\n          subseccion: $json.body.field_number_1uftd4hkuk7,\n          libro: $json.body.field_number_ufr0dc83ebc,\n        },\n      ],\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fd43e5f7-27bf-4e2c-8f2f-c351b95dad54",
+      "name": "Obtener campos"
+    },
+    {
       "parameters": {
         "method": "POST",
         "url": "https://api.virtualpro.co/api/uploadFile",
@@ -131,20 +156,52 @@
         0
       ],
       "id": "21d0567c-9a45-4002-aa9a-fb7f7de51d3d",
-      "name": "HTTP Request"
+      "name": "Enviar archivos a S3"
     },
     {
       "parameters": {
-        "jsCode": "return [\n  {\n    json: {\n      voices: [\n        {\n          name: \"femenina\",\n          id: \"2Lb1en5ujrODDIqmp7F3\",\n          text: $json.body.field_long_text_p437rbmkbd,\n          subseccion: $json.body.field_number_1uftd4hkuk7,\n          libro: $json.body.field_number_ufr0dc83ebc,\n        },\n        {\n          name: \"masculina\",\n          id: \"HJAIwgFDzw3Kk9aW7RYr\",\n          text: $json.body.field_long_text_p437rbmkbd,\n          subseccion: $json.body.field_number_1uftd4hkuk7,\n          libro: $json.body.field_number_ufr0dc83ebc,\n        },\n      ],\n    },\n  },\n];\n"
+        "jsCode": "const items = $input.all();\n\n// Filtrar solo los .mp3\nconst mp3Items = items.filter(item => item.json?.s3_path?.endsWith('.mp3'));\n\n// Crear el objeto final\nconst result = {};\n\nfor (const item of mp3Items) {\n  const path = item.json.s3_path;\n\n  if (path.includes('audio_voz_1')) {\n    result.audioF = path; // voz femenina\n  } else if (path.includes('audio_voz_2')) {\n    result.audioM = path; // voz masculina\n  }\n}\n\nreturn [{ json: result }];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        208,
+        1488,
         0
       ],
-      "id": "fd43e5f7-27bf-4e2c-8f2f-c351b95dad54",
-      "name": "Code"
+      "id": "fa7c82e2-2e4a-44f2-825b-674578aa3be0",
+      "name": "Convertir respuesta a 1 objeto con ambos enlaces"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/subsectionPub/{{ $('Generar 2 objetos').first().json.subseccion }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"id\": \"{{ $('Generar 2 objetos').first().json.subseccion }}\",\n  \"sup_audio\": \"https://bucketvisualizadorlibros.s3.amazonaws.com/{{ $json.audioM }}\",\n  \"sup_audio2\": \"https://bucketvisualizadorlibros.s3.amazonaws.com/{{ $json.audioF }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1920,
+        0
+      ],
+      "id": "9171ae84-2164-4ada-ba23-9d0d739a0e9e",
+      "name": "Modificar subsección"
+    },
+    {
+      "parameters": {
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/publicar/publication/{{ $('Generar 2 objetos').first().json.libro }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2128,
+        0
+      ],
+      "id": "3bed4af2-c09d-4548-900c-0f06ced0099f",
+      "name": "Generar JSON"
     }
   ],
   "connections": {
@@ -152,7 +209,7 @@
       "main": [
         [
           {
-            "node": "Code",
+            "node": "Obtener campos",
             "type": "main",
             "index": 0
           }
@@ -196,18 +253,62 @@
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "Enviar archivos a S3",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Code": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Modificar subsección",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener campos": {
       "main": [
         [
           {
             "node": "Generar 2 objetos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar archivos a S3": {
+      "main": [
+        [
+          {
+            "node": "Convertir respuesta a 1 objeto con ambos enlaces",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convertir respuesta a 1 objeto con ambos enlaces": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modificar subsección": {
+      "main": [
+        [
+          {
+            "node": "Generar JSON",
             "type": "main",
             "index": 0
           }
@@ -221,7 +322,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "7bb6c9ba-aa75-4d01-b8b6-a7fef0f690c3",
+  "versionId": "5ca265e6-9c3f-4d44-987f-6aeb21aefd2f",
   "triggerCount": 0,
   "tags": []
 }
