@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-16T14:48:03.725Z",
-  "updatedAt": "2025-11-10T14:54:30.213Z",
+  "updatedAt": "2025-11-12T03:07:25.913Z",
   "id": "6X10p2VMk8oR4uhy",
   "name": "Generar BV All",
   "active": true,
@@ -20,7 +20,7 @@
       "typeVersion": 1.2,
       "position": [
         0,
-        0
+        32
       ],
       "id": "1b6eed6a-e0d0-4045-ba53-13c72921f602",
       "name": "Schedule Trigger"
@@ -28,18 +28,20 @@
     {
       "parameters": {
         "url": "https://api.virtualpro.co/api/generate/biblioteca",
-        "options": {}
+        "options": {
+          "timeout": 10000
+        }
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        208,
-        0
+        224,
+        32
       ],
       "id": "e4c42af0-0a87-4906-bb0d-c3451a050ec9",
       "name": "HTTP Request",
-      "alwaysOutputData": true,
-      "onError": "continueRegularOutput"
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -50,11 +52,33 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        416,
-        0
+        448,
+        -64
       ],
       "id": "a88b9579-8a1f-4ad2-badc-d6c1b8d31451",
       "name": "Send a text message",
+      "webhookId": "c3458fe3-f758-4270-9e37-acb743f638ad",
+      "credentials": {
+        "telegramApi": {
+          "id": "rOOSfezTBGWLluyQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6957598767",
+        "text": "Termino BV con error",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        128
+      ],
+      "id": "ac2e59c0-bb67-4cb4-88fd-189c3e43432d",
+      "name": "Send a text message1",
       "webhookId": "c3458fe3-f758-4270-9e37-acb743f638ad",
       "credentials": {
         "telegramApi": {
@@ -84,6 +108,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -102,7 +133,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "1ab3bc61-8c99-45fc-899f-63da860fed48",
+  "versionId": "18e17089-f0b9-4f52-99b5-b2d32943530a",
   "triggerCount": 1,
   "tags": [
     {
