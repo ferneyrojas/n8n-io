@@ -1,0 +1,188 @@
+{
+  "createdAt": "2025-11-12T19:27:58.957Z",
+  "updatedAt": "2025-11-12T20:37:27.563Z",
+  "id": "5c18Pj8EAAVvqS7d",
+  "name": "leerDocs",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -96
+      ],
+      "id": "25bba5b5-0ba2-4844-946c-04fb140bcc49",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1KhPiEyU0B1UX09Wloj8uqyM2BfMm5yn0v34tDmO0dsQ"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        0
+      ],
+      "id": "8f770a18-2aaa-4a37-ad3c-7019afff892d",
+      "name": "Get a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "b5Sd9P2ErrPJdoA9",
+          "name": "AuthGoogle - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.content; // texto exportado del documento\nconst paragraphs = text.split(/\\n+/).filter(p => p.trim() !== \"\");\nreturn paragraphs.map((p, i) => ({\n  json: { id: i + 1, paragraph: p }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        0
+      ],
+      "id": "70036f36-a1f0-4ae9-94c5-440a4e541a1c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8e7ea42-e171-4081-afaa-c7b06b1d2f5b",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        0
+      ],
+      "id": "565cca29-6948-4c9c-843c-427e1ae049bd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "Principitocompleto.docx",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -160,
+        -192
+      ],
+      "id": "24b1231f-7a80-4d77-b381-21ea74aea2ba",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        48,
+        -192
+      ],
+      "id": "9c8ef41d-99ec-4181-b77e-6512a6549fdb",
+      "name": "HTTP Request",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get a document",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        []
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "92281f0a-ae71-4edb-b255-e3a06a0032e1",
+  "triggerCount": 0,
+  "tags": []
+}
