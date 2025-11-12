@@ -1,9 +1,9 @@
 {
   "createdAt": "2025-11-11T20:54:51.851Z",
-  "updatedAt": "2025-11-11T20:58:51.293Z",
+  "updatedAt": "2025-11-11T21:05:43.425Z",
   "id": "H4i1nsF5xQvx78NC",
   "name": "createUser",
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
@@ -43,11 +43,25 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        208,
+        224,
         0
       ],
       "id": "eea24df0-4c2b-43e0-8f59-df96bb977dc3",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html>\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>Proceso ejecutado</title>\n</head>\n<body>\n  <div class=\"container\">\n    <h1>Proceso ejecutado</h1>\n    <!-- <h2>This is an H2 heading</h2>\n    <p>This is a paragraph</p> -->\n  </div>\n</body>\n</html>\n\n<style>\n.container {\n  background-color: #ffffff;\n  text-align: center;\n  padding: 16px;\n  border-radius: 8px;\n}\n\nh1 {\n  color: #ff6d5a;\n  font-size: 24px;\n  font-weight: bold;\n  padding: 8px;\n}\n\nh2 {\n  color: #909399;\n  font-size: 18px;\n  font-weight: bold;\n  padding: 8px;\n}\n</style>\n\n<script>\nconsole.log(\"Hello World!\");\n</script>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "3af26ac0-ca72-420c-83fe-c3662fcf7bbf",
+      "name": "HTML"
     }
   ],
   "connections": {
@@ -56,6 +70,17 @@
         [
           {
             "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
             "type": "main",
             "index": 0
           }
@@ -80,7 +105,7 @@
       }
     ]
   },
-  "versionId": "167c5ccb-3fe3-4fe3-9da8-73a29a169cfb",
-  "triggerCount": 0,
+  "versionId": "9079ee34-7df5-4fdc-ac99-3e883d57bd82",
+  "triggerCount": 1,
   "tags": []
 }
