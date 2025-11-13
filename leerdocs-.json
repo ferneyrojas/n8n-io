@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T19:27:58.957Z",
-  "updatedAt": "2025-11-12T20:37:27.563Z",
+  "updatedAt": "2025-11-12T21:57:13.804Z",
   "id": "5c18Pj8EAAVvqS7d",
   "name": "leerDocs",
   "active": false,
@@ -39,16 +39,115 @@
     },
     {
       "parameters": {
-        "jsCode": "const text = $input.first().json.content; // texto exportado del documento\nconst paragraphs = text.split(/\\n+/).filter(p => p.trim() !== \"\");\nreturn paragraphs.map((p, i) => ({\n  json: { id: i + 1, paragraph: p }\n}));\n"
+        "content": "Extarer imagenes\n-- No se hace, pues es más facil pasar el docx a zip y buscar allí las imágenes",
+        "height": 176,
+        "width": 848
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -200,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "73a76a54-b111-4e3a-bb99-bdc1cc81abad",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "Principitocompleto-drive",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -160,
+        -192
+      ],
+      "id": "24b1231f-7a80-4d77-b381-21ea74aea2ba",
+      "name": "Buscar archivo",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        64,
+        -192
+      ],
+      "id": "9c8ef41d-99ec-4181-b77e-6512a6549fdb",
+      "name": "Traer el archivo",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body.content;\nconst images = [];\n\nfunction findImages(elements) {\n  for (const el of elements) {\n    if (el.paragraph && el.paragraph.elements) {\n      for (const e of el.paragraph.elements) {\n        if (e.inlineObjectElement) {\n          images.push(e.inlineObjectElement.inlineObjectId);\n        }\n      }\n    }\n    if (el.table) {\n      el.table.tableRows.forEach(row =>\n        row.tableCells.forEach(cell => findImages(cell.content))\n      );\n    }\n  }\n}\n\nfindImages(body);\nreturn images.map(id => ({ json: { inlineObjectId: id } }));\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         288,
-        0
+        -192
       ],
-      "id": "70036f36-a1f0-4ae9-94c5-440a4e541a1c",
-      "name": "Code"
+      "id": "82f57427-0948-4081-a977-fe64defd2586",
+      "name": "Extarer id Imágenes"
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $('Buscar archivo').item.json.id }}?fields=inlineObjects",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        -192
+      ],
+      "id": "e19cf2af-188b-47a2-80b2-3be64a8cdaab",
+      "name": "Buscar cada imagen",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## Extraer textos del documento\n",
+        "height": 192,
+        "width": 608,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "fd6b82c9-5e96-4eb8-adfb-f9d92d812647",
+      "name": "Sticky Note1"
     },
     {
       "parameters": {
@@ -71,51 +170,20 @@
         0
       ],
       "id": "565cca29-6948-4c9c-843c-427e1ae049bd",
-      "name": "Edit Fields"
+      "name": "Convertir el doc a Txt-Json"
     },
     {
       "parameters": {
-        "resource": "fileFolder",
-        "queryString": "Principitocompleto.docx",
-        "filter": {},
-        "options": {}
+        "jsCode": "const text = $input.first().json.content; // texto exportado del documento\nconst paragraphs = text.split(/\\n+/).filter(p => p.trim() !== \"\");\nreturn paragraphs.map((p, i) => ({\n  json: { id: i + 1, paragraph: p }\n}));\n"
       },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        -160,
-        -192
+        288,
+        0
       ],
-      "id": "24b1231f-7a80-4d77-b381-21ea74aea2ba",
-      "name": "Search files and folders",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "X8Q7VA77D1tpqDJZ",
-          "name": "Auth Drive - ferneyrojas@gmail.com"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        48,
-        -192
-      ],
-      "id": "9c8ef41d-99ec-4181-b77e-6512a6549fdb",
-      "name": "HTTP Request",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "X8Q7VA77D1tpqDJZ",
-          "name": "Auth Drive - ferneyrojas@gmail.com"
-        }
-      }
+      "id": "70036f36-a1f0-4ae9-94c5-440a4e541a1c",
+      "name": "Extraer párrafos de txt"
     }
   ],
   "connections": {
@@ -128,7 +196,7 @@
             "index": 0
           },
           {
-            "node": "Search files and folders",
+            "node": "Buscar archivo",
             "type": "main",
             "index": 0
           }
@@ -139,38 +207,60 @@
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "Convertir el doc a Txt-Json",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Edit Fields": {
+    "Buscar archivo": {
       "main": [
         [
           {
-            "node": "Code",
+            "node": "Traer el archivo",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Code": {
+    "Traer el archivo": {
+      "main": [
+        [
+          {
+            "node": "Extarer id Imágenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extarer id Imágenes": {
+      "main": [
+        [
+          {
+            "node": "Buscar cada imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convertir el doc a Txt-Json": {
+      "main": [
+        [
+          {
+            "node": "Extraer párrafos de txt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer párrafos de txt": {
       "main": [
         []
-      ]
-    },
-    "Search files and folders": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
       ]
     }
   },
@@ -182,7 +272,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "92281f0a-ae71-4edb-b255-e3a06a0032e1",
+  "versionId": "05090cf5-dad8-4b48-9b28-16949bce7edb",
   "triggerCount": 0,
   "tags": []
 }
