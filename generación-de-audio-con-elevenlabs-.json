@@ -1,9 +1,9 @@
 {
   "createdAt": "2025-11-11T14:33:58.495Z",
-  "updatedAt": "2025-11-12T13:54:33.987Z",
+  "updatedAt": "2025-11-12T22:00:04.645Z",
   "id": "jcN1FJHFrnbm2cAu",
   "name": "Generación de audio con ElevenLabs",
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
@@ -323,6 +323,6 @@
   "meta": null,
   "pinData": {},
   "versionId": "5ca265e6-9c3f-4d44-987f-6aeb21aefd2f",
-  "triggerCount": 0,
+  "triggerCount": 1,
   "tags": []
 }
