@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T19:27:58.957Z",
-  "updatedAt": "2025-11-12T21:57:13.804Z",
+  "updatedAt": "2025-11-13T10:54:09.770Z",
   "id": "5c18Pj8EAAVvqS7d",
   "name": "leerDocs",
   "active": false,
@@ -46,7 +46,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         -200,
-        -240
+        -208
       ],
       "typeVersion": 1,
       "id": "73a76a54-b111-4e3a-bb99-bdc1cc81abad",
@@ -272,7 +272,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "05090cf5-dad8-4b48-9b28-16949bce7edb",
+  "versionId": "0904001b-476c-4f78-a8b7-dd58b30bd9dc",
   "triggerCount": 0,
   "tags": []
 }
