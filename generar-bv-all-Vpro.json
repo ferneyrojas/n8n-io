@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-16T14:48:03.725Z",
-  "updatedAt": "2025-11-12T03:07:25.913Z",
+  "updatedAt": "2025-11-14T11:46:23.186Z",
   "id": "6X10p2VMk8oR4uhy",
   "name": "Generar BV All",
   "active": true,
@@ -20,7 +20,7 @@
       "typeVersion": 1.2,
       "position": [
         0,
-        32
+        -64
       ],
       "id": "1b6eed6a-e0d0-4045-ba53-13c72921f602",
       "name": "Schedule Trigger"
@@ -86,6 +86,17 @@
           "name": "Telegram account"
         }
       }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        128
+      ],
+      "id": "63320620-71fb-4930-89fb-a1e42bd29b05",
+      "name": "When clicking ‘Execute workflow’"
     }
   ],
   "connections": {
@@ -117,6 +128,17 @@
           }
         ]
       ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -133,7 +155,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "18e17089-f0b9-4f52-99b5-b2d32943530a",
+  "versionId": "f0088cb0-c033-4a1f-b886-2d8a2ad8cf2a",
   "triggerCount": 1,
   "tags": [
     {
