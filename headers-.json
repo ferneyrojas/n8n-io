@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-31T15:28:33.159Z",
-  "updatedAt": "2025-10-31T15:28:53.170Z",
+  "updatedAt": "2025-11-14T11:41:31.129Z",
   "id": "AbfgxWROYRimHsVa",
   "name": "Headers",
   "active": true,
@@ -27,7 +27,7 @@
     },
     {
       "parameters": {
-        "url": "https://api.virtualpro.co/data/json/homeHeader.json",
+        "url": "https://api.virtualpro.co/api/generate?type=homestats",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -63,7 +63,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "2d35c419-f90f-4028-a635-2f5d94de5fe2",
+  "versionId": "178e6af5-8ad2-45b1-a79a-3a9682784e71",
   "triggerCount": 1,
   "tags": []
 }
