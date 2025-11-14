@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-17T12:01:37.597Z",
-  "updatedAt": "2025-10-17T12:06:53.643Z",
+  "updatedAt": "2025-11-14T11:43:13.936Z",
   "id": "l8fsRgeCJk8CEJ1P",
   "name": "Upd Estadísticas",
   "active": true,
@@ -64,7 +64,7 @@
         "rule": {
           "interval": [
             {
-              "triggerAtHour": 11
+              "triggerAtHour": 23
             }
           ]
         }
@@ -129,7 +129,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "25125b1f-e271-4004-967a-fb478db3476f",
+  "versionId": "8913d2c7-a23b-40f6-91d8-8dcbbd773c28",
   "triggerCount": 1,
   "tags": [
     {
