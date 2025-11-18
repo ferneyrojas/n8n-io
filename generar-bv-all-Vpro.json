@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-16T14:48:03.725Z",
-  "updatedAt": "2025-11-14T11:46:23.186Z",
+  "updatedAt": "2025-11-18T16:48:18.947Z",
   "id": "6X10p2VMk8oR4uhy",
   "name": "Generar BV All",
   "active": true,
@@ -10,9 +10,7 @@
       "parameters": {
         "rule": {
           "interval": [
-            {
-              "daysInterval": 2
-            }
+            {}
           ]
         }
       },
@@ -155,7 +153,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "f0088cb0-c033-4a1f-b886-2d8a2ad8cf2a",
+  "versionId": "e2f2fc77-e275-42f7-b4a9-71d057b69cc8",
   "triggerCount": 1,
   "tags": [
     {
