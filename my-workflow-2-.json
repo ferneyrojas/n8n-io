@@ -1,40 +1,191 @@
 {
-  "createdAt": "2025-10-20T19:20:56.968Z",
-  "updatedAt": "2025-10-23T22:37:08.013Z",
-  "id": "gioqbuuIcg35OwDy",
+  "createdAt": "2025-11-19T20:17:16.631Z",
+  "updatedAt": "2025-11-19T20:53:14.649Z",
+  "id": "An5Ykq1ksEKFGtbQ",
   "name": "My workflow 2",
   "active": false,
-  "isArchived": true,
+  "isArchived": false,
   "nodes": [
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['Descripción'] }}",
+        "options": {
+          "systemMessage": "=Eres un generador de datos jerárquicos. \nSiempre debes devolver la información en formato JSON válido, sin explicaciones ni texto fuera del JSON.\n\nLa estructura que debes seguir es la siguiente:\n\n{\n  \"temas\": [\n    {\n      \"nombre\": \"Tema 1\",\n      \"subtemas\": [\n        {\n          \"nombre\": \"Subtema 1\",\n          \"contenido\": [\n            \"Párrafo 1\",\n            \"Párrafo 2\"\n          ]\n        },\n        {\n          \"nombre\": \"Subtema 2\",\n          \"contenido\": [\n            \"Párrafo 1\"\n          ]\n        }\n      ]\n    }\n  ]\n}\n\nRegla especial:\n- Debes añadir siempre dos nodos fijos, la portada al inicio el cual tenga la siguiente estructura\n{\n  \"nombre\": \"Portada\",\n  \"prompt\" : \"\", /* Ej. Genera una imagen en formato PNG, no texto, solo imagen, sobre el tema ${temática del usuario}. No incluyas ninguna descripción, solo devuelve la imagen. */\n  \"subtemas\": [\n    {\n      \"nombre\": \"portada\",\n      \"titulo\": \"\" /* Aquí debe ir la temática que ingresó el usuario */\n    }\n  ]\n}\n\ny la trivia al final la cual tenga esta estructura:\n{\n  \"nombre\": \"Trivia\",\n  \"subtemas\": [\n    {\n      \"nombre\": \"Trivia\"\n    }\n  ]\n}\n\nReglas:\n- Genera el número exacto de temas principales para el área de estudio que te de el usuario.\n- Para cada tema genera entre 1 y 3 subtemas.\n- Para cada subtema genera entre 1 y 3 párrafos explicativos.\n- Nunca incluyas texto adicional fuera del JSON.\n- Respeta estrictamente la jerarquía y el formato indicado.\n- Genera párrafos bien elaborados, que no sean muy extensos pero tampoco tan cortos, que aporten una información clara y valiosa.\n\nDebes generar el contenido según el área de estudio proporcionada por el usuario.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
       "position": [
-        0,
+        192,
         0
       ],
-      "id": "d2442398-c472-4d1d-9c43-efa388e2e915",
-      "name": "When clicking ‘Execute workflow’"
+      "id": "7c99bc60-617a-4d86-afd9-88a6b7418412",
+      "name": "AI Agent"
     },
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.noOp",
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        208,
+        144,
+        208
+      ],
+      "id": "1b34c75f-933e-4cde-ae80-db23834342c1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aIxnqyxtSpRHT2lD",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        208
+      ],
+      "id": "d724c1e9-f445-4e03-815c-2789f25802f3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "formTitle": "Infografías",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Proyecto",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Virtualpro"
+                  },
+                  {
+                    "option": "Virtualplant"
+                  },
+                  {
+                    "option": "Erosky"
+                  },
+                  {
+                    "option": "Phet"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Plantilla",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Virtualpro"
+                  },
+                  {
+                    "option": "Virtualplant"
+                  },
+                  {
+                    "option": "Guia laboratorio"
+                  },
+                  {
+                    "option": "Laboratorio"
+                  },
+                  {
+                    "option": "Info V2"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Fuente",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Arial"
+                  },
+                  {
+                    "option": "monospace"
+                  },
+                  {
+                    "option": "Helvetica"
+                  },
+                  {
+                    "option": "sans-serif"
+                  },
+                  {
+                    "option": "serif"
+                  },
+                  {
+                    "option": "Roboto"
+                  },
+                  {
+                    "option": "Courier"
+                  },
+                  {
+                    "option": "Hanalei"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Descripción",
+              "fieldType": "textarea",
+              "placeholder": "Descripción de la infografía"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
         0
       ],
-      "id": "9531d06e-6c82-4a4f-b8da-262012a7b310",
-      "name": "No Operation, do nothing"
+      "id": "dbfe5d6e-ce3f-4548-8c12-24cbd7c44296",
+      "name": "On form submission",
+      "webhookId": "7c78f82b-d646-4354-9d85-6b05bae234c4"
     }
   ],
   "connections": {
-    "When clicking ‘Execute workflow’": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
       "main": [
         [
           {
-            "node": "No Operation, do nothing",
+            "node": "AI Agent",
             "type": "main",
             "index": 0
           }
@@ -46,9 +197,11 @@
     "executionOrder": "v1"
   },
   "staticData": null,
-  "meta": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "pinData": {},
-  "versionId": "dab2071c-6c09-450c-bd81-326b00ab34c3",
+  "versionId": "068269df-5c5a-4979-9868-078e00469a9d",
   "triggerCount": 0,
   "tags": []
 }
