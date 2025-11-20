@@ -1,0 +1,271 @@
+{
+  "createdAt": "2025-11-20T19:25:07.153Z",
+  "updatedAt": "2025-11-20T20:56:39.401Z",
+  "id": "bpp7Uu8e6rR4HBok",
+  "name": "My workflow 4",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "infografias-ia",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4422496e-7438-47c7-b132-9981696159ef",
+      "name": "Webhook",
+      "webhookId": "0d172027-1038-41ae-b780-5a92d34bfa89"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\" />\n<title>Panel n8n</title>\n<script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n\n<body class=\"bg-gray-100 p-6\">\n\n<div id=\"mainMenu\" class=\"max-w-xl mx-auto bg-white p-6 rounded-xl shadow\">\n  <h1 class=\"text-xl font-bold mb-4\">Panel de acciones</h1>\n\n  <div class=\"flex flex-col gap-3\">\n    <button onclick=\"showForm()\" class=\"bg-blue-600 text-white py-2 px-4 rounded-lg\">Crear estructura infografías</button>\n    <button class=\"bg-gray-600 text-white py-2 px-4 rounded-lg\">Otra acción</button>\n    <button class=\"bg-gray-600 text-white py-2 px-4 rounded-lg\">Otra acción 2</button>\n  </div>\n</div>\n\n<!-- FORMULARIO OCULTO -->\n<div id=\"formContainer\" class=\"hidden max-w-xl mx-auto bg-white p-6 rounded-xl shadow\">\n  \n  <button onclick=\"showMenu()\" class=\"text-blue-600 mb-4 flex items-center\">\n    ← Volver\n  </button>\n\n  <h2 class=\"text-lg font-semibold mb-4\">Crear estructura infografía</h2>\n\n  <form method=\"POST\" action=\"https://hpa.lugnia.com/webhook/infografias-ia\">\n\n    <!-- Nombre -->\n    <label class=\"block mb-2 font-medium\">Nombre</label>\n    <input type=\"text\" name=\"inf_nombre\" class=\"w-full border px-3 py-2 rounded mb-4\" required />\n\n    <!-- Proyecto -->\n    <label class=\"block mb-2 font-medium\">Proyecto</label>\n    <select name=\"inf_proyecto\" class=\"w-full border px-3 py-2 rounded mb-4\">\n      <option value=\"1\">Virtualpro</option>\n      <option value=\"2\">Virtualplant</option>\n      <option value=\"3\">Erosky</option>\n      <option value=\"4\">Phet</option>\n    </select>\n\n    <!-- Plantilla -->\n    <label class=\"block mb-2 font-medium\">Plantilla</label>\n    <select name=\"inf_plantilla\" class=\"w-full border px-3 py-2 rounded mb-4\">\n      <option value=\"1\">Virtualpro</option>\n      <option value=\"2\">Virtualplant</option>\n      <option value=\"3\">Guía de laboratorio</option>\n      <option value=\"4\">Laboratorio</option>\n      <option value=\"5\">Info V2</option>\n    </select>\n\n    <!-- Fuente -->\n    <label class=\"block mb-2 font-medium\">Fuente</label>\n    <select name=\"inf_font\" class=\"w-full border px-3 py-2 rounded mb-4\">\n      <option value=\"1\">Arial</option>\n      <option value=\"2\">Monospace</option>\n      <option value=\"3\">Helvética</option>\n      <option value=\"4\">Sans-serif</option>\n      <option value=\"5\">Serif</option>\n      <option value=\"6\">Courier</option>\n      <option value=\"7\">Hanalei</option>\n    </select>\n\n    <!-- Colores -->\n    <label class=\"block mb-2 font-medium\">Color base</label>\n    <input type=\"text\" name=\"inf_color\" value=\"#000000\" class=\"w-full border px-3 py-2 rounded mb-4\" />\n\n    <label class=\"block mb-2 font-medium\">Color secundario</label>\n    <input type=\"text\" name=\"inf_color_secundario\" value=\"#000000\" class=\"w-full border px-3 py-2 rounded mb-4\" />\n\n    <!-- Checkbox -->\n    <label class=\"flex items-center gap-2 mb-4\">\n      <input type=\"checkbox\" name=\"inf_activo\" value=\"true\" />\n      Activo\n    </label>\n\n    <!-- Descripción -->\n    <label class=\"block mb-2 font-medium\">Descripción</label>\n    <textarea name=\"inf_descripcion\" class=\"w-full border px-3 py-2 rounded mb-4\"></textarea>\n\n    <!-- Tipo infografía -->\n    <label class=\"block mb-2 font-medium\">Tipo de infografía</label>\n    <select name=\"inf_tipo_infografia\" class=\"w-full border px-3 py-2 rounded mb-4\">\n      <option value=\"1\">Infografía</option>\n      <option value=\"2\">Proceso</option>\n      <option value=\"3\">Perfil</option>\n      <option value=\"4\">Escenario</option>\n    </select>\n\n    <button type=\"submit\" class=\"bg-green-600 text-white py-2 px-4 rounded-lg w-full\">\n      Enviar\n    </button>\n  </form>\n\n</div>\n\n<script>\nfunction showForm() {\n  document.getElementById('mainMenu').classList.add('hidden');\n  document.getElementById('formContainer').classList.remove('hidden');\n}\n\nfunction showMenu() {\n  document.getElementById('formContainer').classList.add('hidden');\n  document.getElementById('mainMenu').classList.remove('hidden');\n}\n</script>\n\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        448,
+        -160
+      ],
+      "id": "f584f922-8d52-4c80-b2ec-73821191288f",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "646391c4-5b0c-4686-b16f-d81c973aff25",
+              "name": "=inf_nombre",
+              "value": "={{$json[\"body\"][\"inf_nombre\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "4e233a79-c766-4e31-af61-7157229b60f7",
+              "name": "inf_proyecto",
+              "value": "={{$json[\"body\"][\"inf_proyecto\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "b3f87446-0340-4dcb-a602-8ce63b0d1de2",
+              "name": "inf_plantilla",
+              "value": "={{$json[\"body\"][\"inf_plantilla\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "10a31127-b62e-441a-9182-4bf42afc0027",
+              "name": "inf_font",
+              "value": "={{$json[\"body\"][\"inf_font\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "479c7e32-eae1-4b8a-babf-b5a9c801dda2",
+              "name": "inf_color",
+              "value": "={{$json[\"body\"][\"inf_color\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "3b0db931-eca0-4482-8cd8-63d70b908e7a",
+              "name": "inf_color_secundario",
+              "value": "={{$json[\"body\"][\"inf_color_secundario\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "6e8f2a02-8b1c-4ecc-8285-c7f1da09a3cf",
+              "name": "inf_activo",
+              "value": "={{$json[\"body\"][\"inf_activo\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "f37684a3-c3e0-43c6-a2d4-0d9d4ec617bf",
+              "name": "inf_descripcion",
+              "value": "={{$json[\"body\"][\"inf_descripcion\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "71641a02-2d69-484e-b22e-d43993872b2a",
+              "name": "inf_tipo_infografia",
+              "value": "={{$json[\"body\"][\"inf_tipo_infografia\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "376aace4-af7a-4228-baed-0e1ec83545ee",
+              "name": "inf_proyecto",
+              "value": "9",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        272
+      ],
+      "id": "c220a2a8-8f1d-4527-bf5a-3e08d04507ee",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\">\n<title>Procesando...</title>\n<script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n\n<body class=\"bg-gray-100 p-10 text-center\">\n\n<h1 class=\"text-2xl font-bold mb-4\">Procesando datos…</h1>\n<p class=\"text-gray-600 mb-6\">Tu información está siendo procesada.</p>\n\n<div class=\"my-6 animate-pulse text-gray-700\">\n  Cargando...\n</div>\n\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        768,
+        272
+      ],
+      "id": "6b9383cf-2312-4ea8-93f2-9191d599b918",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/infografia",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inf_nombre",
+              "value": "={{ $json.inf_nombre }}"
+            },
+            {
+              "name": "inf_proyecto",
+              "value": "={{ $json.inf_proyecto }}"
+            },
+            {
+              "name": "inf_plantilla",
+              "value": "={{ $json.inf_plantilla }}"
+            },
+            {
+              "name": "inf_font",
+              "value": "={{ $json.inf_font }}"
+            },
+            {
+              "name": "inf_color",
+              "value": "={{ $json.inf_color }}"
+            },
+            {
+              "name": "inf_color_secundario",
+              "value": "={{ $json.inf_color_secundario }}"
+            },
+            {
+              "name": "inf_activo",
+              "value": "={{ $json.inf_activo }}"
+            },
+            {
+              "name": "inf_descripcion",
+              "value": "={{ $json.inf_descripcion }}"
+            },
+            {
+              "name": "inf_tipo_infografia",
+              "value": "={{ $json.inf_tipo_infografia }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        272
+      ],
+      "id": "22bd1f31-b19d-44f4-9307-3858c9de870b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        272
+      ],
+      "id": "ecbd4f8a-6d00-4936-9297-af1484681fb0",
+      "name": "Create spreadsheet"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Webhook": []
+  },
+  "versionId": "2670ffca-52a6-4265-9888-ecaa9dba0689",
+  "triggerCount": 1,
+  "tags": []
+}
