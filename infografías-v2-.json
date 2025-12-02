@@ -1,0 +1,1109 @@
+{
+  "createdAt": "2025-11-20T19:25:07.153Z",
+  "updatedAt": "2025-11-22T22:26:05.075Z",
+  "id": "bpp7Uu8e6rR4HBok",
+  "name": "Infografías V2",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "infografias-ia",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4422496e-7438-47c7-b132-9981696159ef",
+      "name": "Webhook",
+      "webhookId": "0d172027-1038-41ae-b780-5a92d34bfa89"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.pag_accion }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "532d2c42-9d66-4753-a9ac-8463b0535e28"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Crear estructura"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "64b09aa3-2df3-49b5-9c96-4a8cd33ed9f3",
+                    "leftValue": "={{ $json.pag_accion }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Generar contenido"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7c51d5cd-b124-4019-b0f8-57af29bf31f5",
+                    "leftValue": "={{ $json.pag_accion }}",
+                    "rightValue": "3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Diagramar infografía"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        256
+      ],
+      "id": "73969058-fc74-4a58-ab36-e9b5f201e02e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Crea {{ $('Obtener campos del formulario').item.json.inf_num_secciones }} temas, cada tema debe contener {{ $('Obtener campos del formulario').item.json.inf_num_secciones }} subtemas, a su vez, cada uno con {{ $('Obtener campos del formulario').item.json.inf_num_slides }} contenidos (estos deben ser strings vacíos pero debe quedar el campo), los temas y subtemas genéralos sobre {{ $('Obtener campos del formulario').item.json.inf_tema }}. Los temas que generes deben tener coherencia con el tipo de audiencia, para este caso es \"{{ $('Obtener campos del formulario').item.json.inf_audiencia }}\"",
+        "options": {
+          "systemMessage": "=Eres un generador de datos jerárquicos. \nSiempre debes devolver la información en formato JSON válido, sin explicaciones ni texto fuera del JSON.\n\nReglas crítica de formato:\n- Prohibido usar bloques de código. No uses backticks (```).\n- Prohibido usar markdown.\n- No incluyas texto, explicaciones ni comentarios fuera del     JSON.\n- La salida final debe ser solo JSON puro y válido.\n\nLa estructura que debes seguir es la siguiente:\n\n{\n  \"temas\": [\n    {\n      \"nombre\": \"Tema 1\",\n      \"subtemas\": [\n        {\n          \"nombre\": \"Subtema 1\",\n          \"contenido\": [\n            \"Vacío\",\n            \"Vacío\"\n          ]\n        },\n        {\n          \"nombre\": \"Subtema 2\",\n          \"contenido\": [\n            \"Vacío\"\n          ]\n        }\n      ]\n    }\n  ]\n}\n\nRegla especial:\n- Debes añadir siempre dos nodos fijos, la portada al inicio el cual tenga la siguiente estructura\n{\n  \"nombre\": \"Portada\",\n  \"prompt\" : \"\", /* Ej. Genera una imagen en formato PNG, no texto, solo imagen, sobre el tema \"{{ $('Obtener campos del formulario').first().json.inf_nombre }}\". No incluyas ninguna descripción, solo devuelve la imagen. El nombre del tema debe ser exacto al que el usuario digitó en el prompt, no lo cambies por la influencia de la audiencia */\n  \"subtemas\": [\n    {\n      \"nombre\": \"portada\",\n      \"titulo\": \"\" /* Aquí debe ir la temática que ingresó el usuario */\n    }\n  ]\n}\n\ny la trivia al final la cual tenga esta estructura:\n{\n  \"nombre\": \"Trivia\",\n  \"subtemas\": [\n    {\n      \"nombre\": \"Trivia\"\n    }\n  ]\n}\n\nReglas:\n- Genera el número exacto de temas principales para el área de estudio que te de el usuario.\n- Para cada tema genera n subtemas que serán definidos por el usuario.\n- Para cada subtema genera n cantidad de párrafos explicativos (el ususario los proveerá).\n- Nunca incluyas texto adicional fuera del JSON.\n- Respeta estrictamente la jerarquía y el formato indicado.\n- Genera párrafos bien elaborados, que no sean muy extensos pero tampoco tan cortos, que aporten una información clara y valiosa.\n- Se debe generar n cantidad de contenidos, pero deben ser strings vacíos.\n\nDebes generar el contenido según el área de estudio proporcionada por el usuario.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1408,
+        -144
+      ],
+      "id": "36a0f783-e272-4243-9740-167c6411c982",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        32
+      ],
+      "id": "4e66a82b-9614-4c89-8e93-9ffb3b6451b4",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aIxnqyxtSpRHT2lD",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "n8n-infografias",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        32
+      ],
+      "id": "c183e251-9593-4670-b7cd-8add4dfd8255",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function node (Parse JSON)\nconst out = [];\n\n/** Recopila todos los strings dentro del objeto (busca en keys/arrays) */\nfunction collectStrings(obj, acc = []) {\n  if (obj == null) return acc;\n  if (typeof obj === 'string') { acc.push(obj); return acc; }\n  if (Array.isArray(obj)) {\n    for (const v of obj) collectStrings(v, acc);\n  } else if (typeof obj === 'object') {\n    for (const k of Object.keys(obj)) collectStrings(obj[k], acc);\n  }\n  return acc;\n}\n\n/** Extrae una subcadena JSON balanceada (soporta { ... } y [ ... ]).\n *  Devuelve null si no encuentra cierre balanceado. */\nfunction extractBalanced(s) {\n  const start = s.search(/[{[]/);\n  if (start === -1) return null;\n  const open = s[start];\n  const close = open === '{' ? '}' : ']';\n  let depth = 0;\n  let inString = false;\n  let prev = '';\n  for (let i = start; i < s.length; i++) {\n    const ch = s[i];\n    if (ch === '\"' && prev !== '\\\\') inString = !inString;\n    if (!inString) {\n      if (ch === open) depth++;\n      else if (ch === close) {\n        depth--;\n        if (depth === 0) return s.slice(start, i + 1);\n      }\n    }\n    prev = ch;\n  }\n  // Si aquí no está balanceado, intenta devolver hasta la última llave/corchete\n  const lastClose = s.lastIndexOf(close);\n  if (lastClose > start) return s.slice(start, lastClose + 1);\n  return null;\n}\n\n/** Intento de parse seguro */\nfunction tryJSONParse(s) {\n  try { return JSON.parse(s); } catch (e) { return null; }\n}\n\n// ---- comienzo ----\nconst item = items[0] ? items[0].json : {};\nconst candidates = collectStrings(item);\n\n// Si no hay strings, usa la representación JSON del objeto\nconst rawCandidate = (candidates.length ? candidates : [JSON.stringify(item)]).sort((a,b) => {\n  // Prioriza candidatos que contengan \"temas\" y llaves\n  const score = s => (s.includes('\"temas\"') ? 10 : 0) + (s.includes('{') ? 1 : 0);\n  return score(b) - score(a);\n})[0];\n\nlet parsed = null;\n\n// 1) intenta extraer bloque balanceado y parsear\nconst balanced = extractBalanced(rawCandidate);\nif (balanced) parsed = tryJSONParse(balanced);\n\n// 2) si falla, intenta \"unescape\" de \\n y \\\"\nif (!parsed) {\n  const unesc = rawCandidate.replace(/\\\\n/g, '\\n').replace(/\\\\\"/g, '\"');\n  const balanced2 = extractBalanced(unesc) || unesc;\n  parsed = tryJSONParse(balanced2);\n}\n\n// 3) si aún falla, busca la clave \"temas\" y recorta desde la llave previa\nif (!parsed) {\n  const keyIdx = rawCandidate.search(/\"temas\"\\s*:/);\n  if (keyIdx !== -1) {\n    const braceIdx = rawCandidate.lastIndexOf('{', keyIdx);\n    if (braceIdx !== -1) {\n      const substr = rawCandidate.slice(braceIdx);\n      const balanced3 = extractBalanced(substr) || substr;\n      parsed = tryJSONParse(balanced3);\n    }\n  }\n}\n\n// 4) salida: si parseó, devuelve el objeto; si no, devuelve raw para debug\nif (!parsed) {\n  out.push({\n    json: {\n      success: false,\n      error: 'No se pudo parsear JSON. Revisa el campo raw para depuración.',\n      raw: rawCandidate\n    }\n  });\n  return out;\n}\n\n// Si parseó correctamente, devolvemos el objeto (ej: { temas: [...] })\nout.push({ json: parsed });\nreturn out[0].json.temas.map(t => ({ json: t }));\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        -144
+      ],
+      "id": "066e7b13-8305-4a61-92ca-8118b00deda9",
+      "name": "Respuesta IA convertida a JSON"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://polifoniaeditores.com/v/verbo7api/public/api/infografia",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inf_nombre",
+              "value": "={{ $json.inf_nombre }}"
+            },
+            {
+              "name": "inf_proyecto",
+              "value": "={{ $json.inf_proyecto }}"
+            },
+            {
+              "name": "inf_plantilla",
+              "value": "={{ $json.inf_plantilla }}"
+            },
+            {
+              "name": "inf_font",
+              "value": "={{ $json.inf_font }}"
+            },
+            {
+              "name": "inf_color",
+              "value": "={{ $json.inf_color }}"
+            },
+            {
+              "name": "inf_color_secundario",
+              "value": "={{ $json.inf_color_secundario }}"
+            },
+            {
+              "name": "inf_activo",
+              "value": "={{ $json.inf_activo }}"
+            },
+            {
+              "name": "inf_descripcion",
+              "value": "={{ $json.inf_descripcion }}"
+            },
+            {
+              "name": "inf_tipo_infografia",
+              "value": "={{ $json.inf_tipo_infografia }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        -144
+      ],
+      "id": "22bd1f31-b19d-44f4-9307-3858c9de870b",
+      "name": "Crear infografía en Verbo 8"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "=infografía_{{ $('Obtener campos del formulario').first().json.inf_tema }}_{{ $json.inf_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1008,
+        -144
+      ],
+      "id": "ec599b4d-f64d-4f22-bc8d-8e8e6ad8ecd4",
+      "name": "Crear hoja de cálculo",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DLJrnOoexWAgefO7",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/{{ $json.spreadsheetId }}",
+          "mode": "url"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1CscMQiUg7iNmJa0piE1qZZVcVieZJFvN",
+          "mode": "list",
+          "cachedResultName": "Infografías",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1CscMQiUg7iNmJa0piE1qZZVcVieZJFvN"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1216,
+        -144
+      ],
+      "id": "820bcf4e-57fe-4f19-a691-0fd7d5a64cb6",
+      "name": "Mover hoja a infografías",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "tKyXlrHxdPRzxNET",
+          "name": "Accounts Virtualpro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let rows = [];\n\nfor (const item of items) {\n\n  const seccion = item.json;     // cada sección viene separada\n  const nombre = seccion.nombre || \"\";\n\n  // regla de plantilla\n  let plantilla = 2;\n  if (nombre.toLowerCase() === \"portada\") plantilla = 8;\n  if (nombre.toLowerCase() === \"trivia\") plantilla = 10;\n\n  for (const sub of seccion.subtemas || []) {\n\n    const subNombre = sub.nombre || \"\";\n\n    \n    if (!sub.contenido || sub.contenido.length === 0) {\n      rows.push({\n        seccion: nombre,\n        subseccion: subNombre,\n        slide: 1,\n        plantilla\n      });\n      continue;\n    }\n\n    \n    sub.contenido.forEach((texto, index) => {\n      const slide = index + 1;\n\n      rows.push({\n        seccion: index === 0 ? nombre : \"\",\n        subseccion: index === 0 ? subNombre : \"\",\n        slide,\n        plantilla\n      });\n    });\n\n  }\n\n}\n\n// Regresar cada fila como item\nreturn rows.map(r => ({ json: r }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        -144
+      ],
+      "id": "f5bfef04-29e2-403e-857e-7ffaef9fb808",
+      "name": "Ajustar formato para Sheets"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/{{ $('Crear hoja de cálculo').first().json.spreadsheetId }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "seccion",
+              "displayName": "seccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "subseccion",
+              "displayName": "subseccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "slide",
+              "displayName": "slide",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "plantilla",
+              "displayName": "plantilla",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2144,
+        -144
+      ],
+      "id": "53b3b466-f2c6-49ac-94d5-4d850a06332c",
+      "name": "Agregar las filas al documento",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DLJrnOoexWAgefO7",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Infografía creada</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n\n<body class=\"bg-gray-100 flex items-center justify-center h-screen\">\n\n    <div class=\"bg-white p-8 rounded-xl shadow max-w-lg text-center\">\n\n        <h1 class=\"text-2xl font-bold text-green-700 mb-4\">\n            Estructura generada correctamente\n        </h1>\n\n        <p class=\"text-gray-700 mb-6\">\n            La estructura de la infografía ha sido generada exitosamente.  \n            Puedes acceder a ella haciendo clic en el siguiente enlace:\n        </p>\n\n        <a href=\"{{ $('Crear hoja de cálculo').first().json.spreadsheetUrl }}\" \ntarget=\"_blank\" \n           rel=\"noopener noreferrer\"\n           class=\"bg-blue-600 text-white px-5 py-3 rounded-lg inline-block hover:bg-blue-700 transition\">\n           Ver estructura\n        </a>\n\n    </div>\n\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2560,
+        -144
+      ],
+      "id": "6b9383cf-2312-4ea8-93f2-9191d599b918",
+      "name": "Página de respuesta"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/infografia/{{ $('Crear infografía en Verbo 8').first().json.inf_id }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inf_idSheet",
+              "value": "={{ $('Crear hoja de cálculo').first().json.spreadsheetId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2352,
+        -144
+      ],
+      "id": "8d9b1aa2-d7d7-4fc2-9499-f86358a16997",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Eres un modelo encargado de transformar un JSON sin alterar su estructura. Tu comportamiento debe cumplir las siguientes reglas obligatorias:\n\n1. El JSON de entrada es la PLANTILLA DEFINITIVA. \n   - No puedes agregar claves nuevas.\n   - No puedes eliminar claves existentes.\n   - No puedes renombrar ninguna clave.\n   - No puedes mover elementos ni reordenar secciones.\n   - No puedes modificar el contenido de ningún campo excepto strings vacíos.\n\n2. SOLO puedes reemplazar los strings vacíos (\"\") dentro de arreglos llamados \"contenido\".\n   - Cada string vacío debe convertirse en un párrafo narrativo de 5–7 líneas.\n   - No puedes añadir más elementos al arreglo de \"contenido\".\n   - No puedes borrar elementos del arreglo.\n   - No puedes insertar listas, viñetas ni títulos.\n\n3. TODAS las demás partes del JSON deben permanecer EXACTAMENTE IGUALES.\n   - \"Portada\" debe permanecer idéntica, sin alteraciones.\n   - \"Trivia\" debe permanecer idéntica, sin alteraciones.\n   - Cualquier sección o subsección que no contenga un arreglo de \"contenido\" debe quedar intacta.\n   - No puedes generar texto adicional fuera del contenido requerido.\n\n4. El orden del JSON es inmutable.\n   - Debes devolver el JSON exactamente en el mismo orden en que se te entregó: \n     1. Portada\n     2. Secciones intermedias y sus subsecciones\n     3. Trivia\n\n5. La salida debe ser EXCLUSIVAMENTE un JSON válido.\n   - No incluyas explicaciones, notas, comentarios, formato Markdown ni texto adicional.\n   - Si intentas añadir, cambiar o eliminar algún campo, debes corregirte automáticamente y devolver el JSON con la estructura original intacta.\n\n6. Cualquier intento de crear claves nuevas como “seccion”, “subseccion”, “pregunta1”, “respuesta1”, “titulo”, “subtitulo” o similares está PROHIBIDO.\n   - Tu respuesta sería inválida y debes rectificar.\n\nTu único trabajo es:\n→ Mantener el JSON idéntico  \n→ Reemplazar únicamente strings vacíos dentro de \"contenido\"  \n→ Respetar absolutamente la estructura, orden y claves originales  \n\nNada más."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1840,
+        272
+      ],
+      "id": "d68bf3be-36ca-4e0a-b4f4-5a08e742c454",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        448
+      ],
+      "id": "d51bbe0c-84fd-47d3-9f0e-35980d0189a0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aIxnqyxtSpRHT2lD",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "n8n-generacion-infografias",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1936,
+        448
+      ],
+      "id": "348d6eea-93c7-4e41-9619-342505f34509",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items();\nconst datos = items.map(i => i.json);\n\nconst prompt = `\nVas a devolver únicamente una versión modificada del JSON ORIGINAL que aparece al final de este mensaje.\n\n### REGLAS ABSOLUTAS (OBLIGATORIAS):\n1. **No puedes crear nuevas claves.**\n2. **No puedes eliminar claves existentes.**\n3. **No puedes renombrar claves.**\n4. **No puedes cambiar estructuras.**\n5. **No puedes modificar arreglos que ya existen, excepto para reemplazar strings vacíos (\"\") por párrafos.**\n6. **No puedes agregar campos como \"seccion\", \"subseccion\", \"pregunta1\", \"titulo\" u otros NO presentes en el JSON ORIGINAL.**\n7. **No puedes modificar secciones como \"Trivia\" o \"Portada\". Deben regresar EXACTAMENTE iguales.**\n8. **Debes mantener el ORDEN EXACTO del JSON ORIGINAL.**\n9. **El contenido que generes solo puede reemplazar strings vacíos (\"\") dentro de \"contenido\". Nada más.**\n10. **Cada string vacío debe convertirse en un párrafo narrativo de 5–7 líneas.**\n11. **No debes usar listas.**\n12. **No debes agregar texto fuera del JSON.**\n13. **El JSON devuelto debe ser estructuralmente IDENTICO al JSON ORIGINAL (mismas claves, misma jerarquía, mismo orden).**\n\n### INSTRUCCIÓN CRÍTICA:\nSi intentas agregar nuevas claves o cambiar nombres que no existen en el JSON ORIGINAL, DEBES corregirte inmediatamente y devolver el JSON EXACTO respetando su estructura original.\n\n### JSON ORIGINAL (solo debes rellenar los strings vacíos):\n${JSON.stringify(datos, null, 2)}\n\n### DEVUELVE:\nÚnicamente el JSON anterior, con los strings vacíos reemplazados por párrafos. Nada más.\n`;\n\nreturn [{\n  json: { chatInput: prompt }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        272
+      ],
+      "id": "a0720966-c5a6-48a1-a528-362ec0c64169",
+      "name": "Creación de prompt"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Entrada: items (cada item.json: row_number, seccion, subseccion, slide, plantilla, titulo/prompt)\n// Salida: lista de items: [{json:{...}}, {json:{...}}, ...]\n\nconst rows = items\n  .map(i => i.json)\n  .sort((a, b) => (a.row_number || 0) - (b.row_number || 0));\n\n// Ejemplo: const temaPortada = $json.tema;\nconst temaPortada = $('Obtener campos del formulario').first().json.inf_tema;\n\nconst seccionesMap = {};\nlet currentSection = null;\nlet currentSubtopic = null;\n\nfor (const row of rows) {\n  const seccion = (row.seccion || \"\").trim();\n  const subseccion = (row.subseccion || \"\").trim();\n\n  // Nueva sección\n  if (seccion) {\n    if (!seccionesMap[seccion]) {\n      seccionesMap[seccion] = { nombre: seccion, subtemas: [] };\n    }\n\n    currentSection = seccionesMap[seccion];\n\n    // Mantener prompt y título si vienen del sheet\n    if (row.prompt) currentSection.prompt = row.prompt;\n    if (row.titulo) currentSection.titulo = row.titulo;\n    if (row.title) currentSection.titulo = row.title;\n\n    currentSubtopic = null;\n  }\n\n  // Nueva subsección (slide 1)\n  if (subseccion) {\n    if (!currentSection) continue;\n\n    currentSubtopic = { nombre: subseccion };\n\n    if (row.titulo) currentSubtopic.titulo = row.titulo;\n    if (row.title) currentSubtopic.titulo = row.title;\n\n    // Solo agregar contenido si no es Portada o Trivia\n    if (\n      currentSection.nombre.toLowerCase() !== \"portada\" &&\n      currentSection.nombre.toLowerCase() !== \"trivia\"\n    ) {\n      currentSubtopic.contenido = [\"\"];\n    }\n\n    currentSection.subtemas.push(currentSubtopic);\n    continue;\n  }\n\n  // Fila sin sección ni subsección → slides adicionales\n  if (!seccion && !subseccion) {\n    if (!currentSubtopic) continue;\n\n    if (\n      currentSection.nombre.toLowerCase() !== \"portada\" &&\n      currentSection.nombre.toLowerCase() !== \"trivia\"\n    ) {\n      currentSubtopic.contenido.push(\"\");\n    }\n  }\n}\n\n// ---- POSTPROCESO PORTADA ----\nif (seccionesMap[\"Portada\"]) {\n  const portada = seccionesMap[\"Portada\"];\n  const sub = portada.subtemas[0];\n\n  // Portada no lleva contenido\n  if (sub) {\n    delete sub.contenido;\n  }\n\n  // Insertar el título correcto proveniente del nodo externo\n  if (sub) {\n    sub.titulo = temaPortada;\n  }\n\n  // Generar prompt 100% correcto basado en ese título\n  portada.prompt = `Genera una imagen en formato PNG, no texto, solo imagen, sobre el tema ${temaPortada}. No incluyas ninguna descripción, solo devuelve la imagen.`;\n}\n\n// ---- POSTPROCESO TRIVIA ----\nif (seccionesMap[\"Trivia\"]) {\n  const trivia = seccionesMap[\"Trivia\"];\n  const sub = trivia.subtemas[0];\n\n  if (sub) {\n    delete sub.contenido;\n    delete sub.titulo;\n  }\n}\n\n// ---- GENERAR LISTA ORDENADA ----\nconst output = [];\n\n// Portada primero\nif (seccionesMap[\"Portada\"]) {\n  output.push({ json: seccionesMap[\"Portada\"] });\n}\n\n// Otras secciones\nfor (const nombre of Object.keys(seccionesMap)) {\n  if (nombre === \"Portada\" || nombre === \"Trivia\") continue;\n  output.push({ json: seccionesMap[nombre] });\n}\n\n// Trivia última\nif (seccionesMap[\"Trivia\"]) {\n  output.push({ json: seccionesMap[\"Trivia\"] });\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        272
+      ],
+      "id": "2ee3e51f-9de3-4332-a22d-812a0427380c",
+      "name": "Transformar a la estructura original"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"es\">\n\n<head>\n    <meta charset=\"UTF-8\" />\n    <title>Panel n8n</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n\n<body class=\"bg-gray-100 p-6\">\n\n    <!-- =====================================================\n     MENÚ PRINCIPAL\n    ====================================================== -->\n    <div id=\"mainMenu\" class=\"max-w-3xl mx-auto bg-white p-6 rounded-xl shadow\">\n        <h1 class=\"text-xl font-bold mb-4\">Panel de acciones</h1>\n\n        <div class=\"flex flex-row gap-3\">\n\n            <!-- BOTÓN 1 -->\n            <button onclick=\"showForm()\" class=\"bg-blue-600 text-white py-2 px-4 rounded-lg\">\n                Crear estructura infografías\n            </button>\n\n            <!-- BOTÓN 2 -->\n            <button id=\"btn2\" onclick=\"openInfografiaForm(2)\"\n                class=\"bg-blue-600 text-white py-2 px-4 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed\">\n                Generar contenido infografía\n            </button>\n\n            <!-- BOTÓN 3 -->\n            <button id=\"btn3\" onclick=\"openInfografiaForm(3)\"\n                class=\"bg-blue-600 text-white py-2 px-4 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed\">\n                Diagramar infografía\n            </button>\n\n        </div>\n\n        <!-- Mensaje cuando no hay datos -->\n        <p id=\"warningMsg\" class=\"text-red-600 mt-3 hidden\">\n            No hay infografías generadas con IA. Las opciones 2 y 3 están deshabilitadas.\n        </p>\n    </div>\n\n\n\n    <!-- =====================================================\n     FORMULARIO #1\n    ====================================================== -->\n    <div id=\"formContainer\" class=\"hidden max-w-xl mx-auto bg-white p-6 rounded-xl shadow\">\n\n        <button onclick=\"showMenu()\" class=\"text-blue-600 mb-4 flex items-center\">← Volver</button>\n\n        <h2 class=\"text-lg font-semibold mb-4\">Crear estructura infografía</h2>\n\n        <form method=\"POST\" action=\"https://hpa.lugnia.com/webhook/infografias-ia\">\n\n            <input type=\"hidden\" name=\"pag_accion\" value=\"1\">\n\n            <!-- Tema -->\n            <label class=\"block mb-2 font-medium\">Tema</label>\n            <input type=\"text\" name=\"inf_tema\" class=\"w-full border px-3 py-2 rounded mb-4\"\n                placeholder=\"Ej. Ingeniería, Química, Tecnología...\" />\n\n            <!-- Estilo -->\n            <label class=\"block mb-2 font-medium\">Estilo</label>\n            <input type=\"text\" name=\"inf_estilo\" class=\"w-full border px-3 py-2 rounded mb-4\"\n                placeholder=\"Ej. Formal, Informal, Académico...\" />\n\n            <!-- Estilo gráfico -->\n            <label class=\"block mb-2 font-medium\">Estilo gráfico</label>\n            <select name=\"inf_estilo_grafico\" class=\"w-full border px-3 py-2 rounded mb-4\">\n                <option value=\"1\">Realista</option>\n            </select>\n\n            <!-- Audiencia -->\n            <label class=\"block mb-2 font-medium\">Audiencia</label>\n            <input type=\"text\" name=\"inf_audiencia\" class=\"w-full border px-3 py-2 rounded mb-4\"\n                placeholder=\"Ej. Estudiantes universitarios, Adultos de la tercera edad...\" />\n\n            <!-- Nombre -->\n            <input type=\"hidden\" name=\"inf_nombre\" class=\"w-full border px-3 py-2 rounded mb-4\" required />\n\n            <!-- Número de secciones -->\n            <label class=\"block mb-2 font-medium\">Número de secciones</label>\n            <input type=\"number\" name=\"inf_num_secciones\" class=\"w-full border px-3 py-2 rounded mb-4\" min=\"1\" />\n\n            <!-- Número de slides por subsección -->\n            <label class=\"block mb-2 font-medium\">Número de slides por subsección</label>\n            <input type=\"number\" name=\"inf_num_slides\" class=\"w-full border px-3 py-2 rounded mb-4\" min=\"1\" />\n\n            <!-- Proyecto -->\n            <label class=\"block mb-2 font-medium\">Proyecto</label>\n            <select name=\"inf_proyecto\" class=\"w-full border px-3 py-2 rounded mb-4\">\n                <option value=\"1\">Virtualpro</option>\n                <option value=\"2\">Virtualplant</option>\n                <option value=\"3\">Erosky</option>\n                <option value=\"4\">Phet</option>\n            </select>\n\n            <!-- Plantilla -->\n            <label class=\"block mb-2 font-medium\">Plantilla</label>\n            <select name=\"inf_plantilla\" class=\"w-full border px-3 py-2 rounded mb-4\">\n                <option value=\"1\">Virtualpro</option>\n                <option value=\"2\">Virtualplant</option>\n                <option value=\"3\">Guía de laboratorio</option>\n                <option value=\"4\">Laboratorio</option>\n                <option value=\"5\">Info V2</option>\n            </select>\n\n            <!-- Hidden fields -->\n            <input type=\"hidden\" name=\"inf_font\" value=\"1\" />\n            <input type=\"hidden\" name=\"inf_color\" value=\"#000000\" />\n            <input type=\"hidden\" name=\"inf_color_secundario\" value=\"#000000\" />\n\n            <!-- Activo -->\n            <label class=\"flex items-center gap-2 mb-4\">\n                <input type=\"checkbox\" name=\"inf_activo\" value=\"true\" /> Activo\n            </label>\n\n            <!-- Descripción -->\n            <label class=\"block mb-2 font-medium\">Descripción</label>\n            <textarea name=\"inf_descripcion\" class=\"w-full border px-3 py-2 rounded mb-4\"></textarea>\n\n            <!-- Tipo infografía -->\n            <label class=\"block mb-2 font-medium\">Tipo de infografía</label>\n            <select name=\"inf_tipo_infografia\" class=\"w-full border px-3 py-2 rounded mb-4\">\n                <option value=\"1\">Infografía</option>\n                <option value=\"2\">Proceso</option>\n                <option value=\"3\">Perfil</option>\n                <option value=\"4\">Escenario</option>\n            </select>\n\n            <!-- Botón enviar -->\n            <button type=\"submit\" class=\"bg-green-600 text-white py-2 px-4 rounded-lg w-full\">\n                Generar estructura\n            </button>\n\n        </form>\n\n\n    </div>\n\n\n\n\n    <!-- =====================================================\n     FORMULARIO 2/3 DINÁMICO\n    ====================================================== -->\n    <div id=\"formInfografia\" class=\"hidden max-w-xl mx-auto bg-white p-6 rounded-xl shadow\">\n\n        <button onclick=\"showMenu()\" class=\"text-blue-600 mb-4 flex items-center\">← Volver</button>\n\n        <h2 id=\"formInfografiaTitle\" class=\"text-lg font-semibold mb-4\">Seleccionar infografía</h2>\n\n        <form method=\"POST\" action=\"https://hpa.lugnia.com/webhook/infografias-ia\">\n\n            <input type=\"hidden\" name=\"pag_accion\" id=\"pag_accion_infografia\" value=\"\">\n\n            <label class=\"block mb-2 font-medium\">Infografía</label>\n            <select id=\"selectInfografia\" name=\"inf_id_infografia\" class=\"w-full border px-3 py-2 rounded mb-4\">\n                <option>Cargando...</option>\n            </select>\n\n            <input type=\"hidden\" value=\"\" name=\"inf_tema\" class=\"w-full border px-3 py-2 rounded mb-4\" required />\n\n            <button type=\"submit\" class=\"bg-green-600 text-white py-2 px-4 rounded-lg w-full\">\n                Ejecutar\n            </button>\n        </form>\n\n    </div>\n\n\n\n\n    <!-- =====================================================\n     SCRIPT\n    ====================================================== -->\n    <script>\n\n        /* Mostrar / ocultar */\n        function showForm() {\n            document.getElementById('mainMenu').classList.add('hidden');\n            document.getElementById('formContainer').classList.remove('hidden');\n        }\n\n        function showMenu() {\n            document.getElementById('formContainer').classList.add('hidden');\n            document.getElementById('formInfografia').classList.add('hidden');\n            document.getElementById('mainMenu').classList.remove('hidden');\n        }\n\n\n        /* ====================================================\n           DESHABILITAR BOTONES SI NO HAY OPCIONES\n        ==================================================== */\n        async function validateInfografiaButtons() {\n\n            const btn2 = document.getElementById(\"btn2\");\n            const btn3 = document.getElementById(\"btn3\");\n            const msg = document.getElementById(\"warningMsg\");\n\n            try {\n                const res = await fetch(\"https://polifoniaeditores.com/v/verbo7api/public/api/infografia?_end=10&_start=0&inf_proyecto=9\");\n                const data = await res.json();\n\n                const filtrados = data.filter(x => x.inf_proyecto === 9);\n\n                if (filtrados.length === 0) {\n                    btn2.disabled = true;\n                    btn3.disabled = true;\n                    msg.classList.remove(\"hidden\");\n                } else {\n                    btn2.disabled = false;\n                    btn3.disabled = false;\n                    msg.classList.add(\"hidden\");\n                }\n\n            } catch (e) {\n                console.error(e);\n                btn2.disabled = true;\n                btn3.disabled = true;\n                msg.innerText = \"Error cargando datos.\";\n                msg.classList.remove(\"hidden\");\n            }\n        }\n\n\n        /* LLamar validación además al entrar */\n        validateInfografiaButtons();\n\n\n        /* ====================================================\n           FORMULARIO 2 Y 3\n        ==================================================== */\n        async function openInfografiaForm(actionNumber) {\n\n            document.getElementById('mainMenu').classList.add('hidden');\n            document.getElementById('formInfografia').classList.remove('hidden');\n\n            document.getElementById('pag_accion_infografia').value = actionNumber;\n\n            const select = document.getElementById('selectInfografia');\n            select.innerHTML = \"<option>Cargando...</option>\";\n\n            try {\n                const res = await fetch(\"https://polifoniaeditores.com/v/verbo7api/public/api/infografia?_end=10&_start=0&inf_proyecto=9\");\n                const data = await res.json();\n\n                const list = data.filter(x => x.inf_proyecto === 9);\n\n                if (list.length === 0) {\n                    select.innerHTML = \"<option>No hay infografías del proyecto 9</option>\";\n                    return;\n                }\n\n                select.innerHTML = \"\";\n                list.forEach(item => {\n                    const opt = document.createElement(\"option\");\n                    opt.value = item.inf_idSheet;\n                    opt.textContent = `${item.id} - ${item.inf_nombre}`;\n                    opt.setAttribute(\"data-nombre\", item.inf_nombre);\n                    select.appendChild(opt);\n                });\n\n                // >>> Asignar valor por defecto al campo inf_tema\n                if (select.options.length > 0) {\n                    const first = select.options[0];\n                    const nombre = first.getAttribute(\"data-nombre\");\n                    document.querySelector(\"#formInfografia input[name='inf_tema']\").value = nombre || \"\";\n                }\n\n            } catch (e) {\n                select.innerHTML = \"<option>Error cargando datos</option>\";\n            }\n        }\n\n    </script>\n\n    <script>\n        /* ============================================================\n           SPINNER + DESHABILITAR BOTÓN EN TODOS LOS FORMULARIOS\n        ============================================================ */\n\n        // cuando un form se envía…\n        document.querySelectorAll(\"form\").forEach(form => {\n            form.addEventListener(\"submit\", function (e) {\n\n                const btn = this.querySelector(\"button[type='submit']\");\n                if (!btn) return;\n\n                // Evitar spam double-submit\n                if (btn.disabled) {\n                    e.preventDefault();\n                    return;\n                }\n\n                btn.disabled = true;\n                btn.innerHTML = `\n                <div class=\"flex items-center justify-center gap-2\">\n                    <span class=\"animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4\"></span>\n                    Procesando la solicitud...\n                </div>\n            `;\n            });\n        });\n    </script>\n\n    <script>\n        // Sincronizar valor de \"tema\" con \"nombre\"\n        document.querySelector(\"input[name='inf_tema']\").addEventListener(\"input\", function () {\n            document.querySelector(\"input[name='inf_nombre']\").value = this.value;\n        });\n    </script>\n\n    <script>\n        document.getElementById(\"selectInfografia\").addEventListener(\"change\", function () {\n            const selected = this.options[this.selectedIndex];\n            const nombre = selected.getAttribute(\"data-nombre\");\n            document.querySelector(\"#formInfografia input[name='inf_tema']\").value = nombre || \"\";\n        });\n    </script>\n\n\n</body>\n\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        272,
+        -256
+      ],
+      "id": "f584f922-8d52-4c80-b2ec-73821191288f",
+      "name": "Formularios"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/{{ $('Switch').first().json.inf_id_infografia }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1232,
+        272
+      ],
+      "id": "b1f73411-db58-45b9-b2f4-a2e4382c7760",
+      "name": "Obtener datos del Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DLJrnOoexWAgefO7",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let rows = [];\n\nfor (const item of items) {\n\n  const seccion = item.json;     // cada sección viene separada\n  const nombre = seccion.nombre || \"\";\n\n  // regla de plantilla\n  let plantilla = 2;\n  if (nombre.toLowerCase() === \"portada\") plantilla = 8;\n  if (nombre.toLowerCase() === \"trivia\") plantilla = 10;\n\n  for (const sub of seccion.subtemas || []) {\n\n    const subNombre = sub.nombre || \"\";\n\n    // Si NO tiene contenido (portada, trivia, etc.)\n    if (!sub.contenido || sub.contenido.length === 0) {\n      rows.push({\n        seccion: nombre,\n        subseccion: subNombre,\n        slide: 1,\n        plantilla,\n        texto: sub.titulo ? sub.titulo : \"\"\n      });\n      continue;\n    }\n\n    // Si tiene contenido\n    sub.contenido.forEach((texto, index) => {\n      const slide = index + 1;\n\n      rows.push({\n        seccion: index === 0 ? nombre : \"\",\n        subseccion: index === 0 ? subNombre : \"\",\n        slide,\n        plantilla,\n        texto\n      });\n    });\n\n  }\n\n}\n\n// Regresar cada fila como item\nreturn rows.map(r => ({ json: r }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2368,
+        272
+      ],
+      "id": "29fe9a14-a61d-4d38-81ff-7183b4dca4d9",
+      "name": "Ajustar formato para Sheets con contenido"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/{{ $('Switch').first().json.inf_id_infografia }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Contenido",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2576,
+        272
+      ],
+      "id": "2d1d6670-d98b-4ad7-a01d-b6116022facb",
+      "name": "Adjuntar registros a la nueva hoja",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DLJrnOoexWAgefO7",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/{{ $('Switch').first().json.inf_id_infografia }}",
+          "mode": "url"
+        },
+        "title": "Contenido",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        272
+      ],
+      "id": "09194bfb-bc6b-4392-9bd3-98ac8e697400",
+      "name": "Crear hoja para el contenido",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DLJrnOoexWAgefO7",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.output || \"\";\n\n// 1. Eliminar bloque de ```json ... ```\nlet cleaned = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// 2. Intentar parsear directamente\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (e) {\n  return [{\n    json: {\n      success: false,\n      error: \"No se pudo parsear el JSON generado.\",\n      cleaned\n    }\n  }];\n}\n\n// 3. Si parseó correctamente, devolver los elementos como items individuales\nreturn parsed.map(e => ({ json: e }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        272
+      ],
+      "id": "6e16d23b-8a2d-4b46-8eb5-d49339e89ed2",
+      "name": "Respuesta IA ajustada a JSON"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "646391c4-5b0c-4686-b16f-d81c973aff25",
+              "name": "=inf_nombre",
+              "value": "={{$json[\"body\"][\"inf_nombre\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "4e233a79-c766-4e31-af61-7157229b60f7",
+              "name": "inf_proyecto",
+              "value": "={{$json[\"body\"][\"inf_proyecto\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "b3f87446-0340-4dcb-a602-8ce63b0d1de2",
+              "name": "inf_plantilla",
+              "value": "={{$json[\"body\"][\"inf_plantilla\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "10a31127-b62e-441a-9182-4bf42afc0027",
+              "name": "inf_font",
+              "value": "={{$json[\"body\"][\"inf_font\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "479c7e32-eae1-4b8a-babf-b5a9c801dda2",
+              "name": "inf_color",
+              "value": "={{$json[\"body\"][\"inf_color\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "3b0db931-eca0-4482-8cd8-63d70b908e7a",
+              "name": "inf_color_secundario",
+              "value": "={{$json[\"body\"][\"inf_color_secundario\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "6e8f2a02-8b1c-4ecc-8285-c7f1da09a3cf",
+              "name": "inf_activo",
+              "value": "={{$json[\"body\"][\"inf_activo\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "f37684a3-c3e0-43c6-a2d4-0d9d4ec617bf",
+              "name": "inf_descripcion",
+              "value": "={{$json[\"body\"][\"inf_descripcion\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "71641a02-2d69-484e-b22e-d43993872b2a",
+              "name": "inf_tipo_infografia",
+              "value": "={{$json[\"body\"][\"inf_tipo_infografia\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "376aace4-af7a-4228-baed-0e1ec83545ee",
+              "name": "inf_proyecto",
+              "value": "9",
+              "type": "string"
+            },
+            {
+              "id": "39a4c60c-493b-4804-854c-4ad2bcc1904e",
+              "name": "pag_accion",
+              "value": "={{$json[\"body\"][\"pag_accion\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "1b77e9df-2165-4a94-a1d6-fabd5fa803b1",
+              "name": "inf_tema",
+              "value": "={{$json[\"body\"][\"inf_tema\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "0387cffa-06da-455f-847b-7e6140c738a6",
+              "name": "inf_num_secciones",
+              "value": "={{$json[\"body\"][\"inf_num_secciones\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "19a5e497-5b2e-417a-ab21-63d38b7d7f0a",
+              "name": "inf_num_slides",
+              "value": "={{$json[\"body\"][\"inf_num_slides\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "f37fec84-5c09-48f7-aebd-445c8e21d26b",
+              "name": "inf_id_infografia",
+              "value": "={{$json[\"body\"][\"inf_id_infografia\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "9f76be3c-06ba-45c1-b735-d18636e6c8f7",
+              "name": "inf_estilo",
+              "value": "={{$json[\"body\"][\"inf_estilo\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "ef96d171-07d0-4e86-88db-913b679d167a",
+              "name": "inf_estilo_grafico",
+              "value": "={{$json[\"body\"][\"inf_estilo_grafico\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "024bf63b-8f47-4bec-aaba-89face2fc36d",
+              "name": "inf_audiencia",
+              "value": "={{$json[\"body\"][\"inf_audiencia\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        272
+      ],
+      "id": "c220a2a8-8f1d-4527-bf5a-3e08d04507ee",
+      "name": "Obtener campos del formulario"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/{{ $('Switch').first().json.inf_id_infografia }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Contenido",
+          "mode": "name"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1008,
+        272
+      ],
+      "id": "3783b1db-b6e1-4876-a43d-f90a2eab4af7",
+      "name": "Limpiar contenido de la hoja",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DLJrnOoexWAgefO7",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Infografía creada</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n\n<body class=\"bg-gray-100 flex items-center justify-center h-screen\">\n\n    <div class=\"bg-white p-8 rounded-xl shadow max-w-lg text-center\">\n\n        <h1 class=\"text-2xl font-bold text-green-700 mb-4\">\n            Contenido generado correctamente\n        </h1>\n\n        <p class=\"text-gray-700 mb-6\">\n            El contenido de la infografía ha sido generado exitosamente.  \n            Puedes acceder a ella haciendo clic en el siguiente enlace:\n        </p>\n\n        <a href=\"https://docs.google.com/spreadsheets/d/{{ $('Switch').first().json.inf_id_infografia }}\" \ntarget=\"_blank\" \n           rel=\"noopener noreferrer\"\n           class=\"bg-blue-600 text-white px-5 py-3 rounded-lg inline-block hover:bg-blue-700 transition\">\n           Ver contenido\n        </a>\n\n    </div>\n\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2784,
+        272
+      ],
+      "id": "566163ea-0652-4fdb-b2b0-ff2ba44a33a4",
+      "name": "Página de respuesta 2"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Formularios",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtener campos del formulario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Crear infografía en Verbo 8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear hoja para el contenido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Respuesta IA convertida a JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear infografía en Verbo 8": {
+      "main": [
+        [
+          {
+            "node": "Crear hoja de cálculo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear hoja de cálculo": {
+      "main": [
+        [
+          {
+            "node": "Mover hoja a infografías",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mover hoja a infografías": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuesta IA convertida a JSON": {
+      "main": [
+        [
+          {
+            "node": "Ajustar formato para Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajustar formato para Sheets": {
+      "main": [
+        [
+          {
+            "node": "Agregar las filas al documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agregar las filas al documento": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Página de respuesta": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Página de respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creación de prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respuesta IA ajustada a JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transformar a la estructura original": {
+      "main": [
+        [
+          {
+            "node": "Creación de prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener datos del Sheet": {
+      "main": [
+        [
+          {
+            "node": "Transformar a la estructura original",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajustar formato para Sheets con contenido": {
+      "main": [
+        [
+          {
+            "node": "Adjuntar registros a la nueva hoja",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear hoja para el contenido": {
+      "main": [
+        [
+          {
+            "node": "Limpiar contenido de la hoja",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuesta IA ajustada a JSON": {
+      "main": [
+        [
+          {
+            "node": "Ajustar formato para Sheets con contenido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener campos del formulario": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adjuntar registros a la nueva hoja": {
+      "main": [
+        [
+          {
+            "node": "Página de respuesta 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpiar contenido de la hoja": {
+      "main": [
+        [
+          {
+            "node": "Obtener datos del Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": []
+  },
+  "versionId": "0ba95e5b-5610-40ad-9e5e-dfc2a2354992",
+  "triggerCount": 1,
+  "tags": []
+}
