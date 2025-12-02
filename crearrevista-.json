@@ -1,0 +1,1989 @@
+{
+  "createdAt": "2025-11-21T21:05:51.587Z",
+  "updatedAt": "2025-11-21T21:19:04.530Z",
+  "id": "SAMf8x0OjHCgjuL7",
+  "name": "CrearRevista",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "Las revistas se pueden crear de 3 formas:\n- Un listado de secciones\n- Todo en una sola sección\n- Una sección por archivo",
+        "height": 112,
+        "width": 336,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "847289eb-a072-4fd6-b4ae-416d6790d69f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "49b08903-8775-4b51-88ec-d1f511bdf599",
+                    "leftValue": "={{ $('Setup Inicial').item.json.formatoSecciones }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Todo-una-Seccion"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "edd57409-798f-4bcc-9fb8-172dc50d3f5b",
+                    "leftValue": "={{ $('Setup Inicial').item.json.formatoSecciones }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Seccion-X-Articulo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Setup Inicial').item.json.formatoSecciones }}",
+                    "rightValue": "3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "bf93c80e-b515-4601-af75-c08ba7e28e1e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Diversas-Secciones"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1104,
+        528
+      ],
+      "id": "37f0b205-ec41-40ba-bbd6-da5c460d9f00",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "content": "Servers\n\nLocal:\nhttp://localhost/verbo7api/verbo7Api_V2/public\n\nProduccion:\nhttps://polifoniaeditores.com/v/verbo7api/public",
+        "height": 352,
+        "width": 368,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -688,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "4b53c093-1d43-46ae-81e2-1721342d6550",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const urlTest = \"http://host.docker.internal:80/verbo7api/verbo7Api_V2/public\";\nconst urlProd = \"https://polifoniaeditores.com/v/verbo7api/public\";\nserv = $input.first().json.entorno == \"test\"?urlTest:urlProd;\n\nreturn {\"server\" : serv};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        496
+      ],
+      "id": "14ab8ef7-f30c-4a45-80ae-d29c88c2818b",
+      "name": "Set-Server"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "925576bf-f6ef-4050-89dd-2a5c9e2029a2",
+              "name": "entorno",
+              "value": "prod",
+              "type": "string"
+            },
+            {
+              "id": "29eb1d57-82d4-4447-954c-b5974bb821c0",
+              "name": "urlApiRevista",
+              "value": "/api/publicacion",
+              "type": "string"
+            },
+            {
+              "id": "eb15a5c9-831e-4104-8f93-cda4f249db36",
+              "name": "urlApiSeccion",
+              "value": "/api/seccionPublicacion",
+              "type": "string"
+            },
+            {
+              "id": "7b838366-391d-4939-8d36-ec9eb650749d",
+              "name": "urlPaginaSeccion",
+              "value": "/api/paginaXSeccion",
+              "type": "string"
+            },
+            {
+              "id": "5b124166-6cef-44b3-98cf-43f5dec9ddd3",
+              "name": "urlDocXPagina",
+              "value": "/api/docXPagina",
+              "type": "string"
+            },
+            {
+              "id": "373af65e-2622-4955-a549-51471bba6a53",
+              "name": "urlDocsBV",
+              "value": "/api/bibliotecaVirtual",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        496
+      ],
+      "id": "325bbba3-05a2-496a-8793-66cb08490d9b",
+      "name": "Set-Ambiente"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.server + $('Set-Ambiente').item.json.urlApiRevista+\"/\" +$('Form-Inicial').item.json.ID_Revista }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -208,
+        496
+      ],
+      "id": "049b0ad4-23c6-48f8-961c-5118ffddad8c",
+      "name": "Consultar-Revista"
+    },
+    {
+      "parameters": {
+        "content": "Consultar Citacion de la revista. La revista ya debe estar creada en Verbo, para poder asociar los Docs",
+        "height": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -288,
+        368
+      ],
+      "typeVersion": 1,
+      "id": "9d920ce2-e595-421f-a9a4-94ac9023e7f3",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Estandarizar Variables",
+        "height": 288,
+        "width": 160,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -16,
+        368
+      ],
+      "typeVersion": 1,
+      "id": "bf054f1c-b0a9-4d9e-9c7b-af2f8cfaa7df",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Set-Server').item.json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').item.json.citacion }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        336
+      ],
+      "id": "fd394a12-2af6-4737-a7c3-8bf6b58c9c33",
+      "name": "Consultar-Documentos-1"
+    },
+    {
+      "parameters": {
+        "content": "Crear La seccion, página, consultar los docs y enviarlos a la página. Se prepara la data de los docs para añadir un consecutivo del orden",
+        "height": 208,
+        "width": 1024
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1312,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "88d867f1-b322-4d28-a0f7-7b0f4c84b17c",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "Crear La seccion, página, consultar los docs y enviarlos a la página. Se prepara la data de los docs para añadir un consecutivo del orden",
+        "height": 176,
+        "width": 1264
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1312,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "112e574a-710a-450e-84bc-462aee63c293",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Set-Server').item.json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').item.json.citacion }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        544
+      ],
+      "id": "209d1228-31e5-4b99-9476-02ce515d6b59",
+      "name": "Consultar-Documentos-2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion}}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sxp_id_publicacion",
+              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+            },
+            {
+              "name": "sxp_nombre",
+              "value": "={{ $('Form-Inicial').item.json['Nombre-secciones'] }}"
+            },
+            {
+              "name": "sxp_orden",
+              "value": "3"
+            },
+            {
+              "name": "sxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        336
+      ],
+      "id": "3d7d6119-bad7-4874-be05-1e5059e42dc4",
+      "name": "Crear-Seccion1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion}}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sxp_id_publicacion",
+              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+            },
+            {
+              "name": "sxp_nombre",
+              "value": "={{ $json.bv_dc_title_spa }}"
+            },
+            {
+              "name": "sxp_orden",
+              "value": "={{ $json.itemNumber + 3 }}"
+            },
+            {
+              "name": "sxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        528
+      ],
+      "id": "067e0a3b-1d45-450e-9bf5-fa02e8309fe2",
+      "name": "Crear-Seccion2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlDocXPagina }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "dxp_id_pag",
+              "value": "={{ $('Crear-Pagina1').item.json.pxs_id }}"
+            },
+            {
+              "name": "dxp_tipo_doc",
+              "value": "={{ \"doc\" }}"
+            },
+            {
+              "name": "dxp_contenido",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "dxp_orden",
+              "value": "={{ $('Preparar-data1').item.json.itemNumber }}"
+            },
+            {
+              "name": "dxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        336
+      ],
+      "id": "4b63f17c-8047-4bf1-acae-f9de2abc7320",
+      "name": "Adicionar-Doc-A-Pagina1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlDocXPagina }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "dxp_id_pag",
+              "value": "={{ $('Crear-Pagina2').item.json.pxs_id }}"
+            },
+            {
+              "name": "dxp_tipo_doc",
+              "value": "={{ \"doc\" }}"
+            },
+            {
+              "name": "dxp_contenido",
+              "value": "={{ $('Consultar-Documentos-2').item.json.id }}"
+            },
+            {
+              "name": "dxp_orden",
+              "value": "=1"
+            },
+            {
+              "name": "dxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2448,
+        528
+      ],
+      "id": "5ce2ec1b-c724-40e2-a6bc-4777ffa71fd8",
+      "name": "Adicionar-Doc-A-Pagina2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "pxs_id_seccion",
+              "value": "={{ $(\"Crear-Seccion1\").item.json.sxp_id }}"
+            },
+            {
+              "name": "pxs_plantilla",
+              "value": "32"
+            },
+            {
+              "name": "pxs_orden",
+              "value": "1"
+            },
+            {
+              "name": "pxs_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        336
+      ],
+      "id": "1149bbc3-e0cd-4639-bcee-d317460c4772",
+      "name": "Crear-Pagina1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "pxs_id_seccion",
+              "value": "={{ $(\"Crear-Seccion2\").item.json.sxp_id }}"
+            },
+            {
+              "name": "pxs_plantilla",
+              "value": "32"
+            },
+            {
+              "name": "pxs_orden",
+              "value": "1"
+            },
+            {
+              "name": "pxs_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        528
+      ],
+      "id": "ef967a7e-3914-4c6c-bdb1-47286f07294b",
+      "name": "Crear-Pagina2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// añadir consecutivo con JS\nreturn $input.all().map((item, index) => {\n  item.json.itemNumber = index + 1;\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        544
+      ],
+      "id": "43382f50-cc3e-4e0b-8968-d7fe33d434ba",
+      "name": "Preparar-data2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// añadir consecutivo con JS\nreturn $input.all().map((item, index) => {\n  item.json.itemNumber = index + 1;\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        336
+      ],
+      "id": "476f9b3d-ccd3-4f2c-8c93-b5f18822c0da",
+      "name": "Preparar-data1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1792,
+        544
+      ],
+      "id": "e1913b12-56f6-468e-9e83-3fb0047d1d60",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2176,
+        1104
+      ],
+      "id": "c8290de4-170e-4fc9-b8c5-c82ff7936f2a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Or1GCrSnlRg8Kxki",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Set-Server').item.json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').item.json.citacion }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        896
+      ],
+      "id": "10dfc883-d4bd-4b7e-b103-6b5e3e4af706",
+      "name": "Consultar-Documentos-3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.bv_dc_title_spa + '. resumen: ' + $json.bv_dc_descripcion}}",
+        "options": {
+          "systemMessage": "={{ \"Como experto en \" + $('Setup Inicial').item.json.temaRevista + \" clasifica en una de las siguientes categorías el texto. Las categorias están separadas por  |. Si no es posible asignar una categoría, retorna 'Sin seccion', las categorias son : \" +$('Generar-String-Secciones').item.json.SeccionesRevista.join(\"|\")  }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2304,
+        896
+      ],
+      "id": "3ed0cfde-d9e4-4b46-8e0d-c4d6cc2c63f4",
+      "name": "Clasificador-DocsSeccion"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sxp_id_publicacion",
+              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+            },
+            {
+              "name": "sxp_nombre",
+              "value": "={{ $json.seccion }}"
+            },
+            {
+              "name": "sxp_orden",
+              "value": "={{ $json.itemNumber + 3 }}"
+            },
+            {
+              "name": "sxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3184,
+        832
+      ],
+      "id": "a17db8d0-6130-4dbf-aa71-e4d663b68622",
+      "name": "Crear-Seccion-3"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "seccionesArray",
+        "include": "allOtherFields",
+        "options": {
+          "disableDotNotation": false,
+          "destinationFieldName": "seccion",
+          "includeBinary": false
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        800
+      ],
+      "id": "41e89870-b06a-4982-bfa9-17b0f76d3ca3",
+      "name": "Crear-Array-Secciones"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "674136e1-bbcf-4341-a7ed-a4074dfaaee2",
+              "name": "seccionesArray",
+              "value": "={{ ($('Setup Inicial').item.json.nombreSecciones+\"|Sin seccion\").split(\"|\") }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        800
+      ],
+      "id": "acbc9950-c54a-43ab-90cc-68038a6858cd",
+      "name": "Split-Secciones"
+    },
+    {
+      "parameters": {
+        "content": "## Preparar y Crear Secciones",
+        "height": 208,
+        "width": 624
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1312,
+        736
+      ],
+      "typeVersion": 1,
+      "id": "193d9d31-45a6-410f-8f23-af7cdc06ed81",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// añadir consecutivo con JS\nreturn $input.all().map((item, index) => {\n  item.json.seccion = item.json.seccion.replace(/[\\n\\r\\t]/g, '').trim()\n  item.json.itemNumber = index + 1;\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        800
+      ],
+      "id": "419ebd9f-6986-4386-84fc-e0eec2418fe0",
+      "name": "Preparar-dataSeccion-3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// añadir consecutivo con JS\nreturn $(\"Consultar-Documentos-3\").all().map((item, index) => {\n  \n  // item.json.itemNumber = index + 1;\n  // item.json.seccion = $input.all().at(index).json.output;\n\n  itemNumber = index + 1;\n  seccion = $input.all().at(index).json.output;\n  const { id, bv_dc_title_spa } = item.json;\n  \n  // $input.first().json.output\n  return {itemNumber, seccion, id, bv_dc_title_spa};\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        896
+      ],
+      "id": "b7cf42df-f8eb-4cf0-a05e-496fb863924b",
+      "name": "Preparar-data-Docs-3"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2768,
+        816
+      ],
+      "id": "1105f0c1-d9dc-499b-8479-9788e508b31f",
+      "name": "ContinuarSecciones-3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "pxs_id_seccion",
+              "value": "={{ $json.sxp_id }}"
+            },
+            {
+              "name": "pxs_plantilla",
+              "value": "32"
+            },
+            {
+              "name": "pxs_orden",
+              "value": "1"
+            },
+            {
+              "name": "pxs_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3376,
+        832
+      ],
+      "id": "2fdc6cf7-63c3-478f-87a9-91400e5ac72f",
+      "name": "Crear-Pagina-3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlDocXPagina }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "dxp_id_pag",
+              "value": "={{ $json.pxs_id }}"
+            },
+            {
+              "name": "dxp_tipo_doc",
+              "value": "={{ \"doc\" }}"
+            },
+            {
+              "name": "dxp_contenido",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "dxp_orden",
+              "value": "={{ $json.itemNumber }}"
+            },
+            {
+              "name": "dxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3936,
+        816
+      ],
+      "id": "95108dc2-6ae3-48f8-8fca-94c4b43415e3",
+      "name": "Adicionar-Doc-A-Pagina"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4096,
+        816
+      ],
+      "id": "69b3010a-717b-42dd-9c88-c37df88d1a28",
+      "name": "Wait2",
+      "webhookId": "0a55f731-7892-4ab8-8632-23d1957a2c7f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2992,
+        816
+      ],
+      "id": "794aa818-713e-4e92-856e-7615bccd95db",
+      "name": "Loop Secciones-3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n// for (const item of $(\"Preparar-data-Docs-3\").all()) {\n//   item.json.myNewField = 1;\n// }\n\n// return $input.all();\n\n\nreturn $(\"Preparar-data-Docs-3\").all().filter(function(item){\n  return item.json.seccion == $(\"Crear-Seccion-3\").first().json.sxp_nombre;    \n  // return 1==1\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3552,
+        720
+      ],
+      "id": "a7dcb95a-2922-4c1c-800f-319e93e8bbdb",
+      "name": "Filtrar-Docs-Seccion",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "chatId": "6957598767",
+        "text": "Terminado",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3296,
+        624
+      ],
+      "id": "375c0f31-f4df-406f-b400-fec9d0310aca",
+      "name": "Send a text message",
+      "webhookId": "d794a8b2-b24c-41c9-a1c1-4588ff2b252b",
+      "credentials": {
+        "telegramApi": {
+          "id": "rOOSfezTBGWLluyQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "seccion",
+              "renameField": true,
+              "outputFieldName": "SeccionesRevista"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        896
+      ],
+      "id": "b0242c66-10d9-44be-b418-6ef62687c0fd",
+      "name": "Generar-String-Secciones"
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "SELECT * FROM input1 LEFT JOIN input2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3744,
+        816
+      ],
+      "id": "10d723f4-1524-4031-88c8-790aaae7cb44",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sxp_id_publicacion",
+              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+            },
+            {
+              "name": "sxp_nombre",
+              "value": "={{ \"Portada \"}}"
+            },
+            {
+              "name": "sxp_orden",
+              "value": "={{ 1 }}"
+            },
+            {
+              "name": "sxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        672
+      ],
+      "id": "1ff7b892-f5df-4884-9f8f-73873a70f611",
+      "name": "Crear-SeccionPortada"
+    },
+    {
+      "parameters": {
+        "content": "## Crear Portada",
+        "height": 208,
+        "width": 384,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        608
+      ],
+      "typeVersion": 1,
+      "id": "a9973bd5-82e6-4716-be46-f7474390964f",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "pxs_id_seccion",
+              "value": "={{ $json.sxp_id }}"
+            },
+            {
+              "name": "pxs_plantilla",
+              "value": "1"
+            },
+            {
+              "name": "pxs_orden",
+              "value": "1"
+            },
+            {
+              "name": "pxs_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        672
+      ],
+      "id": "b015a173-612d-4d9a-bfff-21c72a5b6bea",
+      "name": "Crear-Pagina-Portada"
+    },
+    {
+      "parameters": {
+        "content": "## Crear Contenido",
+        "height": 208,
+        "width": 384,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        848
+      ],
+      "typeVersion": 1,
+      "id": "986206eb-5017-4b93-a5fd-ebb062fc554b",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sxp_id_publicacion",
+              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+            },
+            {
+              "name": "sxp_nombre",
+              "value": "={{ \"Contenido \"}}"
+            },
+            {
+              "name": "sxp_orden",
+              "value": "={{ 2 }}"
+            },
+            {
+              "name": "sxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        912
+      ],
+      "id": "a4841f3f-5de8-4e7f-9609-f3e0a4939606",
+      "name": "Crear-SeccionContenido"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "pxs_id_seccion",
+              "value": "={{ $json.sxp_id }}"
+            },
+            {
+              "name": "pxs_plantilla",
+              "value": "2"
+            },
+            {
+              "name": "pxs_orden",
+              "value": "1"
+            },
+            {
+              "name": "pxs_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        912
+      ],
+      "id": "13df264f-015b-4486-b20a-c1b1ae988e87",
+      "name": "Crear-Pagina-Contenido"
+    },
+    {
+      "parameters": {
+        "content": "## Crear Editorial",
+        "height": 208,
+        "width": 384,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        1088
+      ],
+      "typeVersion": 1,
+      "id": "bd1e9616-fa23-4495-9091-fcb8296ee51f",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sxp_id_publicacion",
+              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+            },
+            {
+              "name": "sxp_nombre",
+              "value": "={{ \"Editorial \"}}"
+            },
+            {
+              "name": "sxp_orden",
+              "value": "={{ 3 }}"
+            },
+            {
+              "name": "sxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        1152
+      ],
+      "id": "7356e4ca-6922-4b57-bd8a-17c0daed89e3",
+      "name": "Crear-SeccionContenido1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "pxs_id_seccion",
+              "value": "={{ $json.sxp_id }}"
+            },
+            {
+              "name": "pxs_plantilla",
+              "value": "4"
+            },
+            {
+              "name": "pxs_orden",
+              "value": "1"
+            },
+            {
+              "name": "pxs_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        1152
+      ],
+      "id": "17cd6166-32d6-4f8b-bcec-f7851dbd812b",
+      "name": "Crear-Pagina-Contenido1"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        512
+      ],
+      "id": "b63db1aa-a4fa-4308-b5c5-02a9a60403c4",
+      "name": "Continuar"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26048d6f-c15e-4da7-b85e-829fce2ac5af",
+              "name": "citacion",
+              "value": "={{ $('Consultar-Revista').item.json.pub_carpeta }}",
+              "type": "string"
+            },
+            {
+              "id": "7d7f5085-c438-47fe-9c0d-a5996afba49b",
+              "name": "formatoSecciones",
+              "value": "={{ $('Form-Inicial').item.json['Formato-Docs-por-seccion'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bfe3b869-70e8-4ffd-b005-172954e9da31",
+              "name": "nombreSecciones",
+              "value": "={{ $('Form-Inicial').item.json['Nombre-secciones'] }}",
+              "type": "string"
+            },
+            {
+              "id": "2e6ac68d-addb-4c93-b7c5-8ee799b533f1",
+              "name": "docsXPagina",
+              "value": "={{ $('Form-Inicial').item.json.DocsXPagina }}",
+              "type": "string"
+            },
+            {
+              "id": "bd9fe29f-de0d-4dc0-8ba6-1b08c5e194e4",
+              "name": "nombrePerfil",
+              "value": "={{ $('Form-Inicial').item.json.Nombre_Perfil }}",
+              "type": "string"
+            },
+            {
+              "id": "c995faa4-0bf1-4640-a3f0-e734d79845f9",
+              "name": "temaRevista",
+              "value": "={{ $json.pub_titulo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        496
+      ],
+      "id": "7b557a76-2a29-4315-b8a3-d40c39c0b871",
+      "name": "Setup Inicial"
+    },
+    {
+      "parameters": {
+        "content": "## Crear Perfil",
+        "height": 208,
+        "width": 384,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "25d1e9e9-b9aa-4b21-a5b1-26b9cf6dc0e7",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "11d9cdff-cc0e-468b-9d34-58f4903d9cb1",
+              "leftValue": "={{ $json.nombrePerfil }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        368
+      ],
+      "id": "31a806ee-1574-4a8f-8694-5b1771c8696a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sxp_id_publicacion",
+              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+            },
+            {
+              "name": "sxp_nombre",
+              "value": "={{ \"Perfil \"+$json.nombrePerfil}}"
+            },
+            {
+              "name": "sxp_orden",
+              "value": "={{ 100 }}"
+            },
+            {
+              "name": "sxp_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        352
+      ],
+      "id": "1904e6f5-d577-497a-99d9-d457464ce04c",
+      "name": "Crear-SeccionPerfil"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "pxs_id_seccion",
+              "value": "={{ $json.sxp_id }}"
+            },
+            {
+              "name": "pxs_plantilla",
+              "value": "26"
+            },
+            {
+              "name": "pxs_orden",
+              "value": "1"
+            },
+            {
+              "name": "pxs_activo",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        352
+      ],
+      "id": "4a8975a5-aea5-4033-8249-369dbeee0017",
+      "name": "Crear-Pagina-Perfil"
+    },
+    {
+      "parameters": {
+        "content": "## Objetivo\n\nEste workflow diagrama la revista para el portal Virtualpro",
+        "height": 96,
+        "width": 768
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "c13ad652-e75d-4832-a6e5-9a9ac75c688c",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "formTitle": "Generación de Revista",
+        "formDescription": "Generador de revistas",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ID_Revista",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Formato-Docs-por-seccion",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1. Todos en una Seccion"
+                  },
+                  {
+                    "option": "2. Un artículo x Seccion"
+                  },
+                  {
+                    "option": "3. Varias Secciones"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "DocsXPagina",
+              "fieldType": "number",
+              "placeholder": "# de Docs x página"
+            },
+            {
+              "fieldLabel": "Nombre_Perfil"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -896,
+        496
+      ],
+      "id": "82e3b40b-71f6-4b16-9143-c70454a21ed3",
+      "name": "On form submission",
+      "webhookId": "f3603f30-4353-4895-bfb2-7451b31bdc94"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Crear-Seccion1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Consultar-Documentos-2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split-Secciones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set-Server": {
+      "main": [
+        [
+          {
+            "node": "Consultar-Revista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set-Ambiente": {
+      "main": [
+        [
+          {
+            "node": "Set-Server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar-Revista": {
+      "main": [
+        [
+          {
+            "node": "Setup Inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar-Documentos-1": {
+      "main": [
+        [
+          {
+            "node": "Preparar-data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar-Documentos-2": {
+      "main": [
+        [
+          {
+            "node": "Preparar-data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-Seccion1": {
+      "main": [
+        [
+          {
+            "node": "Crear-Pagina1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-Seccion2": {
+      "main": [
+        [
+          {
+            "node": "Crear-Pagina2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adicionar-Doc-A-Pagina1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-Pagina1": {
+      "main": [
+        [
+          {
+            "node": "Consultar-Documentos-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-Pagina2": {
+      "main": [
+        [
+          {
+            "node": "Adicionar-Doc-A-Pagina2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar-data2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar-data1": {
+      "main": [
+        [
+          {
+            "node": "Adicionar-Doc-A-Pagina1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear-Seccion2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adicionar-Doc-A-Pagina2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clasificador-DocsSeccion",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar-Documentos-3": {
+      "main": [
+        [
+          {
+            "node": "Clasificador-DocsSeccion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clasificador-DocsSeccion": {
+      "main": [
+        [
+          {
+            "node": "Preparar-data-Docs-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split-Secciones": {
+      "main": [
+        [
+          {
+            "node": "Crear-Array-Secciones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-Seccion-3": {
+      "main": [
+        [
+          {
+            "node": "Crear-Pagina-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-Array-Secciones": {
+      "main": [
+        [
+          {
+            "node": "Preparar-dataSeccion-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar-dataSeccion-3": {
+      "main": [
+        [
+          {
+            "node": "Generar-String-Secciones",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ContinuarSecciones-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar-data-Docs-3": {
+      "main": [
+        [
+          {
+            "node": "ContinuarSecciones-3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "ContinuarSecciones-3": {
+      "main": [
+        [
+          {
+            "node": "Loop Secciones-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-Pagina-3": {
+      "main": [
+        [
+          {
+            "node": "Filtrar-Docs-Seccion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Adicionar-Doc-A-Pagina": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Loop Secciones-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Secciones-3": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear-Seccion-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar-Docs-Seccion": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar-String-Secciones": {
+      "main": [
+        [
+          {
+            "node": "Consultar-Documentos-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Adicionar-Doc-A-Pagina",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-SeccionPortada": {
+      "main": [
+        [
+          {
+            "node": "Crear-Pagina-Portada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-SeccionContenido": {
+      "main": [
+        [
+          {
+            "node": "Crear-Pagina-Contenido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-SeccionContenido1": {
+      "main": [
+        [
+          {
+            "node": "Crear-Pagina-Contenido1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-Pagina-Contenido1": {
+      "main": [
+        [
+          {
+            "node": "Continuar",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Crear-Pagina-Portada": {
+      "main": [
+        [
+          {
+            "node": "Continuar",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Crear-Pagina-Contenido": {
+      "main": [
+        [
+          {
+            "node": "Continuar",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Continuar": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup Inicial": {
+      "main": [
+        [
+          {
+            "node": "Continuar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crear-SeccionContenido1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crear-SeccionContenido",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crear-SeccionPortada",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-SeccionPerfil": {
+      "main": [
+        [
+          {
+            "node": "Crear-Pagina-Perfil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Crear-SeccionPerfil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Set-Ambiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "5034f547-42ef-4809-975b-85ee930d695c",
+  "triggerCount": 0,
+  "tags": []
+}
