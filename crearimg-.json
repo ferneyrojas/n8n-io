@@ -1,0 +1,194 @@
+{
+  "createdAt": "2025-11-26T12:49:22.807Z",
+  "updatedAt": "2025-11-26T13:22:50.017Z",
+  "id": "ONldT8z2NnB2Utc9",
+  "name": "CrearImg",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -32
+      ],
+      "id": "da0e40a9-18a1-4a82-a759-30378803be88",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Crea un prompt para crear una imagen [8]realista relacionada con: {{ $json.mensaje }}. Solo retorna el Prompt sin títulos o textos adicionales"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        -32
+      ],
+      "id": "e46357f0-90ee-4f24-a4a1-bf3045ec0c2d",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Ab63gjkvzxRd1IIA",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash-exp-image-generation",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash-exp-image-generation"
+        },
+        "prompt": "={{ $json.message.content }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -32
+      ],
+      "id": "edd43d2b-f413-498c-ab45-6e10891201a8",
+      "name": "Generate an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Or1GCrSnlRg8Kxki",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26529c81-6326-4b79-bb17-fe59c02a6824",
+              "name": "mensaje",
+              "value": "Un transbordador espacial saliendo de la tierra",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        -32
+      ],
+      "id": "6e74fbd0-f3c8-40df-8ea5-c0b30862e235",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "name": "image",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
+          "mode": "list",
+          "cachedResultName": "TMP",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        544,
+        -32
+      ],
+      "id": "d56f5acb-a1b7-42e2-8a5b-1edd130aea03",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "07e1cff5-a055-46fd-a486-e11f9da0646f",
+  "triggerCount": 0,
+  "tags": []
+}
