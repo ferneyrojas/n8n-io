@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-17T22:27:14.843Z",
-  "updatedAt": "2025-10-17T22:28:05.101Z",
+  "updatedAt": "2025-12-11T21:58:40.670Z",
   "id": "Y2T7k3xaxDF7fZNo",
   "name": "Genera Not All",
   "active": true,
@@ -49,6 +49,20 @@
       ],
       "id": "e1d8b4b6-c3b5-4ea5-bee4-d4ea14c75a6f",
       "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=not",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        -80
+      ],
+      "id": "fb11dfc8-d5c6-4b58-a348-9c7d1615c4d8",
+      "name": "Generar Noticias"
     }
   ],
   "connections": {
@@ -73,6 +87,17 @@
           }
         ]
       ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Generar Noticias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -85,7 +110,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "ec38ca3d-c207-4226-b301-d75110b728f9",
+  "versionId": "678f38fb-ccfe-4d14-8d2a-b3ad4073bacc",
   "triggerCount": 1,
   "tags": [
     {
