@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-03T17:00:19.446Z",
-  "updatedAt": "2025-10-21T19:40:47.078Z",
+  "updatedAt": "2026-02-10T20:22:04.717Z",
   "id": "PltwlU6hkXZaBxEB",
   "name": "BackupWorkflows",
   "active": true,
@@ -22,7 +22,7 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "position": [
         -144,
-        160
+        -240
       ],
       "typeVersion": 1.2
     },
@@ -36,7 +36,7 @@
       "type": "n8n-nodes-base.n8n",
       "position": [
         528,
-        160
+        -240
       ],
       "typeVersion": 1,
       "credentials": {
@@ -62,7 +62,7 @@
       "type": "n8n-nodes-base.aggregate",
       "position": [
         304,
-        160
+        -240
       ],
       "typeVersion": 1
     },
@@ -89,7 +89,7 @@
       "type": "n8n-nodes-base.github",
       "position": [
         80,
-        160
+        -240
       ],
       "webhookId": "354d699e-44b0-4444-9d31-af7fd4ff5561",
       "typeVersion": 1,
@@ -125,17 +125,19 @@
       "name": "Update file",
       "type": "n8n-nodes-base.github",
       "position": [
-        1648,
-        64
+        1872,
+        -336
       ],
       "webhookId": "27218087-8df7-474d-a39f-70cfa9c34ec8",
       "typeVersion": 1,
+      "retryOnFail": true,
       "credentials": {
         "githubApi": {
           "id": "AdFvUvurFNS3uQtr",
           "name": "GitHub account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -160,17 +162,19 @@
       "name": "Upload file",
       "type": "n8n-nodes-base.github",
       "position": [
-        1648,
-        256
+        1872,
+        -144
       ],
       "webhookId": "ce4b561b-acb9-4cd8-b76f-4928dada9674",
       "typeVersion": 1,
+      "retryOnFail": true,
       "credentials": {
         "githubApi": {
           "id": "AdFvUvurFNS3uQtr",
           "name": "GitHub account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -189,7 +193,7 @@
       "type": "n8n-nodes-base.if",
       "position": [
         1424,
-        160
+        -240
       ],
       "typeVersion": 1
     },
@@ -206,7 +210,7 @@
       "type": "n8n-nodes-base.convertToFile",
       "position": [
         752,
-        160
+        -240
       ],
       "typeVersion": 1.1
     },
@@ -220,7 +224,7 @@
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
         976,
-        160
+        -240
       ],
       "typeVersion": 1
     },
@@ -235,8 +239,8 @@
       "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        90,
-        -60
+        96,
+        -64
       ],
       "typeVersion": 1
     },
@@ -265,7 +269,7 @@
       "type": "n8n-nodes-base.set",
       "position": [
         1200,
-        160
+        -240
       ],
       "typeVersion": 3.4
     },
@@ -281,7 +285,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         570,
-        -60
+        -460
       ],
       "typeVersion": 1
     },
@@ -297,9 +301,36 @@
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         1242,
-        36
+        -460
       ],
       "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1648,
+        -336
+      ],
+      "id": "44f0bc9f-160b-45e3-bdd9-cc56c1c75300",
+      "name": "Loop Over Items",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1648,
+        -144
+      ],
+      "id": "b8d2ee6d-08da-40cd-94b3-cfad2b0563ae",
+      "name": "Loop Over Items1"
     }
   ],
   "connections": {
@@ -362,14 +393,14 @@
       "main": [
         [
           {
-            "node": "Update file",
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Upload file",
+            "node": "Loop Over Items1",
             "type": "main",
             "index": 0
           }
@@ -397,6 +428,52 @@
           }
         ]
       ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Update file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update file": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -405,7 +482,7 @@
   "staticData": {
     "node:Schedule Trigger": {
       "recurrenceRules": [
-        8
+        16
       ]
     }
   },
@@ -413,7 +490,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "260fdca0-2a53-481f-9a5f-1425597f0390",
+  "versionId": "27c7c106-acd2-448e-b6da-57e96c71e539",
   "triggerCount": 1,
   "tags": []
 }
