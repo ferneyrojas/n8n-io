@@ -1,0 +1,119 @@
+{
+  "createdAt": "2026-01-21T23:47:55.084Z",
+  "updatedAt": "2026-01-26T20:02:44.807Z",
+  "id": "JuPhn9ORyJZuyN0v",
+  "name": "Generacion Archivos Ruta Servicio",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 22
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ac86f2e6-c773-49b8-9639-d4ec9dd57208",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=sp4126",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "eb27c446-1124-4d0a-a0b5-032e4326d2bd",
+      "name": "infoDocentesClientesGeneral"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=sp4127",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "5fc1b60e-6cd0-4b7c-a8b5-5c1cd7dad87c",
+      "name": "infoCursosDocentesClientes"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=sp8342",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "aa0278b5-2f65-4d8b-99e2-55bfbc0b34c7",
+      "name": "infoClientesGeneral"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "infoDocentesClientesGeneral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "infoDocentesClientesGeneral": {
+      "main": [
+        [
+          {
+            "node": "infoCursosDocentesClientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "infoCursosDocentesClientes": {
+      "main": [
+        [
+          {
+            "node": "infoClientesGeneral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "53164e6a-d697-4c4f-8442-474ef5d9e172",
+  "triggerCount": 1,
+  "tags": []
+}
