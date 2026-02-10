@@ -1,0 +1,699 @@
+{
+  "createdAt": "2025-12-10T20:50:21.112Z",
+  "updatedAt": "2026-01-22T13:35:33.125Z",
+  "id": "0Tdc9j5x1FZAys6M",
+  "name": "Pertinencia",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -992
+      ],
+      "id": "2e6c10db-a1bc-4908-bd3e-b7d616331e26",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4e84038f-977f-4c4d-8c69-197c37503c0d",
+              "name": "NOMBRE_MATERIA",
+              "value": "MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO",
+              "type": "string"
+            },
+            {
+              "id": "1dd1a115-391a-4795-8ea7-f965060c573f",
+              "name": "DESCRIPCIÓN_GENERAL",
+              "value": "Materia fundamental que busca mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.",
+              "type": "string"
+            },
+            {
+              "id": "37c19c7e-321d-48c5-b0a6-ecab6632a099",
+              "name": "COMPETENCIAS",
+              "value": "Analizar métodos y procesos productivos. Aplicar técnicas de medición del trabajo. Identificar mejoras en actividades repetitivas.",
+              "type": "string"
+            },
+            {
+              "id": "f4b5f3aa-6574-469e-a9f8-4390d3b28f37",
+              "name": "TEMARIO",
+              "value": "Introducción al estudio del trabajo\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\nAnálisis de métodos\nMedición del trabajo\nCronometraje y técnicas PMTS\nMuestreo del trabajo\nBalanceo de líneas\nErgonomía básica aplicada al estudio del trabajo\nImplementación de mejoras",
+              "type": "string"
+            },
+            {
+              "id": "c5a9233c-ff73-403f-81bf-324df4d72af5",
+              "name": "PALABRAS_CLAVE_SYLLABUS",
+              "value": "métodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        -992
+      ],
+      "id": "283ef735-c1c1-4b8c-ac0e-2c660e260248",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $input.first().json.content.parts[0].text || \"\";\n\n// Limpia los backticks y etiquetas ```json\nraw = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Convierte a JSON\nlet parsed = JSON.parse(raw);\n\nreturn parsed;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -320
+      ],
+      "id": "52c48302-68d8-4345-a434-8a922e9117a0",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -320
+      ],
+      "id": "bba452aa-2967-4bc7-966d-1f0b354d0a2d",
+      "name": "Convert to File2"
+    },
+    {
+      "parameters": {
+        "name": "pertinencia-lab-all.json",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
+          "mode": "list",
+          "cachedResultName": "TMP",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        -320
+      ],
+      "id": "7497ac86-b872-4eaf-a096-fe4f739e7fb1",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $input.first().json.content.parts[0].text || \"\";\n\n// Limpia los backticks y etiquetas ```json\nraw = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Convierte a JSON\nlet parsed = JSON.parse(raw);\n\nreturn parsed;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -544
+      ],
+      "id": "8f6bf098-36f5-45f3-9aae-9483c6ab318b",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -544
+      ],
+      "id": "f8fbb833-6c60-4dda-9031-9e99096a8e7c",
+      "name": "Convert to File3"
+    },
+    {
+      "parameters": {
+        "name": "pertinencia-info.json",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
+          "mode": "list",
+          "cachedResultName": "TMP",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        -544
+      ],
+      "id": "6b958f81-b0c6-4024-b44b-e6ae73d68158",
+      "name": "Upload file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $input.first().json.content.parts[0].text || \"\";\n\n// Limpia los backticks y etiquetas ```json\nraw = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Convierte a JSON\nlet parsed = JSON.parse(raw);\n\nreturn parsed;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -768
+      ],
+      "id": "dede64c3-03da-4cd8-a6c9-c7014421830b",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -768
+      ],
+      "id": "0c628fc7-1b31-4cf1-8f46-725ddf01fb30",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "name": "pertinencia-all.json",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
+          "mode": "list",
+          "cachedResultName": "TMP",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        -768
+      ],
+      "id": "876d2d82-f303-4abc-90f9-a09188035848",
+      "name": "Upload file2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-lite-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-lite-latest"
+        },
+        "text": "=Quiero que actúes como un evaluador académico experto en diseño instruccional. Debes analizar un archivo CSV que contiene recursos educativos con las columnas: ID, título, resumen, tipo, categoría, subcategoría, palabrasClaves.\n\nTu tarea es evaluar la pertinencia de cada recurso frente al SYLLABUS de una materia.\n\nEntradas del SYLLABUS\n\nNombre de la materia: {{ $('Edit Fields').item.json.NOMBRE_MATERIA }}\n\nDescripción general: {{ $json['DESCRIPCIÓN_GENERAL'] }}\n\nCompetencias: {{ $('Edit Fields').item.json.COMPETENCIAS }}\n\nTemario (temas y subtemas): {{ $('Edit Fields').item.json.TEMARIO }}\n\nPalabras clave del curso: {{ $('Edit Fields').item.json.PALABRAS_CLAVE_SYLLABUS }}\n\nInstrucciones de evaluación\n\nAnaliza cada fila del CSV usando:\n\ntítulo\n\nresumen\n\ncategoría / subcategoría\n\npalabrasClaves\n\nCompara cada recurso contra:\n\nobjetivo general de la materia\n\ncompetencias\n\ntemario\n\npalabras clave del SYLLABUS\n\nIncluye solo recursos pertinentes.\n\nAsigna una calificación de pertinencia de 1 a 10 (1 = baja, 10 = máxima).\n\nSelecciona una única palabra clave del recurso como la más representativa para justificar su pertinencia.\n\nFormato ESTRICTO de salida (JSON)\n\nDevuelve únicamente un JSON válido con esta estructura:\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_RECURSO\",\n      \"titulo\": \"TÍTULO\",\n      \"tipo\": \"TIPO\",\n      \"palabraClave\": \"PALABRA_CLAVE_SELECCIONADA\",\n      \"justificacion\": \"Texto breve de máximo 20 palabras que explique la pertinencia incluyendo la palabra clave.\",\n      \"pertinencia\": 1\n    }\n  ]\n}\n\n\nReglas obligatorias:\n\nNo incluyas texto adicional fuera del JSON.\n\nNo inventes datos.\n\nNo incluyas recursos irrelevantes con una pertinencia menor a 6.\n\nLa justificación debe ser clara, corta y contener la palabra clave seleccionada.",
+        "documentUrls": "https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/csv/recursosLM.csv",
+        "options": {
+          "maxOutputTokens": {}
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -768
+      ],
+      "id": "46f7491a-425b-4226-bde9-610e43bf7092",
+      "name": "Analyze All Recursos",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yWbztL8O1z9zkmV3",
+          "name": "N8N-Lugnia-2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-lite-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-lite-latest"
+        },
+        "text": "=Quiero que actúes como un evaluador académico experto en diseño instruccional. Debes analizar un archivo CSV que contiene recursos educativos con las columnas: ID, título, resumen, tipo, categoría, subcategoría, palabrasClaves.\n\nTu tarea es evaluar la pertinencia de cada recurso frente al SYLLABUS de una materia.\n\nEntradas del SYLLABUS\n\nNombre de la materia: {{ $('Edit Fields').item.json.NOMBRE_MATERIA }}\n\nDescripción general: {{ $json['DESCRIPCIÓN_GENERAL'] }}\n\nCompetencias: {{ $('Edit Fields').item.json.COMPETENCIAS }}\n\nTemario (temas y subtemas): {{ $('Edit Fields').item.json.TEMARIO }}\n\nPalabras clave del curso: {{ $('Edit Fields').item.json.PALABRAS_CLAVE_SYLLABUS }}\n\nInstrucciones de evaluación\n\nAnaliza cada fila del CSV usando:\n\ntítulo\n\nresumen\n\ncategoría / subcategoría\n\npalabrasClaves\n\nCompara cada recurso contra:\n\nobjetivo general de la materia\n\ncompetencias\n\ntemario\n\npalabras clave del SYLLABUS\n\nIncluye solo recursos pertinentes.\n\nAsigna una calificación de pertinencia de 1 a 10 (1 = baja, 10 = máxima).\n\nSelecciona una única palabra clave del recurso como la más representativa para justificar su pertinencia.\n\nFormato ESTRICTO de salida (JSON)\n\nDevuelve únicamente un JSON válido con esta estructura:\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_RECURSO\",\n      \"titulo\": \"TÍTULO\",\n      \"tipo\": \"TIPO\",\n      \"palabraClave\": \"PALABRA_CLAVE_SELECCIONADA\",\n      \"justificacion\": \"Texto breve de máximo 20 palabras que explique la pertinencia incluyendo la palabra clave.\",\n      \"pertinencia\": 1\n    }\n  ]\n}\n\n\nReglas obligatorias:\n\nNo incluyas texto adicional fuera del JSON.\n\nNo inventes datos.\n\nNo incluyas recursos irrelevantes con una pertinencia menor a 6.\n\nLa justificación debe ser clara, corta y contener la palabra clave seleccionada.",
+        "documentUrls": "https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/csv/recursosLM-info.csv",
+        "options": {
+          "maxOutputTokens": {}
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -544
+      ],
+      "id": "6132ba7f-6ca7-4a40-98ee-210e78dc837f",
+      "name": "Analyze Infografias",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yWbztL8O1z9zkmV3",
+          "name": "N8N-Lugnia-2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "=Actúa como un evaluador académico experto en diseño instruccional y evaluación curricular.\nTu tarea es evaluar la pertinencia de recursos educativos contenidos en un archivo CSV frente al SYLLABUS de una materia, utilizando criterios ponderados para calcular un valor único de pertinencia.\n\nContexto y Rol\n\nEres responsable de analizar recursos educativos y determinar su alineación curricular con la asignatura MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO, garantizando coherencia pedagógica, relevancia temática y aplicabilidad práctica.\n\nEntrada 1: Archivo CSV\n\nEl archivo CSV contiene las siguientes columnas:\n\nID\n\ntitulo\n\nresumen\n\ntipo\n\ncategoria\n\nsubcategoria\n\npalabrasClaves\n\nCada fila representa un recurso educativo independiente.\n\nEntrada 2: SYLLABUS de la materia\n\nNombre: MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO\n\nDescripción general:\nMateria orientada a mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.\n\nCompetencias:\n\nAnalizar métodos y procesos productivos\n\nAplicar técnicas de medición del trabajo\n\nIdentificar mejoras en actividades repetitivas\n\nTemario:\n\nIntroducción al estudio del trabajo\n\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\n\nAnálisis de métodos\n\nMedición del trabajo\n\nCronometraje y técnicas PMTS\n\nMuestreo del trabajo\n\nBalanceo de líneas\n\nErgonomía básica aplicada\n\nImplementación de mejoras\n\nPalabras clave del curso:\nmétodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo\n\nCriterios de evaluación (con pesos)\n\nEvalúa cada recurso con una calificación de 0 a 10 en cada criterio:\n\n- Alineación con el objetivo general (25%)\n- Cobertura de competencias del curso (25%)\n- Correspondencia con el temario (20%)\n- Coincidencia semántica de palabras clave (15%)\n- Adecuación del tipo de recurso al aprendizaje práctico (10%)\n- Aplicabilidad en contextos productivos reales (5%)\n\nCálculo de pertinencia final\n\nCalcula el valor único de pertinencia usando la fórmula:\n\nPertinencia=(C1×0.25)+(C2×0.25)+(C3×0.20)+(C4×0.15)+(C5×0.10)+(C6×0.05)\n\nRedondea el resultado final a un número entero del 1 al 10.\n\nReglas de selección\n\nIncluye todos los recursos\n\nNo inventes información\n\nUsa únicamente datos presentes en el CSV\n\nSelecciona una única palabra clave del recurso como la más representativa de su pertinencia\n\nFormato ESTRICTO de salida (JSON)\n\nDevuelve únicamente un JSON válido con la siguiente estructura:\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_RECURSO\",\n      \"titulo\": \"TÍTULO\",\n      \"tipo\": \"TIPO\",\n      \"palabraClave\": \"PALABRA_CLAVE_SELECCIONADA\",\n      \"justificacion\": \"Texto breve (máx. 20 palabras) que explique la pertinencia e incluya la palabra clave.\",\n      \"pertinencia\": \"\"pertinencia\"\n      \"criterios\": \"c1,c2,c3,c4,c5,c6\"\n    }\n  ]\n}\n\nRestricciones obligatorias\n\nNo incluyas texto fuera del JSON\n\nIncluye todos los recursos\n\nLa justificación debe ser clara, concisa y contener la palabra clave seleccionada si aplica\n\nEl JSON debe ser sintácticamente válido\n\nEvalúa cada fila del CSV de forma independiente y objetiva siguiendo estrictamente estos criterios.",
+        "documentUrls": "https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/csv/recursosLM-lab.csv",
+        "options": {
+          "maxOutputTokens": {}
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -320
+      ],
+      "id": "51a4a6e7-3186-477a-aa10-1b90656c02b6",
+      "name": "Analyze Labs",
+      "retryOnFail": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yWbztL8O1z9zkmV3",
+          "name": "N8N-Lugnia-2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        208,
+        -992
+      ],
+      "id": "99ec16b9-f5fa-412c-870a-2627545ba993",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.virtualpro.co/api/bigquery/consultar_query?consulta=recursosLM-gen&param1={{ $json.type }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -1056
+      ],
+      "id": "6927072e-185b-4bd3-89d3-ffbc6adafc3d",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const miArreglo = ['show'];\nreturn miArreglo.map(item => ({ json: { type: item } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        -992
+      ],
+      "id": "a1e078ed-e83d-460e-ae28-aa8ed59e7678",
+      "name": "DefineTypes"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1104,
+        -1056
+      ],
+      "id": "e1eb44e4-3653-40ff-9160-2819b31ac528",
+      "name": "Convert to File4"
+    },
+    {
+      "parameters": {
+        "name": "=pertinencia-{{ $('Loop Over Items').item.json.type }}-all.json ",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
+          "mode": "list",
+          "cachedResultName": "TMP",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1328,
+        -992
+      ],
+      "id": "8c46717a-65f3-412f-892c-aa7e826ab061",
+      "name": "Upload file3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "X8Q7VA77D1tpqDJZ",
+          "name": "Auth Drive - ferneyrojas@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "=Actúa como un evaluador académico experto en diseño instruccional y evaluación curricular.\nTu tarea es evaluar la pertinencia de recursos educativos contenidos en un archivo CSV frente al SYLLABUS de una materia, utilizando criterios ponderados para calcular un valor único de pertinencia.\n\nContexto y Rol\n\nEres responsable de analizar recursos educativos y determinar su alineación curricular con la asignatura MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO, garantizando coherencia pedagógica, relevancia temática y aplicabilidad práctica.\n\nEntrada 1: Archivo CSV\n\nEl archivo CSV contiene las siguientes columnas:\n\nID\n\ntitulo\n\nresumen\n\ntipo\n\ncategoria\n\nsubcategoria\n\npalabrasClaves\n\nCada fila representa un recurso educativo independiente.\n\nEntrada 2: SYLLABUS de la materia\n\nNombre: MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO\n\nDescripción general:\nMateria orientada a mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.\n\nCompetencias:\n\nAnalizar métodos y procesos productivos\n\nAplicar técnicas de medición del trabajo\n\nIdentificar mejoras en actividades repetitivas\n\nTemario:\n\nIntroducción al estudio del trabajo\n\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\n\nAnálisis de métodos\n\nMedición del trabajo\n\nCronometraje y técnicas PMTS\n\nMuestreo del trabajo\n\nBalanceo de líneas\n\nErgonomía básica aplicada\n\nImplementación de mejoras\n\nPalabras clave del curso:\nmétodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo\n\nCriterios de evaluación (con pesos)\n\nEvalúa cada recurso con una calificación de 0 a 10 en cada criterio:\n\n- Alineación con el objetivo general (25%)\n- Cobertura de competencias del curso (25%)\n- Correspondencia con el temario (20%)\n- Coincidencia semántica de palabras clave (15%)\n- Adecuación del tipo de recurso al aprendizaje práctico (10%)\n- Aplicabilidad en contextos productivos reales (5%)\n\nCálculo de pertinencia final\n\nCalcula el valor único de pertinencia usando la fórmula:\n\nPertinencia=(C1×0.25)+(C2×0.25)+(C3×0.20)+(C4×0.15)+(C5×0.10)+(C6×0.05)\n\nRedondea el resultado final a un número entero del 1 al 10.\n\nReglas de selección\n\nIncluye todos los recursos\n\nNo inventes información\n\nUsa únicamente datos presentes en el CSV\n\nSelecciona una única palabra clave del recurso como la más representativa de su pertinencia\n\nFormato ESTRICTO de salida (JSON)\n\nDevuelve únicamente un JSON válido con la siguiente estructura:\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_RECURSO\",\n      \"titulo\": \"TÍTULO\",\n      \"tipo\": \"TIPO\",\n      \"palabraClave\": \"PALABRA_CLAVE_SELECCIONADA\",\n      \"justificacion\": \"Texto breve (máx. 20 palabras) que explique la pertinencia e incluya la palabra clave.\",\n      \"pertinencia\": \"\"pertinencia\"\n      \"criterios\": \"c1,c2,c3,c4,c5,c6\"\n    }\n  ]\n}\n\nRestricciones obligatorias\n\nNo incluyas texto fuera del JSON\n\nIncluye todos los recursos\n\nLa justificación debe ser clara, concisa y contener la palabra clave seleccionada si aplica\n\nEl JSON debe ser sintácticamente válido\n\nEvalúa cada fila del CSV de forma independiente y objetiva siguiendo estrictamente estos criterios.",
+        "documentUrls": "=https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/csv/recursosLM-{{ $('DefineTypes').item.json.type }}.csv ",
+        "options": {
+          "maxOutputTokens": null
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -1056
+      ],
+      "id": "4fdcbded-518a-4fee-a847-9fdbf478a7df",
+      "name": "Analyze CSV",
+      "retryOnFail": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "yWbztL8O1z9zkmV3",
+          "name": "N8N-Lugnia-2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $input.first().json.content.parts[0].text || \"\";\n\n// Limpia los backticks y etiquetas ```json\nraw = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Convierte a JSON\nlet parsed = JSON.parse(raw);\n\nreturn parsed;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -1056
+      ],
+      "id": "aadbdd99-cd52-4898-bfc3-180b5a5030c1",
+      "name": "Convert Json"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "DefineTypes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File3": {
+      "main": [
+        [
+          {
+            "node": "Upload file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Upload file2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze All Recursos": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Infografias": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Labs": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Analyze CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DefineTypes": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File4": {
+      "main": [
+        [
+          {
+            "node": "Upload file3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze CSV": {
+      "main": [
+        [
+          {
+            "node": "Convert Json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Json": {
+      "main": [
+        [
+          {
+            "node": "Convert to File4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Edit Fields": [
+      {
+        "json": {
+          "NOMBRE_MATERIA": "MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO",
+          "DESCRIPCIÓN_GENERAL": "Materia fundamental que busca mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.",
+          "COMPETENCIAS": "Analizar métodos y procesos productivos. Aplicar técnicas de medición del trabajo. Identificar mejoras en actividades repetitivas.",
+          "TEMARIO": "Introducción al estudio del trabajo\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\nAnálisis de métodos\nMedición del trabajo\nCronometraje y técnicas PMTS\nMuestreo del trabajo\nBalanceo de líneas\nErgonomía básica aplicada al estudio del trabajo\nImplementación de mejoras",
+          "PALABRAS_CLAVE_SYLLABUS": "métodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo."
+        }
+      }
+    ]
+  },
+  "versionId": "3db82cf9-144b-465b-b96a-441c1881ff4a",
+  "triggerCount": 0,
+  "tags": []
+}
