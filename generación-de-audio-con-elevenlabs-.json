@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-11T14:33:58.495Z",
-  "updatedAt": "2025-11-12T22:00:04.645Z",
+  "updatedAt": "2026-01-25T06:00:22.287Z",
   "id": "jcN1FJHFrnbm2cAu",
   "name": "Generación de audio con ElevenLabs",
   "active": true,
@@ -8,15 +8,16 @@
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "elevenlabsform",
+        "multipleMethods": true,
+        "path": "audios-libros",
+        "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
-        0
+        -288,
+        -144
       ],
       "id": "7ab592b7-d488-44b5-9729-546eb8fbc76d",
       "name": "Webhook",
@@ -58,7 +59,7 @@
             },
             {
               "name": "model_id",
-              "value": "={{ $json.model_id }}"
+              "value": "eleven_v2_5_flash"
             }
           ]
         },
@@ -113,7 +114,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [\n  {\n    json: {\n      voices: [\n        {\n          name: \"femenina\",\n          id: \"2Lb1en5ujrODDIqmp7F3\",\n          text: $json.body.field_long_text_p437rbmkbd,\n          subseccion: $json.body.field_number_1uftd4hkuk7,\n          libro: $json.body.field_number_ufr0dc83ebc,\n        },\n        {\n          name: \"masculina\",\n          id: \"HJAIwgFDzw3Kk9aW7RYr\",\n          text: $json.body.field_long_text_p437rbmkbd,\n          subseccion: $json.body.field_number_1uftd4hkuk7,\n          libro: $json.body.field_number_ufr0dc83ebc,\n        },\n      ],\n    },\n  },\n];\n"
+        "jsCode": "// Función para limpiar el texto manteniendo solo palabras y signos de puntuación básicos\nfunction limpiarTextoParaTimestamps(texto) {\n  if (!texto) return \"\";\n\n  let limpio = texto\n    // 1. Reemplazar paréntesis por pausas explícitas\n    .replace(/\\(/g, ', ')\n    .replace(/\\)/g, '. ')\n\n    // 1.5 Proteger expresiones que deben ser una sola unidad (ej: y/o)\n    .replace(/\\by\\s*\\/\\s*o\\b/gi, 'y_o')\n\n    // 2. Reemplazar caracteres no permitidos (manteniendo signos españoles)\n    .replace(/[^\\w\\s.,;:¿?¡!áéíóúÁÉÍÓÚñÑüÜ]/g, ' ')\n\n    // 3. Normalizar espacios múltiples\n    .replace(/\\s+/g, ' ')\n\n    // 4. Eliminar espacios antes de puntuación (excepto ¿ y ¡)\n    .replace(/\\s+([.,;:?])/g, '$1')\n\n    // 5. Asegurar espacio después de puntuación\n    //    (pero NO separar puntos que estén entre números, ej: 3.000)\n    .replace(/([,;:?])\\s*/g, '$1 ')\n    .replace(/(?<!\\d)\\.(?!\\d)\\s*/g, '. ')\n\n    // 6. Asegurar que ¿ y ¡ tengan espacio antes si no es inicio de texto\n    .replace(/([a-zA-ZáéíóúÁÉÍÓÚñÑüÜ])([¿¡])/g, '$1 $2')\n\n    // 7. Normalizar espacios finales otra vez\n    .replace(/\\s+/g, ' ')\n    .trim();\n\n  return limpio;\n}\n\n// Obtener el texto original\nconst textoOriginal = $input.first().json.texto_subseccion;\n\n// Limpiar el texto\nconst textoLimpio = limpiarTextoParaTimestamps(textoOriginal);\n\n// Log para depuración\nconsole.log(\"Texto original vs limpio:\");\nconsole.log(\"Original (primeros 100 chars):\", textoOriginal.substring(0, 100));\nconsole.log(\"Limpio (primeros 100 chars):\", textoLimpio.substring(0, 100));\n\nreturn [\n  {\n    json: {\n      voices: [\n        {\n          name: \"femenina\",\n          id: \"p18tR9wFA5Ng9WhfWI0o\",\n          text: textoLimpio,\n          subseccion: $input.first().json.id_subseccion,\n          libro: $input.first().json.id_libro,\n        },\n        {\n          name: \"masculina\",\n          id: \"htFfPSZGJwjBv1CL0aMD\",\n          text: textoLimpio,\n          subseccion: $input.first().json.id_subseccion,\n          libro: $input.first().json.id_libro,\n        },\n      ],\n    },\n  },\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -202,6 +203,73 @@
       ],
       "id": "3bed4af2-c09d-4548-900c-0f06ced0099f",
       "name": "Generar JSON"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"es\">\n\n<head>\n    <meta charset=\"UTF-8\" />\n    <title>Formulario subsección</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n\n<body class=\"bg-gray-100 p-6\">\n\n    <div class=\"max-w-xl mx-auto bg-white p-6 rounded-xl shadow\">\n        <h1 class=\"text-xl font-bold mb-6\">Crear subsección</h1>\n\n        <form method=\"POST\" action=\"https://hpa.lugnia.com/webhook/audios-libros\" id=\"audioForm\">\n\n            <!-- ID Libro -->\n            <label class=\"block mb-2 font-medium\">ID Libro</label>\n            <input\n                type=\"number\"\n                name=\"id_libro\"\n                required\n                class=\"w-full border px-3 py-2 rounded mb-4\"\n                placeholder=\"Ej. 12\"\n            />\n\n            <!-- ID Sub-sección -->\n            <label class=\"block mb-2 font-medium\">ID subsección</label>\n            <input\n                type=\"number\"\n                name=\"id_subseccion\"\n                required\n                class=\"w-full border px-3 py-2 rounded mb-4\"\n                placeholder=\"Ej. 3\"\n            />\n\n            <!-- Texto subsección -->\n            <label class=\"block mb-2 font-medium\">Texto subsección</label>\n            <textarea\n                name=\"texto_subseccion\"\n                required\n                class=\"w-full border px-3 py-2 rounded mb-6\"\n                rows=\"6\"\n                placeholder=\"Escribe aquí el contenido de la subsección...\"\n            ></textarea>\n\n            <!-- Botón enviar -->\n            <button\n                type=\"submit\"\n                id=\"submitBtn\"\n                class=\"bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg w-full flex items-center justify-center\"\n            >\n                Generar audio\n            </button>\n\n        </form>\n    </div>\n\n    <!-- =====================================================\n     SCRIPT SPINNER + BLOQUEO BOTÓN\n    ====================================================== -->\n    <script>\n        document.getElementById(\"audioForm\").addEventListener(\"submit\", function () {\n            const btn = document.getElementById(\"submitBtn\");\n\n            btn.disabled = true;\n            btn.classList.add(\"cursor-not-allowed\", \"opacity-80\");\n\n            btn.innerHTML = `\n                <div class=\"flex items-center justify-center gap-2\">\n                    <span class=\"animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4\"></span>\n                    Generando audio...\n                </div>\n            `;\n        });\n    </script>\n\n</body>\n</html>\n",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -80,
+        -336
+      ],
+      "id": "7b6066bc-f02d-49c5-b45a-4c5ef1c31ddc",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Audio generado</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n\n<body class=\"bg-gray-100 flex items-center justify-center h-screen\">\n\n    <div class=\"bg-white p-8 rounded-xl shadow max-w-lg text-center\">\n\n        <h1 class=\"text-2xl font-bold text-green-700 mb-4\">\n            Audio generado correctamente\n        </h1>\n\n        <p class=\"text-gray-700\">\n            El audio de la subsección se ha generado correctamente.\n        </p>\n\n    </div>\n\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2336,
+        0
+      ],
+      "id": "d5f5cd71-27c3-4c53-92c3-cb215d0dd21a",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "05893281-7e55-467e-b7bd-a586f30f5a1a",
+              "name": "id_libro",
+              "value": "={{$json[\"body\"][\"id_libro\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "f175d157-915f-45f8-a103-2be5ac45a631",
+              "name": "id_subseccion",
+              "value": "={{$json[\"body\"][\"id_subseccion\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "ac69a626-c487-4502-85fe-e400298ea959",
+              "name": "texto_subseccion",
+              "value": "={{$json[\"body\"][\"texto_subseccion\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "0f60ab9b-922b-4cdb-b299-9feed00fc240",
+      "name": "Edit Fields"
     }
   ],
   "connections": {
@@ -209,7 +277,14 @@
       "main": [
         [
           {
-            "node": "Obtener campos",
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
@@ -314,6 +389,28 @@
           }
         ]
       ]
+    },
+    "Generar JSON": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Obtener campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -321,8 +418,10 @@
   },
   "staticData": null,
   "meta": null,
-  "pinData": {},
-  "versionId": "5ca265e6-9c3f-4d44-987f-6aeb21aefd2f",
+  "pinData": {
+    "Webhook": []
+  },
+  "versionId": "9447705c-7265-48aa-8f04-81eda2382ec5",
   "triggerCount": 1,
   "tags": []
 }
