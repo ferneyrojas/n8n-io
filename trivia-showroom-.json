@@ -1,19 +1,131 @@
 {
   "createdAt": "2025-10-20T03:17:22.934Z",
-  "updatedAt": "2025-10-27T19:24:05.385Z",
+  "updatedAt": "2026-01-28T12:44:00.360Z",
   "id": "TklBRIvfwiWsjNoE",
   "name": "Trivia Showroom",
   "active": false,
   "isArchived": false,
-  "nodes": [],
-  "connections": {},
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "GET"
+        ],
+        "path": "listar-docs-drive",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        256
+      ],
+      "id": "3d2e1be7-b371-41e8-8461-edb8084fce76",
+      "name": "Webhook",
+      "webhookId": "0d172027-1038-41ae-b780-5a92d34bfa89"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=mimeType='application/vnd.google-apps.document' and '1GE-vQnue-ixwhQb02UXSBXpz0YXNH2SO' in parents and trashed = false",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -64,
+        256
+      ],
+      "id": "2e94275f-527b-4aef-a08f-020610850928",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "3qUA8BacQmVbf8Wx",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({\n  json: {\n    nombre: item.json.name,\n    url: `https://docs.google.com/document/d/${item.json.id}`\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        256
+      ],
+      "id": "33c52893-e169-45bb-9a9b-21b40a22bd3d",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        352,
+        256
+      ],
+      "id": "67e169ed-030e-44f0-ae32-c7ed5d640432",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "settings": {
     "executionOrder": "v1"
   },
   "staticData": null,
-  "meta": null,
-  "pinData": {},
-  "versionId": "fb9af7cc-53a3-4564-a257-738888ea5709",
-  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": []
+  },
+  "versionId": "1947221d-ba2a-4807-af67-0d89467ca11e",
+  "triggerCount": 1,
   "tags": []
 }
