@@ -1,10 +1,10 @@
 {
   "createdAt": "2025-11-20T15:40:41.986Z",
-  "updatedAt": "2025-11-20T15:43:40.828Z",
+  "updatedAt": "2025-12-09T12:59:00.085Z",
   "id": "4d6PRDeJwAObw8T3",
   "name": "My workflow 3",
-  "active": true,
-  "isArchived": false,
+  "active": false,
+  "isArchived": true,
   "nodes": [
     {
       "parameters": {
@@ -63,7 +63,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "e1cfe6e7-2b6a-4a3f-8f07-fe26243e7496",
+  "versionId": "8542632e-bd04-41bb-b157-19a305b75efe",
   "triggerCount": 1,
   "tags": []
 }
