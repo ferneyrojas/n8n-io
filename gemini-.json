@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-28T00:22:47.315Z",
-  "updatedAt": "2026-02-11T02:56:42.223Z",
+  "updatedAt": "2026-02-11T14:21:11.020Z",
   "id": "q8OwZG2ENnbPlAXH",
   "name": "Gemini",
   "active": false,
@@ -126,7 +126,7 @@
       "typeVersion": 2,
       "position": [
         528,
-        1248
+        1584
       ],
       "id": "3c3a1a1e-cfa7-4128-8b50-a83a3491a338",
       "name": "Code3"
@@ -139,7 +139,7 @@
       "typeVersion": 2,
       "position": [
         736,
-        1248
+        1584
       ],
       "id": "d0d39b6b-6cfe-41aa-b96c-aee8c91655d0",
       "name": "Code4"
@@ -152,7 +152,7 @@
       "typeVersion": 3,
       "position": [
         944,
-        1248
+        1584
       ],
       "id": "be43874f-b239-4d0d-8481-046312f10e11",
       "name": "Loop Over Items1"
@@ -170,7 +170,7 @@
       "typeVersion": 4.2,
       "position": [
         1152,
-        1344
+        1680
       ],
       "id": "d7d0fcd5-1e5e-47bb-8649-89b975d5caad",
       "name": "HTTP Request1"
@@ -183,7 +183,7 @@
       "typeVersion": 2,
       "position": [
         80,
-        1248
+        1584
       ],
       "id": "424f0aca-bcd4-415e-8e9e-aed70eec78a1",
       "name": "Code5"
@@ -207,17 +207,223 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-r1-0528\",\n  \"messages\": {{ JSON.stringify($json.messages) }},\n  \"temperature\": 0.2\n}",
+        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-chat\",\n  \"messages\": {{ JSON.stringify($json.messages) }},\n  \"temperature\": 0.2\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
         304,
-        1248
+        1584
       ],
       "id": "f8ff97e1-2a36-4bf3-9887-428b78f7c222",
       "name": "Generar imágenes1",
+      "alwaysOutputData": false,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// ========================================\n// NODO DE LIMPIEZA Y CORRECCIÓN DE JSON IA\n// ========================================\n\nconst items = $input.all();\n\n// 1. Tomamos la respuesta de la IA (ajustado a la estructura real)\nlet raw;\nlet hasError = false;\nlet errorInfo = null;\n\n// Detectar estructura de OpenRouter/Novita\nif (items[0].json.choices && items[0].json.choices[0]) {\n  const choice = items[0].json.choices[0];\n  \n  // 👉 DETECTAR ERRORES DEL PROVIDER\n  if (choice.error) {\n    hasError = true;\n    errorInfo = {\n      message: choice.error.message,\n      code: choice.error.code,\n      provider: choice.error.metadata?.provider_name || items[0].json.provider\n    };\n  }\n  \n  raw = choice.message?.content;\n} else if (items[0].json.output) {\n  raw = items[0].json.output;\n} else if (typeof items[0].json === 'string') {\n  raw = items[0].json;\n} else {\n  throw new Error('No se pudo detectar el formato de respuesta de la IA');\n}\n\n// 2. Validar que raw no sea undefined o null\nif (!raw) {\n  if (hasError) {\n    throw new Error(`Error del proveedor ${errorInfo.provider}: ${errorInfo.message} (código: ${errorInfo.code})`);\n  }\n  throw new Error('La respuesta de la IA está vacía o no existe');\n}\n\n// 3. Detectar si ya es objeto\nlet parsed;\nif (typeof raw === 'object' && raw !== null) {\n  parsed = raw;\n} else {\n  // 4. Limpieza inicial agresiva\n  let cleaned = raw\n    .replace(/```json/gi, '')\n    .replace(/```/g, '')\n    .replace(/^\\uFEFF/, '')\n    .replace(/[\\u0000-\\u001F\\u007F-\\u009F]/g, '')\n    .trim();\n\n  // 5. Recortar solo el bloque JSON real\n  const firstBrace = cleaned.indexOf('{');\n  const lastBrace = cleaned.lastIndexOf('}');\n  \n  if (firstBrace === -1 || lastBrace === -1) {\n    throw new Error('No se encontró JSON válido en la respuesta');\n  }\n  \n  cleaned = cleaned.substring(firstBrace, lastBrace + 1);\n\n  // 6. 👉 DETECTAR JSON INCOMPLETO (cortado)\n  let isIncomplete = false;\n  \n  // Detectar si termina abruptamente (sin cerrar objetos/arrays correctamente)\n  const openBraces = (cleaned.match(/\\{/g) || []).length;\n  const closeBraces = (cleaned.match(/\\}/g) || []).length;\n  const openBrackets = (cleaned.match(/\\[/g) || []).length;\n  const closeBrackets = (cleaned.match(/\\]/g) || []).length;\n  \n  if (openBraces !== closeBraces || openBrackets !== closeBrackets) {\n    isIncomplete = true;\n    console.warn('⚠️ JSON INCOMPLETO DETECTADO');\n    console.warn(`Llaves: ${openBraces} abiertas, ${closeBraces} cerradas`);\n    console.warn(`Corchetes: ${openBrackets} abiertos, ${closeBrackets} cerrados`);\n  }\n  \n  // 7. 👉 COMPLETAR JSON TRUNCADO\n  if (isIncomplete) {\n    // Buscar el último objeto completo en el array\n    const lastCompleteObject = cleaned.lastIndexOf('}');\n    \n    if (lastCompleteObject !== -1) {\n      // Truncar hasta el último objeto completo\n      let truncated = cleaned.substring(0, lastCompleteObject + 1);\n      \n      // Cerrar el array de resultados si está abierto\n      if (openBrackets > closeBrackets) {\n        truncated += '\\n]';\n      }\n      \n      // Cerrar el objeto principal si está abierto\n      if (openBraces > closeBraces) {\n        truncated += '\\n}';\n      }\n      \n      cleaned = truncated;\n      console.warn('✂️ JSON truncado al último objeto completo');\n    }\n  }\n\n  // 8. Reparaciones sofisticadas de JSON malformado\n  \n  // a) Comas duplicadas o múltiples\n  cleaned = cleaned\n    .replace(/,{2,}/g, ',')\n    .replace(/\\}\\s*,\\s*,+/g, '},')\n    .replace(/\\]\\s*,\\s*,+/g, '],');\n  \n  // b) Comas sobrantes (trailing commas)\n  cleaned = cleaned.replace(/,(\\s*[\\]}])/g, '$1');\n  \n  // c) COMAS FALTANTES ENTRE PROPIEDADES\n  cleaned = cleaned.replace(\n    /\"(\\s*\\n\\s*)\"(?=[a-zA-Z_])/g,\n    '\",\\n\"'\n  );\n  \n  // d) Coma faltante después de valores antes de siguiente key\n  cleaned = cleaned\n    .replace(/\"([^\"\\\\]|\\\\.)*\"\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, (match) => {\n      return match.replace(/\"\\s*\\n\\s*\"/, '\",\\n\"');\n    })\n    .replace(/(\\d+)\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '$1,\\n\"$2\":')\n    .replace(/(true|false)\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '$1,\\n\"$2\":')\n    .replace(/\\}\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '},\\n\"$1\":')\n    .replace(/\\]\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '],\\n\"$1\":');\n  \n  // e) Comas faltantes entre objetos en arrays\n  cleaned = cleaned.replace(/\\}\\s*\\n\\s*\\{/g, '},\\n{');\n  \n  // f) Corregir comillas escapadas innecesariamente\n  cleaned = cleaned\n    .replace(/\\\\\"/g, '\"')\n    .replace(/\\\\'/g, \"'\");\n  \n  // g) Espacios en blanco excesivos\n  cleaned = cleaned.replace(/\\n\\s*\\n/g, '\\n');\n\n  // 9. Parsear con manejo de errores detallado\n  try {\n    parsed = JSON.parse(cleaned);\n  } catch (error) {\n    // Intento de rescate: extraer solo el array de resultados\n    try {\n      const resultMatch = cleaned.match(/\"resultados\"\\s*:\\s*(\\[[\\s\\S]*?\\])/);\n      if (resultMatch) {\n        const resultsArray = JSON.parse(resultMatch[1]);\n        parsed = { resultados: resultsArray };\n        console.warn('⚠️ JSON parcialmente recuperado - solo array de resultados');\n      } else {\n        throw error;\n      }\n    } catch (rescueError) {\n      console.error('=== JSON QUE FALLÓ ===');\n      console.error(cleaned.substring(0, 2000));\n      console.error('...');\n      console.error(cleaned.substring(cleaned.length - 500));\n      console.error('=== FIN JSON ===');\n      console.error('Error original:', error.message);\n      \n      if (hasError) {\n        throw new Error(\n          `JSON inválido + Error del proveedor ${errorInfo.provider}: ${errorInfo.message}. ` +\n          `Intenta reejecutar el workflow.`\n        );\n      }\n      \n      throw new Error(`Error parseando JSON de la IA: ${error.message}`);\n    }\n  }\n}\n\n// 10. Validación base\nif (!parsed.resultados || !Array.isArray(parsed.resultados)) {\n  throw new Error('La respuesta no contiene un array \"resultados\" válido');\n}\n\nconst resultados = parsed.resultados;\n\nif (resultados.length === 0) {\n  if (hasError) {\n    throw new Error(\n      `Array vacío debido a error del proveedor: ${errorInfo.message}. ` +\n      `Reintenta la ejecución.`\n    );\n  }\n  throw new Error('El array de resultados está vacío');\n}\n\n// 11. Validar y corregir cada resultado\nconst requiredFields = [\n  'id', \n  'titulo', \n  'tipo', \n  'palabraClave', \n  'justificacion', \n  'pertinencia', \n  'criterios'\n];\n\nconst errores = [];\nconst warnings = [];\n\nconst resultadosCorregidos = resultados.map((r, index) => {\n  // a) Validar campos requeridos\n  const missing = requiredFields.filter(f => !(f in r));\n  if (missing.length > 0) {\n    errores.push(`Recurso ${index + 1} (${r.id || 'sin ID'}): faltan ${missing.join(', ')}`);\n  }\n\n  // b) Validar y corregir criterios\n  if (!r.criterios || typeof r.criterios !== 'object') {\n    warnings.push(`Recurso ${index + 1}: criterios ausentes, usando defaults`);\n    r.criterios = { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0 };\n  } else {\n    ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(c => {\n      if (!(c in r.criterios)) {\n        r.criterios[c] = 0;\n      }\n      if (typeof r.criterios[c] !== 'number' || r.criterios[c] < 0 || r.criterios[c] > 10) {\n        warnings.push(`Recurso ${index + 1}: ${c} fuera de rango, corrigiendo`);\n        r.criterios[c] = Math.max(0, Math.min(10, Number(r.criterios[c]) || 0));\n      }\n    });\n  }\n\n  // c) Validar y recalcular pertinencia si es necesaria\n  if (typeof r.pertinencia !== 'number' || r.pertinencia < 0 || r.pertinencia > 10) {\n    const calc = Math.round(\n      r.criterios.c1 * 0.25 +\n      r.criterios.c2 * 0.25 +\n      r.criterios.c3 * 0.20 +\n      r.criterios.c4 * 0.15 +\n      r.criterios.c5 * 0.10 +\n      r.criterios.c6 * 0.05\n    );\n    warnings.push(`Recurso ${index + 1}: pertinencia recalculada (${r.pertinencia} → ${calc})`);\n    r.pertinencia = Math.max(0, Math.min(10, calc));\n  }\n\n  // d) Defaults seguros para campos faltantes\n  r.id = r.id?.toString() || `unknown_${index + 1}`;\n  r.titulo = r.titulo?.toString() || 'Sin título';\n  r.tipo = r.tipo?.toString() || 'Desconocido';\n  r.palabraClave = r.palabraClave?.toString() || '';\n  r.justificacion = r.justificacion?.toString() || 'Sin justificación disponible';\n\n  // e) Limpiar strings\n  r.titulo = r.titulo.trim();\n  r.justificacion = r.justificacion.trim().replace(/\\s+/g, ' ');\n  r.palabraClave = r.palabraClave.trim();\n\n  return r;\n});\n\n// 12. Logs informativos\nif (hasError) {\n  console.warn(`⚠️ ADVERTENCIA: Hubo un error del proveedor pero se recuperaron ${resultadosCorregidos.length} resultados`);\n  console.warn(`Error: ${errorInfo.message}`);\n}\n\nif (errores.length > 0) {\n  console.error('❌ ERRORES DE VALIDACIÓN:', errores);\n}\n\nif (warnings.length > 0) {\n  console.warn('⚠️ ADVERTENCIAS:', warnings);\n}\n\nconsole.log(`✅ Procesados ${resultadosCorregidos.length} resultados correctamente`);\n\n// 13. Normalizar salida en formato n8n\nreturn resultadosCorregidos.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        2032
+      ],
+      "id": "a6cf4de2-9c28-40f2-a876-9771f0d52cb0",
+      "name": "Code6"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item, index) => {\n  const r = item.json;\n  \n  // 1. Buscar criterios (manejo robusto)\n  let criterios = null;\n  \n  // Caso ideal: ya existe r.criterios\n  if (r.criterios && typeof r.criterios === 'object') {\n    criterios = r.criterios;\n  }\n  \n  // Buscar por estructura si no existe con ese nombre\n  if (!criterios) {\n    for (const [key, value] of Object.entries(r)) {\n      if (\n        value &&\n        typeof value === 'object' &&\n        ['c1','c2','c3','c4','c5','c6'].every(k => k in value)\n      ) {\n        criterios = value;\n        delete r[key]; // elimina el nombre incorrecto\n        break;\n      }\n    }\n  }\n  \n  // Fallback ultra seguro\n  criterios = criterios || {\n    c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0\n  };\n  \n  // 2. Validar y corregir pertinencia NUEVAMENTE (por si acaso)\n  let pertinencia = r.pertinencia;\n  \n  if (typeof pertinencia !== 'number' || pertinencia < 1 || pertinencia > 10) {\n    // Recalcular desde criterios\n    pertinencia = Math.round(\n      (criterios.c1 * 0.25) +\n      (criterios.c2 * 0.25) +\n      (criterios.c3 * 0.20) +\n      (criterios.c4 * 0.15) +\n      (criterios.c5 * 0.10) +\n      (criterios.c6 * 0.05)\n    );\n    pertinencia = Math.max(1, Math.min(10, pertinencia));\n    console.warn(`Item ${index}: pertinencia recalculada = ${pertinencia}`);\n  }\n  \n  // 3. Mapeo final con validaciones\n  return {\n    json: {\n      id: r.id || 'unknown',\n      titulo: r.titulo || 'Sin título',\n      tipo: r.tipo || 'Desconocido',\n      palabra_clave: r.palabraClave || '',\n      pertinencia: pertinencia,\n      c1: parseInt(criterios.c1) || 0,\n      c2: parseInt(criterios.c2) || 0,\n      c3: parseInt(criterios.c3) || 0,\n      c4: parseInt(criterios.c4) || 0,\n      c5: parseInt(criterios.c5) || 0,\n      c6: parseInt(criterios.c6) || 0,\n      justificacion: r.justificacion || 'Sin justificación',\n      numero_ejecucion: $('Start').first().json.numero_ejecucion || 'unknown'\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        2032
+      ],
+      "id": "f6f192a4-9369-4171-806d-ad5efc0be168",
+      "name": "Code7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1136,
+        2032
+      ],
+      "id": "c7b55d06-d58d-4143-9aa3-af5bb132dc3f",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.virtualpro.co/api/prc-pertinencia",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        2128
+      ],
+      "id": "6276e1be-0f29-44ed-9a64-689baf6be72e",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer sk-050df4e7475a42a888b36a5075d72b91"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.deepseek_payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        496,
+        2032
+      ],
+      "id": "af586183-a0a1-47d6-b3a1-1a85640f62ad",
+      "name": "Generar imágenes",
+      "alwaysOutputData": false,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// NODO CODE - Genera payload válido para DeepSeek\nconst input = $input.first().json;\n\n// Obtener el prompt del campo correspondiente\nconst userPrompt = input.chatInput || input.userPrompt || input.prompt;\n\nif (!userPrompt) {\n  throw new Error('No se encontró el prompt en chatInput, userPrompt o prompt');\n}\n\n// System prompt limpio (sin comillas problemáticas)\nconst systemPrompt = `Eres un evaluador académico experto en diseño instruccional y evaluación curricular.\n\nREGLAS ABSOLUTAS DE FORMATO:\n1. Respondes ÚNICAMENTE con JSON válido RFC 8259\n2. NUNCA incluyas markdown (~~~json), texto explicativo, ni comentarios\n3. TODOS los objetos deben tener TODAS estas llaves obligatorias:\n   - id (string)\n   - titulo (string)\n   - tipo (string)\n   - palabraClave (string)\n   - justificacion (string de 40-60 palabras)\n   - pertinencia (número entero 1-10)\n   - criterios (objeto con c1, c2, c3, c4, c5, c6 como números 0-10)\n\n4. VALIDACIÓN PREVIA A RESPONDER:\n   ✓ Cuenta cuántos recursos se te piden evaluar (N)\n   ✓ Verifica que tu array \"resultados\" tenga exactamente N elementos\n   ✓ Verifica que cada elemento tenga las 7 llaves obligatorias\n   ✓ Verifica que no haya comas mal colocadas\n\n5. ESTRUCTURA EXACTA (no alteres nombres de llaves):\n{\n  \"resultados\": [\n    {\n      \"id\": \"valor\",\n      \"titulo\": \"valor\",\n      \"tipo\": \"valor\",\n      \"palabraClave\": \"valor\",\n      \"justificacion\": \"40-60 palabras\",\n      \"pertinencia\": 8,\n      \"criterios\": {\n        \"c1\": 9,\n        \"c2\": 8,\n        \"c3\": 7,\n        \"c4\": 8,\n        \"c5\": 9,\n        \"c6\": 7\n      }\n    }\n  ]\n}\n\nComienza tu respuesta DIRECTAMENTE con el carácter {\nNO incluyas NADA antes ni después del JSON.`;\n\n// Construir payload COMPLETO\nconst payload = {\n  model: \"deepseek-chat\",\n  messages: [\n    {\n      role: \"system\",\n      content: systemPrompt\n    },\n    {\n      role: \"user\",\n      content: userPrompt\n    }\n  ],\n  temperature: 0.1,\n  max_tokens: 4000,\n  response_format: {\n    type: \"json_object\"\n  },\n  stream: false\n};\n\n// Devolver el payload como string JSON (RAW)\nreturn [\n  {\n    json: {\n      deepseek_payload: JSON.stringify(payload),  // Para RAW JSON\n      deepseek_payload_parsed: payload,           // Para JSON estructurado\n      numero_ejecucion: input.numero_ejecucion || input.execution_id,\n      batchNumber: input.batchNumber\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        2032
+      ],
+      "id": "ff1889c3-f775-4c87-9f00-f6af0508f992",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ========================================\n// NODO DE LIMPIEZA Y CORRECCIÓN DE JSON IA\n// ========================================\n\nconst items = $input.all();\n\n// 1. Tomamos la respuesta de la IA (ajustado a la estructura real)\nlet raw;\nlet hasError = false;\nlet errorInfo = null;\n\n// Detectar estructura de OpenRouter/Novita\nif (items[0].json.choices && items[0].json.choices[0]) {\n  const choice = items[0].json.choices[0];\n  \n  // 👉 DETECTAR ERRORES DEL PROVIDER\n  if (choice.error) {\n    hasError = true;\n    errorInfo = {\n      message: choice.error.message,\n      code: choice.error.code,\n      provider: choice.error.metadata?.provider_name || items[0].json.provider\n    };\n  }\n  \n  raw = choice.message?.content;\n} else if (items[0].json.output) {\n  raw = items[0].json.output;\n} else if (typeof items[0].json === 'string') {\n  raw = items[0].json;\n} else {\n  throw new Error('No se pudo detectar el formato de respuesta de la IA');\n}\n\n// 2. Validar que raw no sea undefined o null\nif (!raw) {\n  if (hasError) {\n    throw new Error(`Error del proveedor ${errorInfo.provider}: ${errorInfo.message} (código: ${errorInfo.code})`);\n  }\n  throw new Error('La respuesta de la IA está vacía o no existe');\n}\n\n// 3. Detectar si ya es objeto\nlet parsed;\nif (typeof raw === 'object' && raw !== null) {\n  parsed = raw;\n} else {\n  // 4. Limpieza inicial agresiva\n  let cleaned = raw\n    .replace(/```json/gi, '')\n    .replace(/```/g, '')\n    .replace(/^\\uFEFF/, '')\n    .replace(/[\\u0000-\\u001F\\u007F-\\u009F]/g, '')\n    .trim();\n\n  // 5. Recortar solo el bloque JSON real\n  const firstBrace = cleaned.indexOf('{');\n  const lastBrace = cleaned.lastIndexOf('}');\n  \n  if (firstBrace === -1 || lastBrace === -1) {\n    throw new Error('No se encontró JSON válido en la respuesta');\n  }\n  \n  cleaned = cleaned.substring(firstBrace, lastBrace + 1);\n\n  // 6. 👉 DETECTAR JSON INCOMPLETO (cortado)\n  let isIncomplete = false;\n  \n  // Detectar si termina abruptamente (sin cerrar objetos/arrays correctamente)\n  const openBraces = (cleaned.match(/\\{/g) || []).length;\n  const closeBraces = (cleaned.match(/\\}/g) || []).length;\n  const openBrackets = (cleaned.match(/\\[/g) || []).length;\n  const closeBrackets = (cleaned.match(/\\]/g) || []).length;\n  \n  if (openBraces !== closeBraces || openBrackets !== closeBrackets) {\n    isIncomplete = true;\n    console.warn('⚠️ JSON INCOMPLETO DETECTADO');\n    console.warn(`Llaves: ${openBraces} abiertas, ${closeBraces} cerradas`);\n    console.warn(`Corchetes: ${openBrackets} abiertos, ${closeBrackets} cerrados`);\n  }\n  \n  // 7. 👉 COMPLETAR JSON TRUNCADO\n  if (isIncomplete) {\n    // Buscar el último objeto completo en el array\n    const lastCompleteObject = cleaned.lastIndexOf('}');\n    \n    if (lastCompleteObject !== -1) {\n      // Truncar hasta el último objeto completo\n      let truncated = cleaned.substring(0, lastCompleteObject + 1);\n      \n      // Cerrar el array de resultados si está abierto\n      if (openBrackets > closeBrackets) {\n        truncated += '\\n]';\n      }\n      \n      // Cerrar el objeto principal si está abierto\n      if (openBraces > closeBraces) {\n        truncated += '\\n}';\n      }\n      \n      cleaned = truncated;\n      console.warn('✂️ JSON truncado al último objeto completo');\n    }\n  }\n\n  // 8. Reparaciones sofisticadas de JSON malformado\n  \n  // a) Comas duplicadas o múltiples\n  cleaned = cleaned\n    .replace(/,{2,}/g, ',')\n    .replace(/\\}\\s*,\\s*,+/g, '},')\n    .replace(/\\]\\s*,\\s*,+/g, '],');\n  \n  // b) Comas sobrantes (trailing commas)\n  cleaned = cleaned.replace(/,(\\s*[\\]}])/g, '$1');\n  \n  // c) COMAS FALTANTES ENTRE PROPIEDADES\n  cleaned = cleaned.replace(\n    /\"(\\s*\\n\\s*)\"(?=[a-zA-Z_])/g,\n    '\",\\n\"'\n  );\n  \n  // d) Coma faltante después de valores antes de siguiente key\n  cleaned = cleaned\n    .replace(/\"([^\"\\\\]|\\\\.)*\"\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, (match) => {\n      return match.replace(/\"\\s*\\n\\s*\"/, '\",\\n\"');\n    })\n    .replace(/(\\d+)\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '$1,\\n\"$2\":')\n    .replace(/(true|false)\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '$1,\\n\"$2\":')\n    .replace(/\\}\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '},\\n\"$1\":')\n    .replace(/\\]\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '],\\n\"$1\":');\n  \n  // e) Comas faltantes entre objetos en arrays\n  cleaned = cleaned.replace(/\\}\\s*\\n\\s*\\{/g, '},\\n{');\n  \n  // f) Corregir comillas escapadas innecesariamente\n  cleaned = cleaned\n    .replace(/\\\\\"/g, '\"')\n    .replace(/\\\\'/g, \"'\");\n  \n  // g) Espacios en blanco excesivos\n  cleaned = cleaned.replace(/\\n\\s*\\n/g, '\\n');\n\n  // 9. Parsear con manejo de errores detallado\n  try {\n    parsed = JSON.parse(cleaned);\n  } catch (error) {\n    // Intento de rescate: extraer solo el array de resultados\n    try {\n      const resultMatch = cleaned.match(/\"resultados\"\\s*:\\s*(\\[[\\s\\S]*?\\])/);\n      if (resultMatch) {\n        const resultsArray = JSON.parse(resultMatch[1]);\n        parsed = { resultados: resultsArray };\n        console.warn('⚠️ JSON parcialmente recuperado - solo array de resultados');\n      } else {\n        throw error;\n      }\n    } catch (rescueError) {\n      console.error('=== JSON QUE FALLÓ ===');\n      console.error(cleaned.substring(0, 2000));\n      console.error('...');\n      console.error(cleaned.substring(cleaned.length - 500));\n      console.error('=== FIN JSON ===');\n      console.error('Error original:', error.message);\n      \n      if (hasError) {\n        throw new Error(\n          `JSON inválido + Error del proveedor ${errorInfo.provider}: ${errorInfo.message}. ` +\n          `Intenta reejecutar el workflow.`\n        );\n      }\n      \n      throw new Error(`Error parseando JSON de la IA: ${error.message}`);\n    }\n  }\n}\n\n// 10. Validación base\nif (!parsed.resultados || !Array.isArray(parsed.resultados)) {\n  throw new Error('La respuesta no contiene un array \"resultados\" válido');\n}\n\nconst resultados = parsed.resultados;\n\nif (resultados.length === 0) {\n  if (hasError) {\n    throw new Error(\n      `Array vacío debido a error del proveedor: ${errorInfo.message}. ` +\n      `Reintenta la ejecución.`\n    );\n  }\n  throw new Error('El array de resultados está vacío');\n}\n\n// 11. Validar y corregir cada resultado\nconst requiredFields = [\n  'id', \n  'titulo', \n  'tipo', \n  'palabraClave', \n  'justificacion', \n  'pertinencia', \n  'criterios'\n];\n\nconst errores = [];\nconst warnings = [];\n\nconst resultadosCorregidos = resultados.map((r, index) => {\n  // a) Validar campos requeridos\n  const missing = requiredFields.filter(f => !(f in r));\n  if (missing.length > 0) {\n    errores.push(`Recurso ${index + 1} (${r.id || 'sin ID'}): faltan ${missing.join(', ')}`);\n  }\n\n  // b) Validar y corregir criterios\n  if (!r.criterios || typeof r.criterios !== 'object') {\n    warnings.push(`Recurso ${index + 1}: criterios ausentes, usando defaults`);\n    r.criterios = { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0 };\n  } else {\n    ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(c => {\n      if (!(c in r.criterios)) {\n        r.criterios[c] = 0;\n      }\n      if (typeof r.criterios[c] !== 'number' || r.criterios[c] < 0 || r.criterios[c] > 10) {\n        warnings.push(`Recurso ${index + 1}: ${c} fuera de rango, corrigiendo`);\n        r.criterios[c] = Math.max(0, Math.min(10, Number(r.criterios[c]) || 0));\n      }\n    });\n  }\n\n  // c) Validar y recalcular pertinencia si es necesaria\n  if (typeof r.pertinencia !== 'number' || r.pertinencia < 0 || r.pertinencia > 10) {\n    const calc = Math.round(\n      r.criterios.c1 * 0.25 +\n      r.criterios.c2 * 0.25 +\n      r.criterios.c3 * 0.20 +\n      r.criterios.c4 * 0.15 +\n      r.criterios.c5 * 0.10 +\n      r.criterios.c6 * 0.05\n    );\n    warnings.push(`Recurso ${index + 1}: pertinencia recalculada (${r.pertinencia} → ${calc})`);\n    r.pertinencia = Math.max(0, Math.min(10, calc));\n  }\n\n  // d) Defaults seguros para campos faltantes\n  r.id = r.id?.toString() || `unknown_${index + 1}`;\n  r.titulo = r.titulo?.toString() || 'Sin título';\n  r.tipo = r.tipo?.toString() || 'Desconocido';\n  r.palabraClave = r.palabraClave?.toString() || '';\n  r.justificacion = r.justificacion?.toString() || 'Sin justificación disponible';\n\n  // e) Limpiar strings\n  r.titulo = r.titulo.trim();\n  r.justificacion = r.justificacion.trim().replace(/\\s+/g, ' ');\n  r.palabraClave = r.palabraClave.trim();\n\n  return r;\n});\n\n// 12. Logs informativos\nif (hasError) {\n  console.warn(`⚠️ ADVERTENCIA: Hubo un error del proveedor pero se recuperaron ${resultadosCorregidos.length} resultados`);\n  console.warn(`Error: ${errorInfo.message}`);\n}\n\nif (errores.length > 0) {\n  console.error('❌ ERRORES DE VALIDACIÓN:', errores);\n}\n\nif (warnings.length > 0) {\n  console.warn('⚠️ ADVERTENCIAS:', warnings);\n}\n\nconsole.log(`✅ Procesados ${resultadosCorregidos.length} resultados correctamente`);\n\n// 13. Normalizar salida en formato n8n\nreturn resultadosCorregidos.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        1264
+      ],
+      "id": "9d88d940-39fa-443e-965c-cc54435c2962",
+      "name": "Code8"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item, index) => {\n  const r = item.json;\n  \n  // 1. Buscar criterios (manejo robusto)\n  let criterios = null;\n  \n  // Caso ideal: ya existe r.criterios\n  if (r.criterios && typeof r.criterios === 'object') {\n    criterios = r.criterios;\n  }\n  \n  // Buscar por estructura si no existe con ese nombre\n  if (!criterios) {\n    for (const [key, value] of Object.entries(r)) {\n      if (\n        value &&\n        typeof value === 'object' &&\n        ['c1','c2','c3','c4','c5','c6'].every(k => k in value)\n      ) {\n        criterios = value;\n        delete r[key]; // elimina el nombre incorrecto\n        break;\n      }\n    }\n  }\n  \n  // Fallback ultra seguro\n  criterios = criterios || {\n    c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0\n  };\n  \n  // 2. Validar y corregir pertinencia NUEVAMENTE (por si acaso)\n  let pertinencia = r.pertinencia;\n  \n  if (typeof pertinencia !== 'number' || pertinencia < 1 || pertinencia > 10) {\n    // Recalcular desde criterios\n    pertinencia = Math.round(\n      (criterios.c1 * 0.25) +\n      (criterios.c2 * 0.25) +\n      (criterios.c3 * 0.20) +\n      (criterios.c4 * 0.15) +\n      (criterios.c5 * 0.10) +\n      (criterios.c6 * 0.05)\n    );\n    pertinencia = Math.max(1, Math.min(10, pertinencia));\n    console.warn(`Item ${index}: pertinencia recalculada = ${pertinencia}`);\n  }\n  \n  // 3. Mapeo final con validaciones\n  return {\n    json: {\n      id: r.id || 'unknown',\n      titulo: r.titulo || 'Sin título',\n      tipo: r.tipo || 'Desconocido',\n      palabra_clave: r.palabraClave || '',\n      pertinencia: pertinencia,\n      c1: parseInt(criterios.c1) || 0,\n      c2: parseInt(criterios.c2) || 0,\n      c3: parseInt(criterios.c3) || 0,\n      c4: parseInt(criterios.c4) || 0,\n      c5: parseInt(criterios.c5) || 0,\n      c6: parseInt(criterios.c6) || 0,\n      justificacion: r.justificacion || 'Sin justificación',\n      numero_ejecucion: $('Start').first().json.numero_ejecucion || 'unknown'\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        1264
+      ],
+      "id": "7dc12252-9032-470e-ade7-b814e67a0a5f",
+      "name": "Code9"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        960,
+        1264
+      ],
+      "id": "dbad48af-144e-4257-bae0-ea35b5d0f2d4",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.virtualpro.co/api/prc-pertinencia",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1168,
+        1360
+      ],
+      "id": "7e6f437e-9256-40dd-bac1-7933eacec875",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// NODO CODE - Genera payload para OpenRouter (formato exacto documentación)\nconst input = $input.first().json;\n\n// Obtener el prompt del campo correspondiente\nconst userPrompt = input.chatInput || input.userPrompt || input.prompt;\n\nif (!userPrompt) {\n  throw new Error('No se encontró el prompt en chatInput, userPrompt o prompt');\n}\n\n// Construir payload EXACTAMENTE como muestra la documentación de OpenRouter\nconst payload = {\n  model: \"deepseek/deepseek-r1-0528\",  // Formato: \"proveedor/modelo\"\n  messages: [\n    {\n      role: \"user\",\n      content: userPrompt  // SOLO role: user, NADA de system\n    }\n  ],\n  stream: false  // false para respuestas completas\n};\n\n// Devolver el payload\nreturn [\n  {\n    json: {\n      // Para RAW JSON en HTTP Request\n      openrouter_payload: JSON.stringify(payload),\n      \n      // Para JSON estructurado en HTTP Request\n      openrouter_payload_parsed: payload,\n      \n      // Metadata (se pasa igual)\n      numero_ejecucion: input.numero_ejecucion || input.execution_id,\n      batchNumber: input.batchNumber\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        1264
+      ],
+      "id": "8c8a3b5c-ffb0-442f-a555-4884ad1b114d",
+      "name": "Code10"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.openrouter_payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        1264
+      ],
+      "id": "020e3e58-6939-494c-b4ff-5d331ce47925",
+      "name": "Generar imágenes2",
       "alwaysOutputData": false,
       "retryOnFail": true
     }
@@ -227,7 +433,7 @@
       "main": [
         [
           {
-            "node": "Code5",
+            "node": "AI Agent2",
             "type": "main",
             "index": 0
           }
@@ -348,13 +554,7 @@
     },
     "Code5": {
       "main": [
-        [
-          {
-            "node": "Generar imágenes1",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Generar imágenes1": {
@@ -362,6 +562,140 @@
         [
           {
             "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar imágenes": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Generar imágenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code8": {
+      "main": [
+        [
+          {
+            "node": "Code9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code9": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar imágenes2": {
+      "main": [
+        [
+          {
+            "node": "Code8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code10": {
+      "main": [
+        [
+          {
+            "node": "Generar imágenes2",
             "type": "main",
             "index": 0
           }
@@ -380,13 +714,13 @@
     "Start": [
       {
         "json": {
-          "numero_ejecucion": "07465caf-68a9-45b8-8634-d46975e9787b",
-          "chatInput": "Evalúa la pertinencia de 10 recursos educativos frente al syllabus.\n\n## SYLLABUS DE LA MATERIA\n\n**Nombre:** INVESTIGACIÓN DE OPERACIONES I\n**Descripción:** Introduce técnicas cuantitativas para la toma de decisiones en sistemas operativos.\n**Competencias:** Formular modelos matemáticos.\r\nResolver problemas mediante optimización.\r\nInterpretar resultados para la toma de decisiones.\r\n\n**Temario:** Introducción a la IO\r\nProgramación lineal\r\nMétodo simplex\r\nAnálisis de sensibilidad\r\nModelos de transporte\r\nModelos de asignación\r\nProgramación entera\r\nModelos de redes\r\n\n**Palabras clave del curso:** programación lineal, simplex, optimización, transporte, asignación, redes, toma de decisiones.\n\n## CRITERIOS DE EVALUACIÓN (califica 0-10 cada uno)\n\n- **C1** (25%): Alineación con el objetivo general\n- **C2** (25%): Cobertura de competencias del curso\n- **C3** (20%): Correspondencia con el temario\n- **C4** (15%): Coincidencia semántica de palabras clave\n- **C5** (10%): Adecuación del tipo de recurso al aprendizaje práctico\n- **C6** (5%): Aplicabilidad en contextos productivos reales\n\n**Fórmula de pertinencia:**\nPertinencia = (C1×0.25) + (C2×0.25) + (C3×0.20) + (C4×0.15) + (C5×0.10) + (C6×0.05)\n\nRedondea el resultado final a un número entero del 0 al 10.\n\n## RECURSOS A EVALUAR (10 TOTAL)\n\n⚠️ **CRÍTICO: Debes evaluar EXACTAMENTE 10 recursos. No omitas ninguno.**\n\n```csv\nID,titulo,resumen,tipo,categoria,subcategoria,palabrasClaves\n\"280323\",\"Gestión y control de rutas\",\"La gestión y control de rutas en logística ha experimentado una transformación mediante tecnologías emergentes y sistemas avanzados de gestión de flotas. Estos sistemas, fundamentales para el seguimiento de vehículos mediante geoposicionamiento, permiten a las empresas conocer la ubicación en tiempo real de sus vehículos y cargas. La accesibilidad a esta información se simplifica mediante aplicaciones web, posibilitando a los clientes gestionar sus vehículos desde cualquier lugar con acceso a internet. Los avances en seguridad incorporan sistemas inalámbricos que gestionan la seguridad tanto en la detención como en la detención en marcha, reduciendo riesgos de robo y pérdida de carga. La gestión y control abarcan la localización precisa de diversos activos mediante unidades GPS y GPRS conectadas a internet. Además, la capacidad de detención remota se integra con sistemas de notificación de emergencias para respuestas eficientes en situaciones críticas. Estas innovaciones, al tiempo que optimizan la eficiencia operativa, refuerzan la seguridad y control en la gestión de rutas logísticas.\",\"Infografías\",\"Procesos industriales\",\"Planificación y programación de la producción\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"286896\",\"Innovaciones en materiales de construcción\",\"Este OVA presenta una visión actualizada sobre cómo el sector de la construcción puede responder de forma efectiva al cambio climático. Aborda el impacto ambiental de los materiales convencionales, la eficiencia energética en edificaciones y el uso de tecnologías emergentes como la impresión 3D y los edificios inteligentes. Destaca materiales sostenibles que lideran la transición ecológica y casos inspiradores de arquitectura regenerativa y economía circular en América Latina y Europa. Cada sección combina fundamentos teóricos, datos técnicos y ejemplos reales para comprender los retos ambientales y las soluciones constructivas disponibles. La narrativa visual promueve la reflexión crítica, el pensamiento sistémico y la acción responsable frente a la emergencia climática.\",\"Infografías\",\"Ingeniería y Tecnología\",\"Ingeniería Civil y Estructural\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"286937\",\"Diseño sostenible y eficiencia energética\",\"Este Objeto Virtual de Aprendizaje (OVA) aborda de forma integral los principios del diseño sostenible y la eficiencia energética en el entorno construido. Mediante una infografía interactiva, explora el triple balance (ambiental, social y económico), el uso de materiales de bajo impacto, las certificaciones ambientales y los procesos industriales sustentables. Incluye tecnologías emergentes como la impresión 3D, la automatización y la domótica, junto con estrategias pasivas y activas de diseño bioclimático. Resalta el análisis del ciclo de vida, la economía circular y la integración de energías renovables en la arquitectura contemporánea. El OVA busca fortalecer competencias críticas y propositivas en estudiantes y profesionales de la arquitectura y áreas afines, promoviendo una visión ética, tecnológica y ambiental del diseño.\",\"Infografías\",\"Ingeniería y Tecnología\",\"Ingeniería Civil y Estructural\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"286954\",\"Tecnología en la construcción: BIM y automatización\",\"Este OVA infográfico ofrece una visión integral sobre la incorporación de tecnologías digitales emergentes en los procesos arquitectónicos y constructivos, con énfasis en su impacto sostenible. A través de secciones temáticas, se abordan el Modelado de Información para la Construcción (BIM), la automatización y robótica en obra, la impresión 3D, el diseño paramétrico, los sensores inteligentes y los gemelos digitales, destacando cómo cada herramienta optimiza recursos, mejora la eficiencia energética y reduce impactos ambientales. El enfoque combina aspectos técnicos y consideraciones éticas, impulsando una arquitectura más consciente, adaptable y resiliente. La experiencia está dirigida a estudiantes y profesionales de arquitectura, ingeniería, construcción y urbanismo interesados en aplicar soluciones tecnológicas para enfrentar los retos del cambio climático y la sostenibilidad urbana.\",\"Infografías\",\"Ingeniería y Tecnología\",\"Ingeniería Civil y Estructural\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"286955\",\"La inteligencia artificial en la industria cinematográfica\",\"Este OVA analiza la integración de la inteligencia artificial (IA) en la industria audiovisual, siguiendo como hilo conductor las etapas de desarrollo de un producto, desde la preproducción hasta la experiencia del espectador. Se muestra cómo la IA optimiza la producción mediante la creación de entornos virtuales, el desarrollo de personajes digitales fotorrealistas, la automatización de traducciones y doblaje, y la composición algorítmica de bandas sonoras. También se aborda su impacto en el marketing y la distribución a través de análisis predictivos, personalización de contenido y recomendaciones en plataformas de streaming, así como experiencias interactivas para el público.\",\"Infografías\",\"Ingeniería y Tecnología\",\"Inteligencia Artificial\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"286956\",\"IA en la ingeniería de sonido\",\"La inteligencia artificial está revolucionando la ingeniería de sonido en cine, música y pódcast. Permite restaurar grabaciones antiguas eliminando ruidos y distorsiones. Herramientas como LANDR o Adobe Enhance automatizan la mezcla y la masterización, reduciendo tiempos y costos. La clonación de voz y el doblaje inteligente posibilitan recrear voces sin la presencia física del actor. Además, plataformas como AIVA generan música personalizada según la emoción de cada escena. La IA también es capaz de diseñar entornos sonoros inmersivos, simulando acústicas tridimensionales.\",\"Infografías\",\"Ingeniería y Tecnología\",\"Inteligencia Artificial\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"290821\",\"Infraestructuras inteligentes y ciudades sostenibles\",\"Este OVA presenta una visión integral sobre las infraestructuras inteligentes y su rol en la construcción de ciudades sostenibles del futuro. A través de doce módulos temáticos interactivos, se abordan aspectos clave como el uso de sensores, gemelos digitales, BIM, automatización, impresión 3D, sistemas de monitoreo, gestión hídrica y energética, y participación ciudadana digital. Cada sección incorpora ejemplos reales y tecnologías aplicadas que ilustran cómo la innovación puede mejorar la eficiencia de los recursos, mitigar impactos ambientales y transformar el entorno urbano. Además, ofrece herramientas para comprender los nuevos modelos de planeación, gestión y construcción urbana desde una perspectiva tecnológica, ecológica y participativa. Está dirigido a estudiantes y profesionales de la arquitectura, la ingeniería, el urbanismo y disciplinas afines, interesados en los desafíos y soluciones que plantea la transición hacia ciudades resilientes e inteligentes.\",\"Infografías\",\"Ingeniería y Tecnología\",\"Ingeniería Civil y Estructural\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"290823\",\"IA en el mundo editorial\",\"La inteligencia artificial (IA) está transformando cada etapa de la cadena de producción editorial, desde la concepción de la obra hasta su distribución y seguimiento pospublicación. Actualmente, diversas herramientas basadas en IA optimizan procesos como la generación de contenido, la corrección y edición automáticas, el diseño y la maquetación profesional, la traducción, la personalización de recomendaciones, así como la automatización de marketing y promoción. Estas aplicaciones permiten desde la generación de ideas narrativas, el desarrollo de personajes y las sugerencias creativas para superar bloqueos, hasta la detección precisa de errores gramaticales y estilísticos que mejoran la coherencia y claridad del texto. Además, facilitan la maquetación para formatos digitales e impresos, la creación automática de metadatos y descripciones atractivas de libros, y la gestión de la interacción con lectores mediante plataformas inteligentes y análisis de datos de consumo.Sin embargo, junto con estos avances, es necesario considerar los aspectos éticos relacionados con los derechos de autor, la propiedad intelectual y la transparencia en el uso de la IA en los procesos creativos y editoriales.\",\"Infografías\",\"Ingeniería y Tecnología\",\"Inteligencia Artificial\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"290824\",\"IA en las artes visuales\",\"La inteligencia artificial (IA) ha tenido un impacto profundo y diverso en las artes visuales, ampliando el horizonte de las posibilidades creativas y técnicas. El uso de la IA como herramienta ha permitido que personas sin formación artística puedan crear obras visuales complejas y acceder a plataformas que reducen las barreras de entrada al mundo del arte. Esto ha dado lugar al surgimiento de nuevas corrientes y géneros, así como a formas renovadas de curaduría y exposición de las obras, y a una mayor interactividad mediante experiencias inmersivas con públicos y audiencias. En el campo de las artes visuales existen diversas herramientas de inteligencia artificial con capacidad para generar, transformar, analizar o complementar obras artísticas. Su uso abarca la generación de imágenes a partir de texto, la edición y mejora de imágenes, el arte generativo y la exploración creativa, la curaduría y organización de obras, así como la propuesta de experiencias interactivas e inmersivas.No obstante, el uso de la inteligencia artificial en las artes visuales plantea cuestiones éticas y legales complejas relacionadas con la autoría y la propiedad intelectual, la originalidad de las obras, el desplazamiento del trabajo de los artistas, la transparencia, los sesgos y asuntos jurídicos asociados.\",\"Infografías\",\"Ingeniería y Tecnología\",\"Inteligencia Artificial\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n\"290825\",\"Materiales avanzados: propiedades y aplicaciones\",\"Los materiales avanzados combinan alta resistencia, baja densidad, sostenibilidad y versatilidad, lo que permite su aplicación en sectores como la medicina, la electrónica, la construcción y el transporte. Incluyen compuestos avanzados, nanomateriales, biomateriales y materiales inteligentes, que se distinguen por su capacidad de respuesta, biocompatibilidad y eficiencia.Estos materiales se utilizan en dispositivos médicos, energías renovables, industria aeroespacial y tecnología portátil. Las tendencias actuales apuntan hacia la sostenibilidad, la eficiencia energética y la integración digital con inteligencia artificial (IA). A pesar de desafíos como la escalabilidad, la regulación y el reciclaje, los materiales avanzados poseen un enorme potencial para impulsar un futuro más tecnológico y sustentable.\",\"Infografías\",\"Ciencias de los Materiales\",\"Materiales estructurales\",\"Análisis de tendencias, Vehículos autónomos, Robótica, Inteligencia artificial\"\n```\n\n## CONSTRUCCIÓN DE LA JUSTIFICACIÓN\n\nCada justificación debe tener 40-60 palabras e incluir:\n1. Qué contenido específico aporta (conceptos, técnicas, herramientas)\n2. Conexión explícita con tema/unidad/competencia del syllabus\n3. Utilidad práctica en el contexto de la materia\n\n## FORMATO DE RESPUESTA\n\nResponde con un objeto JSON que contenga EXACTAMENTE 10 recursos evaluados.\n\n**ESTRUCTURA EXACTA (no alteres nombres de llaves):**\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_DEL_RECURSO\",\n      \"titulo\": \"TÍTULO_DEL_RECURSO\",\n      \"tipo\": \"TIPO_DEL_RECURSO\",\n      \"palabraClave\": \"UNA_PALABRA_CLAVE\",\n      \"justificacion\": \"Texto de 40-60 palabras\",\n      \"pertinencia\": 8,\n      \"criterios\": {\n        \"c1\": 9,\n        \"c2\": 8,\n        \"c3\": 7,\n        \"c4\": 8,\n        \"c5\": 9,\n        \"c6\": 7\n      }\n    }\n  ]\n}\n\n## VALIDACIÓN ANTES DE RESPONDER\n\n✅ Cuenta que el array \"resultados\" tenga 10 elementos\n✅ Verifica que cada objeto tenga las 7 llaves: id, titulo, tipo, palabraClave, justificacion, pertinencia, criterios\n✅ Verifica que \"criterios\" tenga las 6 llaves: c1, c2, c3, c4, c5, c6\n✅ Verifica que \"pertinencia\" sea un número entero entre 0 y 10\n✅ Verifica que todos los c1-c6 sean números enteros entre 0 y 10\n✅ Verifica que no haya comas mal colocadas en el JSON\n\n## RESTRICCIONES OBLIGATORIAS\n\n- Devuelve ÚNICAMENTE JSON válido RFC 8259\n- NO incluyas markdown (```json), texto explicativo, ni comentarios\n- Comienza tu respuesta directamente con el carácter {\n- NO incluyas NADA antes ni después del JSON\n- Usa solo información del syllabus, no inventes datos\n- Cada recurso debe evaluarse de forma independiente\n\n**RECORDATORIO: Debes incluir exactamente 10 recursos evaluados.**"
+          "numero_ejecucion": "799cd848-6cde-4b4b-a680-54d42ce3bb04",
+          "chatInput": "Evalúa la pertinencia de 15 recursos educativos frente al syllabus.\n\n## SYLLABUS DE LA MATERIA\n\n**Nombre:** MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO\n**Descripción:** Materia fundamental que busca mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.\n**Competencias:** Analizar métodos y procesos productivos.\r\nAplicar técnicas de medición del trabajo.\r\nIdentificar mejoras en actividades repetitivas.\r\n\n**Temario:** Introducción al estudio del trabajo\r\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\r\nAnálisis de métodos\r\nMedición del trabajo\r\nCronometraje y técnicas PMTS\r\nMuestreo del trabajo\r\nBalanceo de líneas\r\nErgonomía básica aplicada al estudio del trabajo\r\nImplementación de mejoras\r\n\n**Palabras clave del curso:** métodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo.\n\n## CRITERIOS DE EVALUACIÓN (califica 0-10 cada uno)\n\n- **C1** (25%): Alineación con el objetivo general\n- **C2** (25%): Cobertura de competencias del curso\n- **C3** (20%): Correspondencia con el temario\n- **C4** (15%): Coincidencia semántica de palabras clave\n- **C5** (10%): Adecuación del tipo de recurso al aprendizaje práctico\n- **C6** (5%): Aplicabilidad en contextos productivos reales\n\n**Fórmula de pertinencia:**\nPertinencia = (C1×0.25) + (C2×0.25) + (C3×0.20) + (C4×0.15) + (C5×0.10) + (C6×0.05)\n\nRedondea el resultado final a un número entero del 0 al 10.\n\n## RECURSOS A EVALUAR (15 TOTAL)\n\n⚠️ **CRÍTICO: Debes evaluar EXACTAMENTE 15 recursos. No omitas ninguno.**\n\n```csv\nID,titulo,resumen,tipo,categoria,subcategoria,palabrasClaves\n\"33421\",\"Bombas centrífugas: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de las bombas centrífugas, así también como sus componentes y los cálculos necesarios para el dimensionamiento de las bombas. El algoritmo de cálculo incluye presiones de entrada y descarga, diámetro de tubo y accesorios en el sistema de tuberías. El quiz trata la resolución y la toma de decisión en problemáticas industriales comunes vinculadas al funcionamiento de las bombas centrífugas. La bomba centrífuga es ampliamente usada en la industria para impulsar o trasegar fluidos de un lugar a otro por medio de la energía hidráulica, conoce como funciona, cuales son sus partes y cada una de sus secciones. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en: Química De procesos Ambiental Mecánica Electrónica Mecatrónica Agroindustrial De alimentos\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de manipulación y transporte de fluidos\",\"Tuberías, Mecánica de fluidos, Máquinas de fluidos, Diseño de máquinas, Diseño, Bombas de agua, Bombas centrí­fugas\"\n\"33448\",\"Fermentador: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de los fermentadores aplicados a líquidos, se trata la descripción de parámetros operativos, y recomendaciones técnicas de uso y operación. El cálculo incluye el dimensionamiento del sistema de calefacción, el cual es de vital importancia para el correcto funcionamiento. El quiz trata la resolución y la toma de decisión en problemáticas industriales comunes relacionadas con el funcionamiento de los fermentadores y el análisis de situaciones. Un fermentador de líquidos es un equipo diseñado para llevar a cabo en él procesos químicos que involucran el uso de microorganismos aeróbicos o anaeróbicos que convierten un sustrato en un producto. Conoce el funcionamiento y su operación. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos.\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Reactores químicos\",\"Temperatura, Industria cervecera, Fermentación, Cerveza\"\n\"33510\",\"Separador por ósmosis inversa: dimensionamiento y funcionamiento\",\"En el presente módulo se describe el principio de funcionamiento de los equipos de separación por ósmosis inversa. Además, se detallan los principales criterios de diseño de este método de separación, así también como sus materiales principales y selección de componentes. Inclusive se tratan condiciones de operación y mantenimiento de las unidades de separación por ósmosis inversa. En el quiz se trata la resolución de diferentes situaciones vinculadas a la operación de dichas unidades. La ósmosis inversa es un proceso de separación aplicado comúnmente en el tratamiento de aguas, en el cual se busca retirar partículas sólidas invirtiendo el fluido al aplicar presión y pasar este a través de una membrana semipermeable. Conoce el funcionamiento y diseño de los diferentes equipos de separación por ósmosis inversa. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos Ambiental Civil Mecatrónica. \",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de transferencia de masa\",\"Ósmosis inversa, Ósmosis, Equipos de tratamiento del agua, Desalinización, Calidad del agua, Agua\"\n\"33738\",\"Intercambiador de doble tubo: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de los intercambiadores de doble tubo, así como sus componentes y los cálculos necesarios para su dimensionamiento. El cálculo incluye los principales parámetros de operación para el diseño como presión, temperaturas, disposición, y materiales, entre otros. El quiz trata la resolución y la toma de decisión en problemáticas industriales comunes relacionadas con el funcionamiento de los intercambiadores de doble tubo. Son intercambiadores que están formados por dos tubos concéntricos en los cuales en la parte interior pasa el producto y en el tubo exterior el fluido de servicio. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos Mecánica Electrónica Mecatrónica Industrial.\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de transferencia de calor y energía\",\"Transmisión del calor, Presión de vapor, Intercambio de calor, Diseño de máquinas, Diseño\"\n\"33739\",\"Separador vertical gas-líquido: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de los separadores verticales gas-líquido, así también como sus componentes, su dimensionamiento y su diseño mecánico. El cálculo incluye todos los parámetros importantes del diseño mecánico de los separadores verticales. Además, se detallan los principios a tener en cuenta y buenas prácticas de mantenimiento para su óptima operación. Un separador vertical es un equipo diseñado para eliminar líquidos del gas, y es utilizado comúnmente en la industria petrolera. En este módulo se describe el funcionamiento, los componentes, su dimensionamiento y su diseño mecánico. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos De petróleos\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de transferencia de masa\",\"Separación (Tecnología), Gas, Aceites y grasas\"\n\"33740\",\"Columna de platos: dimensionamiento y funcionamiento\",\"En este módulo se describe el diseño conceptual de columnas de platos, así también como sus componentes, y reglas empíricas para su operación. El cálculo incluye la determinación de la cantidad de etapas teóricas, plato óptimo de alimentación y relación de reflujo. El quiz trata la resolución y la toma de decisión en problemáticas industriales comunes relacionadas al funcionamiento de columnas de platos y criterios importantes de diseño. La columna de platos es un equipo utilizado para separar mezclas líquido -gas, el líquido pasa de un plato a otro por gravedad de forma descendente, mientras que el vapor fluye en sentido ascendente. Conoce el diseño conceptual, sus componentes, y las reglas empíricas para su operación Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de transferencia de masa\",\"Transferencia de masa, Refinación del petróleo, Diseño, Destilación\"\n\"33741\",\"Sistema de tuberías: dimensionamiento y accesorios\",\"En este módulo se describe el diseño de los sistemas de tuberías en plantas industriales, junto con sus accesorios y válvulas. El cálculo incluye la caída de presión en un sistema de tubería con base en las propiedades fluidodinámicas del fluido y los accesorios contenidos en la misma. Los accesorios incluidos son: codos a 45°, codos 90°, retornos de 180°, estrechamientos y ensanchamientos (cónicos, cuadrados y biselados), tes, entradas, salidas y válvulas (globo, retención y mariposa). Los sistemas de tuberías son tramos que permiten la conexión y el desplazamiento de productos de un equipo a otro. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Ambiental Mecánica Agroindustrial De alimentos Civil Hidráulica\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de manipulación y transporte de fluidos\",\"Válvulas, Tuberías, Industria de tuberías, Diseño de máquinas\"\n\"33742\",\"Tanques de tratamiento: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de los tanques de tratamiento de agua en plantas industriales, así también como sus principales componentes y las consideraciones necesarias para su correcto diseño. El cálculo incluye los principales parámetros de operación para el dimensionamiento, incluyendo propiedades de los fluidos y parámetros operativos. Este tipo de tanques son adecuados en plantas industriales para llevar a cabo dentro del mismo el tratamiento correcto de las aguas residuales. En este módulo conoce el funcionamiento, sus componentes y las consideraciones de diseño. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Civil Ambiental Mecatrónica Química De procesos\",\"Showroom\",\"Ingeniería y Tecnología\",\"Ingeniería Sanitaria\",\"Tratamiento del agua, Tanques - Diseño y construcción, Tanques, Sedimentos, Mezclas\"\n\"33743\",\"Biodigestor: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de los biodigestores, sus principales componentes, consideraciones de diseño, y recomendaciones de operación. El cálculo incluye los principales parámetros de operación para el dimensionamiento, incluyendo propiedades de biomasa, parámetros operativos, y dimensiones. Un biorreactor es un equipo en el cual se fomenta el crecimiento de microorganismos de forma controlada para transformar un sustrato en producto. Conoce el funcionamiento de los fermentadores aplicados a líquidos, los parámetros operativos, y las técnicas de uso y operación Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Ambiental Agroindustrial De alimentos Biotecnología\",\"Showroom\",\"Ingeniería y Tecnología\",\"Ingeniería Ambiental\",\"Diseño de máquinas, Diseño, Biomasa, Biogas, Biodigestores\"\n\"33744\",\"Filtro de marco: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de los filtros de marco, sus componentes, consideraciones de diseño, limitaciones, y recomendaciones de operación. El cálculo incluye los principales parámetros de operación para el dimensionamiento, incluyendo propiedades de la mezcla a filtrar,, parámetros operativos, y dimensiones. Un filtro de marco es diseñado con membranas microporosas con el objetivo de alcanzar filtración aséptica. Estos filtros cuentan con una gran área de filtro, manejan caudales grandes y se usan en industrias farmacéuticas, químicas y alimentarias. Conoce su funcionamiento, sus componentes, consideraciones de diseño, limitaciones, y recomendaciones de operación. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos Mecánica Mecatrónica\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de limpieza, selección y clasificación\",\"Vapor, Tuberías, Separación (Tecnología), Presión de vapor, Intercambio de calor, Intercambiadores de calor, Filtros y filtración, Alta presión\"\n\"33745\",\"Evaporador de película descendente: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de los evaporadores de película descendente, sus componentes, descripción de parámetros operativos, su dimensionamiento y recomendaciones técnicas de uso y operación. El cálculo incluye el cálculo del área de transferencia de calor, coeficientes de transferencia de calor y definición de factores de operación. Los evaporadores son equipos que permiten concentrar soluciones, y es comúnmente utilizado en industrias farmacéuticas, alimentos y químicos. En este módulo encuentra el funcionamiento, los componentes y las técnicas de uso y operación Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos Mecánica Mecatrónica Electrónica Eléctrica\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de transferencia de calor y energía\",\"Vapor, Tuberías, Presión de vapor, Intercambio de calor\"\n\"33746\",\"Intercambiador de placas\",\"En este módulo se muestran y explican cada uno de los componentes de un intercambiador de calor de placas. Así mismo, la distribución y configuraciones de flujos posibles. Se detallan sus ventajas, desventajas y aplicaciones. Se muestran varias características de los sellos y de las placas, como factores diferenciadores de estos equipos. Se da un ejemplo de dimensionamiento térmico y de presiones, con su respectiva hoja de cálculo. Es un tipo de intercambiador de calor que utiliza múltiples placas metálicas paralelas entre sí para transferir energía entre dos sustancias, gracias a los puertos que tienen en cada esquina de las placas, que permiten el paso de los fluidos. Conoce los componentes de un intercambiador, sus partes, la distribución y configuraciones de flujos posibles. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos Mecánica Electromecánica Industrial\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de transferencia de calor y energía\",\"Transmisión del calor, Transferencia térmica, Máquinas térmicas, Energía térmica, Eficiencia\"\n\"60585\",\"Molino de bolas: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento de los molinos de bolas. Además, se trata la descripción de sus parámetros operativos, y recomendaciones para su operación y funcionamiento. El cálculo incluye el dimensionamiento de molinos de bolas industriales. El quiz trata la resolución y la toma de decisión en problemáticas industriales comunes relacionadas con el funcionamiento de los molinos de bolas y análisis de parámetros claves para mejorar su desempeño. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos Mecánica Electromecánica Industrial\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de reducción de tamaño y tamizado\",\"Trituradoras, Molinos, Molienda, Maquinaria para molienda, Diseño de máquinas, Cemento\"\n\"60586\",\"Centrifugadora de discos: dimensionamiento y funcionamiento\",\"En este módulo se describe el funcionamiento y los componentes de las centrifugadoras industriales. Además, se trata la descripción de sus parámetros operativos, y recomendaciones para su operación y funcionamiento. El cálculo incluye el dimensionamiento de centrífugas industriales. El quiz trata la resolución y la toma de decisión en problemáticas industriales comunes relacionadas con el funcionamiento del equipo, junto con el análisis de parámetros claves de desempeño y criterios de diseño. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en:  Química De procesos Agroindustrial De alimentos Mecánica Electromecánica Industrial\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de limpieza, selección y clasificación\",\"Tecnología de alimentos, Máquinas de fluidos, Dinámica de fluidos, Bombas centrí­fugas, Alimentos\"\n\"60587\",\"Intercambiador de tubo y coraza: dimensionamiento y funcionamiento\",\"En este módulo se describe el diseño y operación de intercambiadores industriales de tubo y coraza. Además, se tratan las buenas prácticas de uso, mantenimiento y limpieza. El cálculo incluye el dimensionamiento de esta clase de intercambiadores. El quiz trata la resolución y la toma de decisión en problemáticas industriales comunes relacionadas con el funcionamiento del equipo, junto con el análisis de parámetros claves de desempeño y criterios de diseño. Programas Académicos o Áreas de aplicación Técnicas, tecnológicas e Ingenierías en: Química De procesos Agroindustrial De alimentos Mecánica Electromecánica Industrial\",\"Showroom\",\"Tecnología de Equipos y Accesorios\",\"Equipos de transferencia de calor y energía\",\"Tuberías, Refrigeración, Intercambiadores de calor, Intercambiador de calor, Industria de tuberías\"\n```\n\n## CONSTRUCCIÓN DE LA JUSTIFICACIÓN\n\nCada justificación debe tener 40-60 palabras e incluir:\n1. Qué contenido específico aporta (conceptos, técnicas, herramientas)\n2. Conexión explícita con tema/unidad/competencia del syllabus\n3. Utilidad práctica en el contexto de la materia\n\n## FORMATO DE RESPUESTA\n\nResponde con un objeto JSON que contenga EXACTAMENTE 15 recursos evaluados.\n\n**ESTRUCTURA EXACTA (no alteres nombres de llaves):**\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_DEL_RECURSO\",\n      \"titulo\": \"TÍTULO_DEL_RECURSO\",\n      \"tipo\": \"TIPO_DEL_RECURSO\",\n      \"palabraClave\": \"UNA_PALABRA_CLAVE\",\n      \"justificacion\": \"Texto de 40-60 palabras\",\n      \"pertinencia\": 8,\n      \"criterios\": {\n        \"c1\": 9,\n        \"c2\": 8,\n        \"c3\": 7,\n        \"c4\": 8,\n        \"c5\": 9,\n        \"c6\": 7\n      }\n    }\n  ]\n}\n\n## VALIDACIÓN ANTES DE RESPONDER\n\n✅ Cuenta que el array \"resultados\" tenga 15 elementos\n✅ Verifica que cada objeto tenga las 7 llaves: id, titulo, tipo, palabraClave, justificacion, pertinencia, criterios\n✅ Verifica que \"criterios\" tenga las 6 llaves: c1, c2, c3, c4, c5, c6\n✅ Verifica que \"pertinencia\" sea un número entero entre 0 y 10\n✅ Verifica que todos los c1-c6 sean números enteros entre 0 y 10\n✅ Verifica que no haya comas mal colocadas en el JSON\n\n## RESTRICCIONES OBLIGATORIAS\n\n- Devuelve ÚNICAMENTE JSON válido RFC 8259\n- NO incluyas markdown (```json), texto explicativo, ni comentarios\n- Comienza tu respuesta directamente con el carácter {\n- NO incluyas NADA antes ni después del JSON\n- Usa solo información del syllabus, no inventes datos\n- Cada recurso debe evaluarse de forma independiente\n\n**RECORDATORIO: Debes incluir exactamente 15 recursos evaluados.**"
         }
       }
     ]
   },
-  "versionId": "99fcd064-ebdc-4c0b-a157-440e67b2a1b3",
+  "versionId": "506e6f00-326c-4b7d-901c-ea0908561df4",
   "triggerCount": 0,
   "tags": []
 }
