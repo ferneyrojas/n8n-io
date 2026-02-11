@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-28T00:22:47.315Z",
-  "updatedAt": "2026-02-10T05:37:17.823Z",
+  "updatedAt": "2026-02-11T02:56:42.223Z",
   "id": "q8OwZG2ENnbPlAXH",
   "name": "Gemini",
   "active": false,
@@ -17,8 +17,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        160,
-        1104
+        128,
+        800
       ],
       "id": "bf679097-844f-4abc-b670-7102cf52fbdd",
       "name": "AI Agent2"
@@ -38,7 +38,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1. Tomamos la respuesta de la IA\nlet raw = items[0].json.output;\n\n// 2. NUEVO: Detectar si ya es un objeto parseado\nlet parsed;\nif (typeof raw === 'object' && raw !== null) {\n  // Ya viene parseado, lo usamos directamente\n  parsed = raw;\n} else {\n  // Es string, necesitamos limpiarlo y parsearlo\n  let cleaned = raw\n    .replace(/```json/g, '')\n    .replace(/```/g, '')\n    .trim();\n  \n  // 3. Eliminar texto antes del primer { y después del último }\n  const firstBrace = cleaned.indexOf('{');\n  const lastBrace = cleaned.lastIndexOf('}');\n  if (firstBrace === -1 || lastBrace === -1) {\n    throw new Error('No se encontró JSON válido en la respuesta');\n  }\n  cleaned = cleaned.substring(firstBrace, lastBrace + 1);\n  \n  // 4. Limpiar comas mal colocadas\n  cleaned = cleaned\n    .replace(/\\}\\s*,\\s*,/g, '},')\n    .replace(/\\]\\s*,\\s*,/g, '],')\n    .replace(/,(\\s*[\\]}])/g, '$1');\n  \n  // 5. Parseamos a objeto JS\n  try {\n    parsed = JSON.parse(cleaned);\n  } catch (error) {\n    console.error('=== JSON QUE FALLÓ ===');\n    console.error(cleaned.substring(0, 1000));\n    throw new Error(`Error parseando JSON de la IA: ${error.message}`);\n  }\n}\n\n// 6. Validación: verificar que resultados existe y es array\nif (!parsed.resultados || !Array.isArray(parsed.resultados)) {\n  throw new Error('La respuesta no contiene un array \"resultados\" válido');\n}\n\nconst resultados = parsed.resultados;\n\n// 7. Validación: verificar que no esté vacío\nif (resultados.length === 0) {\n  throw new Error('El array de resultados está vacío');\n}\n\n// 8. Validar y auto-corregir cada resultado\nconst requiredFields = ['id', 'titulo', 'tipo', 'palabraClave', 'justificacion', 'pertinencia', 'criterios'];\nconst errores = [];\n\nconst resultadosCorregidos = resultados.map((r, index) => {\n  const missing = requiredFields.filter(field => !(field in r));\n  \n  if (missing.length > 0) {\n    errores.push(`Recurso ${index + 1} (ID: ${r.id || '?'}): faltan campos ${missing.join(', ')}`);\n  }\n  \n  // Auto-corregir criterios si faltan\n  if (!r.criterios || typeof r.criterios !== 'object') {\n    r.criterios = { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0 };\n    errores.push(`Recurso ${index + 1} (ID: ${r.id}): criterios faltantes, se asignaron 0s`);\n  } else {\n    ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(c => {\n      if (!(c in r.criterios)) {\n        r.criterios[c] = 0;\n      }\n    });\n  }\n  \n  // Auto-calcular pertinencia si falta o es inválida\n  if (typeof r.pertinencia !== 'number' || r.pertinencia < 0 || r.pertinencia > 10) {\n    const calc = Math.round(\n      (r.criterios.c1 * 0.25) +\n      (r.criterios.c2 * 0.25) +\n      (r.criterios.c3 * 0.20) +\n      (r.criterios.c4 * 0.15) +\n      (r.criterios.c5 * 0.10) +\n      (r.criterios.c6 * 0.05)\n    );\n    r.pertinencia = Math.max(0, Math.min(10, calc));\n    errores.push(`Recurso ${index + 1} (ID: ${r.id}): pertinencia auto-calculada = ${r.pertinencia}`);\n  }\n  \n  // Asegurar que otros campos existan\n  r.id = r.id || 'unknown';\n  r.titulo = r.titulo || 'Sin título';\n  r.tipo = r.tipo || 'Desconocido';\n  r.palabraClave = r.palabraClave || '';\n  r.justificacion = r.justificacion || 'Sin justificación disponible';\n  \n  return r;\n});\n\n// 9. Mostrar advertencias si las hay\nif (errores.length > 0) {\n  console.warn('=== ADVERTENCIAS DE VALIDACIÓN ===');\n  errores.forEach(e => console.warn(e));\n  console.warn(`Total recursos procesados: ${resultadosCorregidos.length}`);\n}\n\n// 10. Normalizar: 1 item por resultado\nreturn resultadosCorregidos.map(r => ({\n  json: r\n}));"
+        "jsCode": "// 1. Tomamos la respuesta de la IA\nlet raw = items[0].json.output;\n\n// 2. Detectar si ya es objeto\nlet parsed;\nif (typeof raw === 'object' && raw !== null) {\n  parsed = raw;\n} else {\n\n  let cleaned = raw\n    .replace(/```json/g, '')\n    .replace(/```/g, '')\n    .trim();\n\n  // 3. Recortar solo el bloque JSON real\n  const firstBrace = cleaned.indexOf('{');\n  const lastBrace = cleaned.lastIndexOf('}');\n  if (firstBrace === -1 || lastBrace === -1) {\n    throw new Error('No se encontró JSON válido en la respuesta');\n  }\n  cleaned = cleaned.substring(firstBrace, lastBrace + 1);\n\n  // 4. Reparaciones típicas de GPT\n\n  // Comas duplicadas\n  cleaned = cleaned\n    .replace(/\\}\\s*,\\s*,/g, '},')\n    .replace(/\\]\\s*,\\s*,/g, '],')\n    .replace(/,(\\s*[\\]}])/g, '$1');\n\n  // 👉 COMAS FALTANTES ENTRE PROPIEDADES (la causa real de tu error)\n  cleaned = cleaned.replace(\n    /\"\\s*\\n\\s*\"(?![:,}\\]])/g,\n    '\",\\n\"'\n  );\n\n  // 👉 Coma faltante después de strings largos antes de siguiente key\n  cleaned = cleaned.replace(\n    /\"([^\"]+)\"\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g,\n    '\"$1\",\\n\"$2\":'\n  );\n\n  // 5. Parsear seguro\n  try {\n    parsed = JSON.parse(cleaned);\n  } catch (error) {\n    console.error('=== JSON QUE FALLÓ ===');\n    console.error(cleaned.substring(0, 1500));\n    throw new Error(`Error parseando JSON de la IA: ${error.message}`);\n  }\n}\n\n// 6. Validación base\nif (!parsed.resultados || !Array.isArray(parsed.resultados)) {\n  throw new Error('La respuesta no contiene un array \"resultados\" válido');\n}\n\nconst resultados = parsed.resultados;\n\nif (resultados.length === 0) {\n  throw new Error('El array de resultados está vacío');\n}\n\n// 7. Validar y corregir resultados\nconst requiredFields = ['id', 'titulo', 'tipo', 'palabraClave', 'justificacion', 'pertinencia', 'criterios'];\nconst errores = [];\n\nconst resultadosCorregidos = resultados.map((r, index) => {\n\n  const missing = requiredFields.filter(f => !(f in r));\n  if (missing.length > 0) {\n    errores.push(`Recurso ${index + 1}: faltan ${missing.join(', ')}`);\n  }\n\n  // Criterios\n  if (!r.criterios || typeof r.criterios !== 'object') {\n    r.criterios = { c1:0,c2:0,c3:0,c4:0,c5:0,c6:0 };\n  } else {\n    ['c1','c2','c3','c4','c5','c6'].forEach(c => {\n      if (!(c in r.criterios)) r.criterios[c] = 0;\n    });\n  }\n\n  // Pertinencia automática\n  if (typeof r.pertinencia !== 'number' || r.pertinencia < 0 || r.pertinencia > 10) {\n    const calc = Math.round(\n      r.criterios.c1 * 0.25 +\n      r.criterios.c2 * 0.25 +\n      r.criterios.c3 * 0.20 +\n      r.criterios.c4 * 0.15 +\n      r.criterios.c5 * 0.10 +\n      r.criterios.c6 * 0.05\n    );\n    r.pertinencia = Math.max(0, Math.min(10, calc));\n  }\n\n  // Defaults seguros\n  r.id ||= 'unknown';\n  r.titulo ||= 'Sin título';\n  r.tipo ||= 'Desconocido';\n  r.palabraClave ||= '';\n  r.justificacion ||= 'Sin justificación disponible';\n\n  return r;\n});\n\n// 8. Logs suaves\nif (errores.length) {\n  console.warn('VALIDACIONES:', errores);\n}\n\n// 9. Normalizar salida\nreturn resultadosCorregidos.map(r => ({ json: r }));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -95,30 +95,11 @@
     },
     {
       "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        -96,
-        1056
-      ],
-      "id": "9cd5eec2-3edd-40eb-8e8b-dfd0804f0e5e",
-      "name": "Google Gemini Chat Model1",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "ZZt1maWHKXh4lkXw",
-          "name": "Virtualpro"
-        }
-      }
-    },
-    {
-      "parameters": {
         "model": {
           "__rl": true,
-          "value": "o4-mini",
+          "value": "gpt-3.5-turbo",
           "mode": "list",
-          "cachedResultName": "o4-mini"
+          "cachedResultName": "gpt-3.5-turbo"
         },
         "options": {}
       },
@@ -126,7 +107,7 @@
       "typeVersion": 1.2,
       "position": [
         80,
-        1328
+        976
       ],
       "id": "ed9b314f-0d56-4a22-a033-fe83524d45dd",
       "name": "OpenAI Chat Model",
@@ -139,17 +120,73 @@
     },
     {
       "parameters": {
+        "jsCode": "// ========================================\n// NODO DE LIMPIEZA Y CORRECCIÓN DE JSON IA\n// ========================================\n\nconst items = $input.all();\n\n// 1. Tomamos la respuesta de la IA (ajustado a la estructura real)\nlet raw;\nlet hasError = false;\nlet errorInfo = null;\n\n// Detectar estructura de OpenRouter/Novita\nif (items[0].json.choices && items[0].json.choices[0]) {\n  const choice = items[0].json.choices[0];\n  \n  // 👉 DETECTAR ERRORES DEL PROVIDER\n  if (choice.error) {\n    hasError = true;\n    errorInfo = {\n      message: choice.error.message,\n      code: choice.error.code,\n      provider: choice.error.metadata?.provider_name || items[0].json.provider\n    };\n  }\n  \n  raw = choice.message?.content;\n} else if (items[0].json.output) {\n  raw = items[0].json.output;\n} else if (typeof items[0].json === 'string') {\n  raw = items[0].json;\n} else {\n  throw new Error('No se pudo detectar el formato de respuesta de la IA');\n}\n\n// 2. Validar que raw no sea undefined o null\nif (!raw) {\n  if (hasError) {\n    throw new Error(`Error del proveedor ${errorInfo.provider}: ${errorInfo.message} (código: ${errorInfo.code})`);\n  }\n  throw new Error('La respuesta de la IA está vacía o no existe');\n}\n\n// 3. Detectar si ya es objeto\nlet parsed;\nif (typeof raw === 'object' && raw !== null) {\n  parsed = raw;\n} else {\n  // 4. Limpieza inicial agresiva\n  let cleaned = raw\n    .replace(/```json/gi, '')\n    .replace(/```/g, '')\n    .replace(/^\\uFEFF/, '')\n    .replace(/[\\u0000-\\u001F\\u007F-\\u009F]/g, '')\n    .trim();\n\n  // 5. Recortar solo el bloque JSON real\n  const firstBrace = cleaned.indexOf('{');\n  const lastBrace = cleaned.lastIndexOf('}');\n  \n  if (firstBrace === -1 || lastBrace === -1) {\n    throw new Error('No se encontró JSON válido en la respuesta');\n  }\n  \n  cleaned = cleaned.substring(firstBrace, lastBrace + 1);\n\n  // 6. 👉 DETECTAR JSON INCOMPLETO (cortado)\n  let isIncomplete = false;\n  \n  // Detectar si termina abruptamente (sin cerrar objetos/arrays correctamente)\n  const openBraces = (cleaned.match(/\\{/g) || []).length;\n  const closeBraces = (cleaned.match(/\\}/g) || []).length;\n  const openBrackets = (cleaned.match(/\\[/g) || []).length;\n  const closeBrackets = (cleaned.match(/\\]/g) || []).length;\n  \n  if (openBraces !== closeBraces || openBrackets !== closeBrackets) {\n    isIncomplete = true;\n    console.warn('⚠️ JSON INCOMPLETO DETECTADO');\n    console.warn(`Llaves: ${openBraces} abiertas, ${closeBraces} cerradas`);\n    console.warn(`Corchetes: ${openBrackets} abiertos, ${closeBrackets} cerrados`);\n  }\n  \n  // 7. 👉 COMPLETAR JSON TRUNCADO\n  if (isIncomplete) {\n    // Buscar el último objeto completo en el array\n    const lastCompleteObject = cleaned.lastIndexOf('}');\n    \n    if (lastCompleteObject !== -1) {\n      // Truncar hasta el último objeto completo\n      let truncated = cleaned.substring(0, lastCompleteObject + 1);\n      \n      // Cerrar el array de resultados si está abierto\n      if (openBrackets > closeBrackets) {\n        truncated += '\\n]';\n      }\n      \n      // Cerrar el objeto principal si está abierto\n      if (openBraces > closeBraces) {\n        truncated += '\\n}';\n      }\n      \n      cleaned = truncated;\n      console.warn('✂️ JSON truncado al último objeto completo');\n    }\n  }\n\n  // 8. Reparaciones sofisticadas de JSON malformado\n  \n  // a) Comas duplicadas o múltiples\n  cleaned = cleaned\n    .replace(/,{2,}/g, ',')\n    .replace(/\\}\\s*,\\s*,+/g, '},')\n    .replace(/\\]\\s*,\\s*,+/g, '],');\n  \n  // b) Comas sobrantes (trailing commas)\n  cleaned = cleaned.replace(/,(\\s*[\\]}])/g, '$1');\n  \n  // c) COMAS FALTANTES ENTRE PROPIEDADES\n  cleaned = cleaned.replace(\n    /\"(\\s*\\n\\s*)\"(?=[a-zA-Z_])/g,\n    '\",\\n\"'\n  );\n  \n  // d) Coma faltante después de valores antes de siguiente key\n  cleaned = cleaned\n    .replace(/\"([^\"\\\\]|\\\\.)*\"\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, (match) => {\n      return match.replace(/\"\\s*\\n\\s*\"/, '\",\\n\"');\n    })\n    .replace(/(\\d+)\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '$1,\\n\"$2\":')\n    .replace(/(true|false)\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '$1,\\n\"$2\":')\n    .replace(/\\}\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '},\\n\"$1\":')\n    .replace(/\\]\\s*\\n\\s*\"([a-zA-Z0-9_]+)\"\\s*:/g, '],\\n\"$1\":');\n  \n  // e) Comas faltantes entre objetos en arrays\n  cleaned = cleaned.replace(/\\}\\s*\\n\\s*\\{/g, '},\\n{');\n  \n  // f) Corregir comillas escapadas innecesariamente\n  cleaned = cleaned\n    .replace(/\\\\\"/g, '\"')\n    .replace(/\\\\'/g, \"'\");\n  \n  // g) Espacios en blanco excesivos\n  cleaned = cleaned.replace(/\\n\\s*\\n/g, '\\n');\n\n  // 9. Parsear con manejo de errores detallado\n  try {\n    parsed = JSON.parse(cleaned);\n  } catch (error) {\n    // Intento de rescate: extraer solo el array de resultados\n    try {\n      const resultMatch = cleaned.match(/\"resultados\"\\s*:\\s*(\\[[\\s\\S]*?\\])/);\n      if (resultMatch) {\n        const resultsArray = JSON.parse(resultMatch[1]);\n        parsed = { resultados: resultsArray };\n        console.warn('⚠️ JSON parcialmente recuperado - solo array de resultados');\n      } else {\n        throw error;\n      }\n    } catch (rescueError) {\n      console.error('=== JSON QUE FALLÓ ===');\n      console.error(cleaned.substring(0, 2000));\n      console.error('...');\n      console.error(cleaned.substring(cleaned.length - 500));\n      console.error('=== FIN JSON ===');\n      console.error('Error original:', error.message);\n      \n      if (hasError) {\n        throw new Error(\n          `JSON inválido + Error del proveedor ${errorInfo.provider}: ${errorInfo.message}. ` +\n          `Intenta reejecutar el workflow.`\n        );\n      }\n      \n      throw new Error(`Error parseando JSON de la IA: ${error.message}`);\n    }\n  }\n}\n\n// 10. Validación base\nif (!parsed.resultados || !Array.isArray(parsed.resultados)) {\n  throw new Error('La respuesta no contiene un array \"resultados\" válido');\n}\n\nconst resultados = parsed.resultados;\n\nif (resultados.length === 0) {\n  if (hasError) {\n    throw new Error(\n      `Array vacío debido a error del proveedor: ${errorInfo.message}. ` +\n      `Reintenta la ejecución.`\n    );\n  }\n  throw new Error('El array de resultados está vacío');\n}\n\n// 11. Validar y corregir cada resultado\nconst requiredFields = [\n  'id', \n  'titulo', \n  'tipo', \n  'palabraClave', \n  'justificacion', \n  'pertinencia', \n  'criterios'\n];\n\nconst errores = [];\nconst warnings = [];\n\nconst resultadosCorregidos = resultados.map((r, index) => {\n  // a) Validar campos requeridos\n  const missing = requiredFields.filter(f => !(f in r));\n  if (missing.length > 0) {\n    errores.push(`Recurso ${index + 1} (${r.id || 'sin ID'}): faltan ${missing.join(', ')}`);\n  }\n\n  // b) Validar y corregir criterios\n  if (!r.criterios || typeof r.criterios !== 'object') {\n    warnings.push(`Recurso ${index + 1}: criterios ausentes, usando defaults`);\n    r.criterios = { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0 };\n  } else {\n    ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(c => {\n      if (!(c in r.criterios)) {\n        r.criterios[c] = 0;\n      }\n      if (typeof r.criterios[c] !== 'number' || r.criterios[c] < 0 || r.criterios[c] > 10) {\n        warnings.push(`Recurso ${index + 1}: ${c} fuera de rango, corrigiendo`);\n        r.criterios[c] = Math.max(0, Math.min(10, Number(r.criterios[c]) || 0));\n      }\n    });\n  }\n\n  // c) Validar y recalcular pertinencia si es necesaria\n  if (typeof r.pertinencia !== 'number' || r.pertinencia < 0 || r.pertinencia > 10) {\n    const calc = Math.round(\n      r.criterios.c1 * 0.25 +\n      r.criterios.c2 * 0.25 +\n      r.criterios.c3 * 0.20 +\n      r.criterios.c4 * 0.15 +\n      r.criterios.c5 * 0.10 +\n      r.criterios.c6 * 0.05\n    );\n    warnings.push(`Recurso ${index + 1}: pertinencia recalculada (${r.pertinencia} → ${calc})`);\n    r.pertinencia = Math.max(0, Math.min(10, calc));\n  }\n\n  // d) Defaults seguros para campos faltantes\n  r.id = r.id?.toString() || `unknown_${index + 1}`;\n  r.titulo = r.titulo?.toString() || 'Sin título';\n  r.tipo = r.tipo?.toString() || 'Desconocido';\n  r.palabraClave = r.palabraClave?.toString() || '';\n  r.justificacion = r.justificacion?.toString() || 'Sin justificación disponible';\n\n  // e) Limpiar strings\n  r.titulo = r.titulo.trim();\n  r.justificacion = r.justificacion.trim().replace(/\\s+/g, ' ');\n  r.palabraClave = r.palabraClave.trim();\n\n  return r;\n});\n\n// 12. Logs informativos\nif (hasError) {\n  console.warn(`⚠️ ADVERTENCIA: Hubo un error del proveedor pero se recuperaron ${resultadosCorregidos.length} resultados`);\n  console.warn(`Error: ${errorInfo.message}`);\n}\n\nif (errores.length > 0) {\n  console.error('❌ ERRORES DE VALIDACIÓN:', errores);\n}\n\nif (warnings.length > 0) {\n  console.warn('⚠️ ADVERTENCIAS:', warnings);\n}\n\nconsole.log(`✅ Procesados ${resultadosCorregidos.length} resultados correctamente`);\n\n// 13. Normalizar salida en formato n8n\nreturn resultadosCorregidos.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        1248
+      ],
+      "id": "3c3a1a1e-cfa7-4128-8b50-a83a3491a338",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item, index) => {\n  const r = item.json;\n  \n  // 1. Buscar criterios (manejo robusto)\n  let criterios = null;\n  \n  // Caso ideal: ya existe r.criterios\n  if (r.criterios && typeof r.criterios === 'object') {\n    criterios = r.criterios;\n  }\n  \n  // Buscar por estructura si no existe con ese nombre\n  if (!criterios) {\n    for (const [key, value] of Object.entries(r)) {\n      if (\n        value &&\n        typeof value === 'object' &&\n        ['c1','c2','c3','c4','c5','c6'].every(k => k in value)\n      ) {\n        criterios = value;\n        delete r[key]; // elimina el nombre incorrecto\n        break;\n      }\n    }\n  }\n  \n  // Fallback ultra seguro\n  criterios = criterios || {\n    c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0\n  };\n  \n  // 2. Validar y corregir pertinencia NUEVAMENTE (por si acaso)\n  let pertinencia = r.pertinencia;\n  \n  if (typeof pertinencia !== 'number' || pertinencia < 1 || pertinencia > 10) {\n    // Recalcular desde criterios\n    pertinencia = Math.round(\n      (criterios.c1 * 0.25) +\n      (criterios.c2 * 0.25) +\n      (criterios.c3 * 0.20) +\n      (criterios.c4 * 0.15) +\n      (criterios.c5 * 0.10) +\n      (criterios.c6 * 0.05)\n    );\n    pertinencia = Math.max(1, Math.min(10, pertinencia));\n    console.warn(`Item ${index}: pertinencia recalculada = ${pertinencia}`);\n  }\n  \n  // 3. Mapeo final con validaciones\n  return {\n    json: {\n      id: r.id || 'unknown',\n      titulo: r.titulo || 'Sin título',\n      tipo: r.tipo || 'Desconocido',\n      palabra_clave: r.palabraClave || '',\n      pertinencia: pertinencia,\n      c1: parseInt(criterios.c1) || 0,\n      c2: parseInt(criterios.c2) || 0,\n      c3: parseInt(criterios.c3) || 0,\n      c4: parseInt(criterios.c4) || 0,\n      c5: parseInt(criterios.c5) || 0,\n      c6: parseInt(criterios.c6) || 0,\n      justificacion: r.justificacion || 'Sin justificación',\n      numero_ejecucion: $('Start').first().json.numero_ejecucion || 'unknown'\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        1248
+      ],
+      "id": "d0d39b6b-6cfe-41aa-b96c-aee8c91655d0",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        944,
+        1248
+      ],
+      "id": "be43874f-b239-4d0d-8481-046312f10e11",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.virtualpro.co/api/prc-pertinencia",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1152,
+        1344
+      ],
+      "id": "d7d0fcd5-1e5e-47bb-8649-89b975d5caad",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
         "jsCode": "const systemPrompt = `\nEres un evaluador académico experto en diseño instruccional y evaluación curricular.\n\nREGLAS ABSOLUTAS DE FORMATO:\n1. Respondes ÚNICAMENTE con JSON válido RFC 8259\n2. NUNCA incluyas markdown (~~~json), texto explicativo, ni comentarios\n3. TODOS los objetos deben tener TODAS estas llaves obligatorias:\n   - id (string)\n   - titulo (string)\n   - tipo (string)\n   - palabraClave (string)\n   - justificacion (string de 40-60 palabras)\n   - pertinencia (número entero 1-10)\n   - criterios (objeto con c1, c2, c3, c4, c5, c6 como números 0-10)\n\n4. VALIDACIÓN PREVIA A RESPONDER:\n   ✓ Cuenta cuántos recursos se te piden evaluar (N)\n   ✓ Verifica que tu array \"resultados\" tenga exactamente N elementos\n   ✓ Verifica que cada elemento tenga las 7 llaves obligatorias\n   ✓ Verifica que no haya comas mal colocadas\n\n5. ESTRUCTURA EXACTA (no alteres nombres de llaves):\n{\n  \"resultados\": [\n    {\n      \"id\": \"valor\",\n      \"titulo\": \"valor\",\n      \"tipo\": \"valor\",\n      \"palabraClave\": \"valor\",\n      \"justificacion\": \"40-60 palabras\",\n      \"pertinencia\": 8,\n      \"criterios\": {\n        \"c1\": 9,\n        \"c2\": 8,\n        \"c3\": 7,\n        \"c4\": 8,\n        \"c5\": 9,\n        \"c6\": 7\n      }\n    }\n  ]\n}\n\nComienza tu respuesta DIRECTAMENTE con el carácter {\nNO incluyas NADA antes ni después del JSON.\n`;\n\nconst userPrompt = items[0].json.chatInput;\n\nreturn [\n  {\n    json: {\n      messages: [\n        { role: \"system\", content: systemPrompt },\n        { role: \"user\", content: userPrompt }\n      ]\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        32,
-        800
+        80,
+        1248
       ],
-      "id": "32527f30-e612-4f6f-8276-74531f28aa10",
-      "name": "Code2",
-      "disabled": true
+      "id": "424f0aca-bcd4-415e-8e9e-aed70eec78a1",
+      "name": "Code5"
     },
     {
       "parameters": {
@@ -160,7 +197,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer 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"
+              "value": "Bearer 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"
             },
             {
               "name": "Content-Type",
@@ -170,20 +207,19 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"qwen/qwen3-4b:free\",\n  \"messages\": {{ JSON.stringify($json.messages) }},\n  \"temperature\": 0.2\n}",
+        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-r1-0528\",\n  \"messages\": {{ JSON.stringify($json.messages) }},\n  \"temperature\": 0.2\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        272,
-        800
+        304,
+        1248
       ],
-      "id": "a0d0d065-8fc7-4e96-970f-14fb0c2a68aa",
-      "name": "Generar imágenes",
+      "id": "f8ff97e1-2a36-4bf3-9887-428b78f7c222",
+      "name": "Generar imágenes1",
       "alwaysOutputData": false,
-      "retryOnFail": true,
-      "disabled": true
+      "retryOnFail": true
     }
   ],
   "connections": {
@@ -191,7 +227,7 @@
       "main": [
         [
           {
-            "node": "Code2",
+            "node": "Code5",
             "type": "main",
             "index": 0
           }
@@ -254,11 +290,6 @@
         ]
       ]
     },
-    "Google Gemini Chat Model1": {
-      "ai_languageModel": [
-        []
-      ]
-    },
     "OpenAI Chat Model": {
       "ai_languageModel": [
         [
@@ -270,20 +301,71 @@
         ]
       ]
     },
-    "Code2": {
+    "Code3": {
       "main": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Code4",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Generar imágenes": {
+    "Code4": {
       "main": [
-        []
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Generar imágenes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar imágenes1": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -304,7 +386,7 @@
       }
     ]
   },
-  "versionId": "dfec71da-5345-4124-8d22-9797f62d5861",
+  "versionId": "99fcd064-ebdc-4c0b-a157-440e67b2a1b3",
   "triggerCount": 0,
   "tags": []
 }
