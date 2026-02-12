@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-21T23:47:55.084Z",
-  "updatedAt": "2026-01-26T20:02:44.807Z",
+  "updatedAt": "2026-02-11T23:28:56.032Z",
   "id": "JuPhn9ORyJZuyN0v",
   "name": "Generacion Archivos Ruta Servicio",
   "active": true,
@@ -33,7 +33,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        208,
+        224,
         0
       ],
       "id": "eb27c446-1124-4d0a-a0b5-032e4326d2bd",
@@ -47,7 +47,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        416,
+        448,
         0
       ],
       "id": "5fc1b60e-6cd0-4b7c-a8b5-5c1cd7dad87c",
@@ -61,11 +61,25 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        624,
+        672,
         0
       ],
       "id": "aa0278b5-2f65-4d8b-99e2-55bfbc0b34c7",
       "name": "infoClientesGeneral"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=sp4128",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "f4a9a87f-b319-4eb9-b18d-1e6c69a1ec1f",
+      "name": "infoDocentesIngresos"
     }
   ],
   "connections": {
@@ -101,6 +115,17 @@
           }
         ]
       ]
+    },
+    "infoClientesGeneral": {
+      "main": [
+        [
+          {
+            "node": "infoDocentesIngresos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -113,7 +138,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "53164e6a-d697-4c4f-8442-474ef5d9e172",
+  "versionId": "a58a821a-7300-4881-8586-e7d788939f51",
   "triggerCount": 1,
   "tags": []
 }
