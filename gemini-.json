@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-28T00:22:47.315Z",
-  "updatedAt": "2026-02-11T14:21:11.020Z",
+  "updatedAt": "2026-02-12T00:49:28.429Z",
   "id": "q8OwZG2ENnbPlAXH",
   "name": "Gemini",
   "active": false,
@@ -92,31 +92,6 @@
       ],
       "id": "0bcacab0-8658-4420-8168-afd592fe888d",
       "name": "HTTP Request"
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "gpt-3.5-turbo",
-          "mode": "list",
-          "cachedResultName": "gpt-3.5-turbo"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.2,
-      "position": [
-        80,
-        976
-      ],
-      "id": "ed9b314f-0d56-4a22-a033-fe83524d45dd",
-      "name": "OpenAI Chat Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
-        }
-      }
     },
     {
       "parameters": {
@@ -426,6 +401,25 @@
       "name": "Generar imágenes2",
       "alwaysOutputData": false,
       "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        80,
+        944
+      ],
+      "id": "525bb5b6-9fd3-4180-b4d7-f6e411f21fc9",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "RkFmnshG2sRFmA16",
+          "name": "DeepSeek account 2"
+        }
+      }
     }
   ],
   "connections": {
@@ -491,17 +485,6 @@
           {
             "node": "Loop Over Items",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent2",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -701,6 +684,17 @@
           }
         ]
       ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -720,7 +714,7 @@
       }
     ]
   },
-  "versionId": "506e6f00-326c-4b7d-901c-ea0908561df4",
+  "versionId": "c1d1c1f3-5cb6-4215-88dd-495220020543",
   "triggerCount": 0,
   "tags": []
 }
