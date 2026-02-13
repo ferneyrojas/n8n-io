@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-02-03T21:23:54.450Z",
-  "updatedAt": "2026-02-12T15:21:05.043Z",
+  "updatedAt": "2026-02-13T00:07:37.308Z",
   "id": "azKZ4veUsiPiO2gk",
   "name": "Infografías V2 (2)",
   "active": true,
@@ -760,6 +760,18 @@
               "id": "d7b1c16d-c4ac-4fd3-b3e6-f3febc91b288",
               "name": "inf_experto",
               "value": "={{$json[\"body\"][\"inf_experto\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "459a4447-c15c-4f00-ba16-5405d24d4c38",
+              "name": "parte_1",
+              "value": "cc27853f623eaaae86e921",
+              "type": "string"
+            },
+            {
+              "id": "46976928-d57f-4727-b2a5-63d7168d9b9b",
+              "name": "parte_2",
+              "value": "e0b20e5b582e2a53e0744b407",
               "type": "string"
             }
           ]
@@ -1782,7 +1794,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer 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"
+              "value": "=Bearer sk-or-v1-{{ $('Obtener campos del formulario').first().json.parte_1 }}{{ $('Obtener campos del formulario').first().json.parte_2 }}"
             },
             {
               "name": "Content-Type",
@@ -6167,7 +6179,7 @@
     ],
     "Webhook": []
   },
-  "versionId": "827c04dd-6a32-4136-90ba-c9508751d948",
+  "versionId": "c7ad7abe-95aa-47c2-870b-fe300d6e98be",
   "triggerCount": 1,
   "tags": []
 }
