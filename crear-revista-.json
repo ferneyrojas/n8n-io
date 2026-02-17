@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-28T13:42:06.539Z",
-  "updatedAt": "2026-02-09T17:20:39.673Z",
+  "updatedAt": "2026-02-17T13:00:17.623Z",
   "id": "FftFcLb2JBCEWrI3",
   "name": "Crear Revista",
   "active": true,
@@ -120,7 +120,7 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -512,
+        -1392,
         416
       ],
       "typeVersion": 1,
@@ -134,7 +134,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -256,
+        -1136,
         608
       ],
       "id": "f98e9366-8be5-4983-9b6b-b3869326c4ba",
@@ -187,7 +187,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -480,
+        -1360,
         608
       ],
       "id": "e041a0c6-8ae9-431b-b291-7b4dab3f1554",
@@ -201,7 +201,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -32,
+        -912,
         608
       ],
       "id": "9f1fdb22-d6b4-4e70-94f4-3d1d22dddd91",
@@ -214,7 +214,7 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -112,
+        -992,
         480
       ],
       "typeVersion": 1,
@@ -1394,7 +1394,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -928,
+        -1808,
         528
       ],
       "id": "9c107366-14b0-464e-8234-f37507211f74",
@@ -1410,7 +1410,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        -704,
+        -1584,
         368
       ],
       "id": "fd373aa6-f93e-4b09-8c0c-622fdd7d54d7",
@@ -1430,61 +1430,6 @@
       ],
       "id": "b7753d43-0db9-4785-a1eb-d90aa000d6b4",
       "name": "Respond to Webhook1"
-    },
-    {
-      "parameters": {
-        "formTitle": "Generación de Revista",
-        "formDescription": "Generador de revistas",
-        "formFields": {
-          "values": [
-            {
-              "fieldLabel": "ID_Revista",
-              "fieldType": "number",
-              "requiredField": true
-            },
-            {
-              "fieldLabel": "Formato-Docs-por-seccion",
-              "fieldType": "dropdown",
-              "fieldOptions": {
-                "values": [
-                  {
-                    "option": "1. Todos en una Seccion"
-                  },
-                  {
-                    "option": "2. Un artículo x Seccion"
-                  },
-                  {
-                    "option": "3. Varias Secciones"
-                  }
-                ]
-              },
-              "requiredField": true
-            },
-            {
-              "fieldLabel": "DocsXPagina",
-              "fieldType": "number",
-              "placeholder": "# de Docs x página"
-            },
-            {
-              "fieldLabel": "Nombre_Perfil"
-            },
-            {
-              "fieldLabel": "Nombre-secciones"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.formTrigger",
-      "typeVersion": 2.2,
-      "position": [
-        -1008,
-        176
-      ],
-      "id": "1f83c628-7b95-40b2-9560-628cc75786dc",
-      "name": "Form-Inicial2",
-      "webhookId": "f3603f30-4353-4895-bfb2-7451b31bdc94",
-      "disabled": true
     },
     {
       "parameters": {
@@ -1527,11 +1472,125 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -720,
+        -1600,
         624
       ],
       "id": "8a13ad72-d2b1-4c2c-bc6f-490d41a53bff",
       "name": "Form-Inicial"
+    },
+    {
+      "parameters": {
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/seccionPublicacion?sxp_id_publicacion={{ $json.pub_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        608
+      ],
+      "id": "5b04a0bb-8689-4fbf-806c-669660eaf241",
+      "name": "Crear-SeccionPortada1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Si tu input viene como múltiples items (normal en n8n)\nconst sections = items.map(item => item.json);\n\n// Normalizamos nombres (quitamos espacios y pasamos a minúsculas)\nconst names = sections.map(s => \n  (s.sxp_nombre || '').trim().toLowerCase()\n);\n\n// Validamos existencia\nconst hasPortada = names.includes('portada');\nconst hasEditorial = names.includes('editorial');\n\n// Retornamos true solo si existen ambas\nreturn [\n  {\n    json: {\n      result: hasPortada && hasEditorial\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        608
+      ],
+      "id": "3b6898d1-4751-46ea-8ae9-c1d924ce5a38",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1fa0c6a8-81f5-458e-a376-85dba80632e0",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        608
+      ],
+      "id": "a0899aea-ab52-459c-9e87-766b89b020da",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26048d6f-c15e-4da7-b85e-829fce2ac5af",
+              "name": "citacion",
+              "value": "={{ $('Consultar-Revista').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "7d7f5085-c438-47fe-9c0d-a5996afba49b",
+              "name": "formatoSecciones",
+              "value": "={{ $('Form-Inicial').item.json['Formato-Docs-por-seccion'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bfe3b869-70e8-4ffd-b005-172954e9da31",
+              "name": "nombreSecciones",
+              "value": "={{ $('Form-Inicial').item.json['Nombre-secciones'] }}",
+              "type": "string"
+            },
+            {
+              "id": "2e6ac68d-addb-4c93-b7c5-8ee799b533f1",
+              "name": "docsXPagina",
+              "value": "={{ $('Form-Inicial').item.json.DocsXPagina }}",
+              "type": "string"
+            },
+            {
+              "id": "bd9fe29f-de0d-4dc0-8ba6-1b08c5e194e4",
+              "name": "nombrePerfil",
+              "value": "={{ $('Form-Inicial').item.json.Nombre_Perfil }}",
+              "type": "string"
+            },
+            {
+              "id": "c995faa4-0bf1-4640-a3f0-e734d79845f9",
+              "name": "temaRevista",
+              "value": "={{ $json.pub_titulo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        304
+      ],
+      "id": "eebba65f-4589-4344-bb75-4b75f0a236ac",
+      "name": "Setup Inicial1"
     }
   ],
   "connections": {
@@ -1586,7 +1645,7 @@
       "main": [
         [
           {
-            "node": "Setup Inicial",
+            "node": "Crear-SeccionPortada1",
             "type": "main",
             "index": 0
           }
@@ -2062,16 +2121,62 @@
         ]
       ]
     },
-    "Form-Inicial2": {
-      "main": [
-        []
-      ]
-    },
     "Form-Inicial": {
       "main": [
         [
           {
             "node": "Set-Ambiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear-SeccionPortada1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Setup Inicial1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Setup Inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup Inicial1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -2087,7 +2192,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "8ef0a1e6-209c-4623-bd33-62d0c523b350",
+  "versionId": "9c56b5a1-ecb7-4959-8dfe-0fcaecd646a1",
   "triggerCount": 1,
   "tags": []
 }
