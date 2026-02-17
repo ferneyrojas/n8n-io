@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-28T13:42:06.539Z",
-  "updatedAt": "2026-02-17T13:00:17.623Z",
+  "updatedAt": "2026-02-17T13:26:24.917Z",
   "id": "FftFcLb2JBCEWrI3",
   "name": "Crear Revista",
   "active": true,
@@ -16,7 +16,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         176,
-        112
+        -96
       ],
       "typeVersion": 1,
       "id": "a72b7ff0-cd1b-451c-9b21-56eebe34a9a0",
@@ -230,7 +230,7 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        160,
+        -272,
         480
       ],
       "typeVersion": 1,
@@ -239,7 +239,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $('Set-Server').item.json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').item.json.citacion }}",
+        "url": "={{ $('Set-Server').first().json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').first().json.citacion }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -283,7 +283,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $('Set-Server').item.json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').item.json.citacion }}",
+        "url": "={{ $('Set-Server').first().json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').first().json.citacion }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -298,18 +298,18 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion}}",
+        "url": "={{ $('Set-Server').first().json.server+ $('Set-Ambiente').first().json.urlApiSeccion}}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
           "parameters": [
             {
               "name": "sxp_id_publicacion",
-              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+              "value": "={{ $('Form-Inicial').first().json.ID_Revista }}"
             },
             {
               "name": "sxp_nombre",
-              "value": "={{ $('Form-Inicial').item.json['Nombre-secciones'] }}"
+              "value": "={{ $('Form-Inicial').first().json['Nombre-secciones'] }}"
             },
             {
               "name": "sxp_orden",
@@ -335,14 +335,14 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion}}",
+        "url": "={{ $('Set-Server').first().json.server+ $('Set-Ambiente').first().json.urlApiSeccion}}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
           "parameters": [
             {
               "name": "sxp_id_publicacion",
-              "value": "={{ $('Form-Inicial').item.json.ID_Revista }}"
+              "value": "={{ $('Form-Inicial').first().json.ID_Revista }}"
             },
             {
               "name": "sxp_nombre",
@@ -372,14 +372,14 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlDocXPagina }}",
+        "url": "={{ $('Set-Server').first().json.server + $('Set-Ambiente').first().json.urlDocXPagina }}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
           "parameters": [
             {
               "name": "dxp_id_pag",
-              "value": "={{ $('Crear-Pagina1').item.json.pxs_id }}"
+              "value": "={{ $('Crear-Pagina1').first().json.pxs_id }}"
             },
             {
               "name": "dxp_tipo_doc",
@@ -391,7 +391,7 @@
             },
             {
               "name": "dxp_orden",
-              "value": "={{ $('Preparar-data1').item.json.itemNumber }}"
+              "value": "={{ $('Preparar-data1').first().json.itemNumber }}"
             },
             {
               "name": "dxp_activo",
@@ -413,14 +413,14 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlDocXPagina }}",
+        "url": "={{ $('Set-Server').first().json.server + $('Set-Ambiente').first().json.urlDocXPagina }}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
           "parameters": [
             {
               "name": "dxp_id_pag",
-              "value": "={{ $('Crear-Pagina2').item.json.pxs_id }}"
+              "value": "={{ $('Crear-Pagina2').first().json.pxs_id }}"
             },
             {
               "name": "dxp_tipo_doc",
@@ -428,7 +428,7 @@
             },
             {
               "name": "dxp_contenido",
-              "value": "={{ $('Consultar-Documentos-2').item.json.id }}"
+              "value": "={{ $('Consultar-Documentos-2').first().json.id }}"
             },
             {
               "name": "dxp_orden",
@@ -454,14 +454,14 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "url": "={{ $('Set-Server').first().json.server + $('Set-Ambiente').first().json.urlPaginaSeccion }}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
           "parameters": [
             {
               "name": "pxs_id_seccion",
-              "value": "={{ $(\"Crear-Seccion1\").item.json.sxp_id }}"
+              "value": "={{ $(\"Crear-Seccion1\").first().json.sxp_id }}"
             },
             {
               "name": "pxs_plantilla",
@@ -491,14 +491,14 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "url": "={{ $('Set-Server').first().json.server + $('Set-Ambiente').first().json.urlPaginaSeccion }}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
           "parameters": [
             {
               "name": "pxs_id_seccion",
-              "value": "={{ $(\"Crear-Seccion2\").item.json.sxp_id }}"
+              "value": "={{ $(\"Crear-Seccion2\").first().json.sxp_id }}"
             },
             {
               "name": "pxs_plantilla",
@@ -566,7 +566,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $('Set-Server').item.json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').item.json.citacion }}",
+        "url": "={{ $('Set-Server').first().json.server +\"/api/bibliotecaVirtual?_end=100&_start=0&bv_dc_citacion=\" +  $('Setup Inicial').first().json.citacion }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -598,7 +598,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server+ $('Set-Ambiente').item.json.urlApiSeccion }}",
+        "url": "={{ $('Set-Server').first().json.server+ $('Set-Ambiente').first().json.urlApiSeccion }}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
@@ -658,7 +658,7 @@
             {
               "id": "674136e1-bbcf-4341-a7ed-a4074dfaaee2",
               "name": "seccionesArray",
-              "value": "={{ ($('Setup Inicial').item.json.nombreSecciones+\"|Sin seccion\").split(\"|\") }}",
+              "value": "={{ ($('Setup Inicial').first().json.nombreSecciones+\"|Sin seccion\").split(\"|\") }}",
               "type": "array"
             }
           ]
@@ -731,7 +731,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlPaginaSeccion }}",
+        "url": "={{ $('Set-Server').first().json.server + $('Set-Ambiente').first().json.urlPaginaSeccion }}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
@@ -768,7 +768,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Set-Server').item.json.server + $('Set-Ambiente').item.json.urlDocXPagina }}",
+        "url": "={{ $('Set-Server').first().json.server + $('Set-Ambiente').first().json.urlDocXPagina }}",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
@@ -1175,37 +1175,37 @@
             {
               "id": "26048d6f-c15e-4da7-b85e-829fce2ac5af",
               "name": "citacion",
-              "value": "={{ $('Consultar-Revista').item.json.id }}",
+              "value": "={{ $('Consultar-Revista').first().json.id }}",
               "type": "string"
             },
             {
               "id": "7d7f5085-c438-47fe-9c0d-a5996afba49b",
               "name": "formatoSecciones",
-              "value": "={{ $('Form-Inicial').item.json['Formato-Docs-por-seccion'] }}",
+              "value": "={{ $('Form-Inicial').first().json['Formato-Docs-por-seccion'] }}",
               "type": "string"
             },
             {
               "id": "bfe3b869-70e8-4ffd-b005-172954e9da31",
               "name": "nombreSecciones",
-              "value": "={{ $('Form-Inicial').item.json['Nombre-secciones'] }}",
+              "value": "={{ $('Form-Inicial').first().json['Nombre-secciones'] }}",
               "type": "string"
             },
             {
               "id": "2e6ac68d-addb-4c93-b7c5-8ee799b533f1",
               "name": "docsXPagina",
-              "value": "={{ $('Form-Inicial').item.json.DocsXPagina }}",
+              "value": "={{ $('Form-Inicial').first().json.DocsXPagina }}",
               "type": "string"
             },
             {
               "id": "bd9fe29f-de0d-4dc0-8ba6-1b08c5e194e4",
               "name": "nombrePerfil",
-              "value": "={{ $('Form-Inicial').item.json.Nombre_Perfil }}",
+              "value": "={{ $('Form-Inicial').first().json.Nombre_Perfil }}",
               "type": "string"
             },
             {
               "id": "c995faa4-0bf1-4640-a3f0-e734d79845f9",
               "name": "temaRevista",
-              "value": "={{ $json.pub_titulo }}",
+              "value": "={{ $('Consultar-Revista').first().json.pub_titulo }}",
               "type": "string"
             }
           ]
@@ -1215,7 +1215,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        192,
+        -240,
         608
       ],
       "id": "eaa2565a-c033-4a45-ad72-ec1587520da6",
@@ -1265,8 +1265,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        416,
-        480
+        336,
+        496
       ],
       "id": "bd70b2da-08c0-4662-af91-2b6d897f1448",
       "name": "If"
@@ -1354,7 +1354,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         176,
-        -16
+        -224
       ],
       "typeVersion": 1,
       "id": "cd2ddff0-1a5e-4220-8ce7-339dbf26ec02",
@@ -1480,20 +1480,6 @@
     },
     {
       "parameters": {
-        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/seccionPublicacion?sxp_id_publicacion={{ $json.pub_id }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -672,
-        608
-      ],
-      "id": "5b04a0bb-8689-4fbf-806c-669660eaf241",
-      "name": "Crear-SeccionPortada1"
-    },
-    {
-      "parameters": {
         "jsCode": "// Si tu input viene como múltiples items (normal en n8n)\nconst sections = items.map(item => item.json);\n\n// Normalizamos nombres (quitamos espacios y pasamos a minúsculas)\nconst names = sections.map(s => \n  (s.sxp_nombre || '').trim().toLowerCase()\n);\n\n// Validamos existencia\nconst hasPortada = names.includes('portada');\nconst hasEditorial = names.includes('editorial');\n\n// Retornamos true solo si existen ambas\nreturn [\n  {\n    json: {\n      result: hasPortada && hasEditorial\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
@@ -1503,7 +1489,8 @@
         608
       ],
       "id": "3b6898d1-4751-46ea-8ae9-c1d924ce5a38",
-      "name": "Code"
+      "name": "Code",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -1517,7 +1504,7 @@
           "conditions": [
             {
               "id": "1fa0c6a8-81f5-458e-a376-85dba80632e0",
-              "leftValue": "={{ $json.result }}",
+              "leftValue": "={{ $('Code').first().json.result }}",
               "rightValue": "true",
               "operator": {
                 "type": "boolean",
@@ -1533,7 +1520,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -256,
+        0,
         608
       ],
       "id": "a0899aea-ab52-459c-9e87-766b89b020da",
@@ -1541,56 +1528,33 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "26048d6f-c15e-4da7-b85e-829fce2ac5af",
-              "name": "citacion",
-              "value": "={{ $('Consultar-Revista').item.json.id }}",
-              "type": "string"
-            },
-            {
-              "id": "7d7f5085-c438-47fe-9c0d-a5996afba49b",
-              "name": "formatoSecciones",
-              "value": "={{ $('Form-Inicial').item.json['Formato-Docs-por-seccion'] }}",
-              "type": "string"
-            },
-            {
-              "id": "bfe3b869-70e8-4ffd-b005-172954e9da31",
-              "name": "nombreSecciones",
-              "value": "={{ $('Form-Inicial').item.json['Nombre-secciones'] }}",
-              "type": "string"
-            },
-            {
-              "id": "2e6ac68d-addb-4c93-b7c5-8ee799b533f1",
-              "name": "docsXPagina",
-              "value": "={{ $('Form-Inicial').item.json.DocsXPagina }}",
-              "type": "string"
-            },
-            {
-              "id": "bd9fe29f-de0d-4dc0-8ba6-1b08c5e194e4",
-              "name": "nombrePerfil",
-              "value": "={{ $('Form-Inicial').item.json.Nombre_Perfil }}",
-              "type": "string"
-            },
-            {
-              "id": "c995faa4-0bf1-4640-a3f0-e734d79845f9",
-              "name": "temaRevista",
-              "value": "={{ $json.pub_titulo }}",
-              "type": "string"
-            }
-          ]
-        },
+        "url": "=https://polifoniaeditores.com/v/verbo7api/public/api/seccionPublicacion?sxp_id_publicacion={{ $json.pub_id }}",
         "options": {}
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        48,
-        304
+        -672,
+        608
       ],
-      "id": "eebba65f-4589-4344-bb75-4b75f0a236ac",
-      "name": "Setup Inicial1"
+      "id": "5b04a0bb-8689-4fbf-806c-669660eaf241",
+      "name": "Consultar secciones creadas",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "Validamos si anteriormente se crearon secciones de Portada, Contenido y Editorial",
+        "height": 288,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -704,
+        480
+      ],
+      "typeVersion": 1,
+      "id": "6bdf27ba-02fb-4d33-bdfe-1104c97abd54",
+      "name": "Sticky Note12"
     }
   ],
   "connections": {
@@ -1645,7 +1609,7 @@
       "main": [
         [
           {
-            "node": "Crear-SeccionPortada1",
+            "node": "Consultar secciones creadas",
             "type": "main",
             "index": 0
           }
@@ -2043,27 +2007,7 @@
       "main": [
         [
           {
-            "node": "Continuar",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Crear-SeccionContenido1",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Crear-SeccionContenido",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Crear-SeccionPortada",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "If",
+            "node": "If1",
             "type": "main",
             "index": 0
           }
@@ -2132,22 +2076,11 @@
         ]
       ]
     },
-    "Crear-SeccionPortada1": {
-      "main": [
-        [
-          {
-            "node": "Code",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Code": {
       "main": [
         [
           {
-            "node": "If1",
+            "node": "Setup Inicial",
             "type": "main",
             "index": 0
           }
@@ -2158,25 +2091,50 @@
       "main": [
         [
           {
-            "node": "Setup Inicial1",
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Setup Inicial",
+            "node": "Crear-SeccionContenido1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crear-SeccionContenido",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crear-SeccionPortada",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Continuar",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Setup Inicial1": {
+    "Crear-Pagina-Perfil": {
+      "main": [
+        []
+      ]
+    },
+    "Consultar secciones creadas": {
       "main": [
         [
           {
-            "node": "Switch",
+            "node": "Code",
             "type": "main",
             "index": 0
           }
@@ -2192,7 +2150,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "9c56b5a1-ecb7-4959-8dfe-0fcaecd646a1",
+  "versionId": "f4a2ac2e-38c6-4dce-83f1-4923e268ddbc",
   "triggerCount": 1,
   "tags": []
 }
