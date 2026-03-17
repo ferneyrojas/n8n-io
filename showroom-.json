@@ -1,10 +1,10 @@
 {
   "createdAt": "2025-10-21T11:27:53.771Z",
-  "updatedAt": "2025-10-27T19:23:28.870Z",
+  "updatedAt": "2026-02-18T21:12:02.844Z",
   "id": "U3SLteDeCKtbvxEA",
   "name": "Showroom",
   "active": false,
-  "isArchived": false,
+  "isArchived": true,
   "nodes": [
     {
       "parameters": {
@@ -508,7 +508,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "2bb728e2-5a6e-4858-8a3a-8e1be34f7de1",
+  "versionId": "5ea9782e-aade-4867-aa87-4aacf8ea8efb",
   "triggerCount": 0,
   "tags": []
 }
