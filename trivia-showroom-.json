@@ -1,10 +1,10 @@
 {
   "createdAt": "2025-10-20T03:17:22.934Z",
-  "updatedAt": "2026-01-28T12:44:00.360Z",
+  "updatedAt": "2026-02-18T21:11:59.378Z",
   "id": "TklBRIvfwiWsjNoE",
   "name": "Trivia Showroom",
   "active": false,
-  "isArchived": false,
+  "isArchived": true,
   "nodes": [
     {
       "parameters": {
@@ -125,7 +125,7 @@
   "pinData": {
     "Webhook": []
   },
-  "versionId": "1947221d-ba2a-4807-af67-0d89467ca11e",
+  "versionId": "468762d6-013f-4ecf-8a41-cd83eb73c84a",
   "triggerCount": 1,
   "tags": []
 }
