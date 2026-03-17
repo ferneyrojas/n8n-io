@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-28T13:42:06.539Z",
-  "updatedAt": "2026-02-17T13:26:24.917Z",
+  "updatedAt": "2026-02-18T14:19:06.954Z",
   "id": "FftFcLb2JBCEWrI3",
   "name": "Crear Revista",
   "active": true,
@@ -313,7 +313,7 @@
             },
             {
               "name": "sxp_orden",
-              "value": "3"
+              "value": "4"
             },
             {
               "name": "sxp_activo",
@@ -2150,7 +2150,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "f4a2ac2e-38c6-4dce-83f1-4923e268ddbc",
+  "versionId": "0bde81bc-f585-49ec-9e0c-f96b05d04340",
   "triggerCount": 1,
   "tags": []
 }
