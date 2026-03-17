@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-28T00:22:47.315Z",
-  "updatedAt": "2026-02-13T00:18:28.204Z",
+  "updatedAt": "2026-02-19T16:06:22.995Z",
   "id": "q8OwZG2ENnbPlAXH",
   "name": "Gemini",
   "active": false,
@@ -87,7 +87,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1120,
+        1136,
         896
       ],
       "id": "0bcacab0-8658-4420-8168-afd592fe888d",
@@ -416,8 +416,8 @@
       "name": "DeepSeek Chat Model",
       "credentials": {
         "deepSeekApi": {
-          "id": "RkFmnshG2sRFmA16",
-          "name": "DeepSeek account 2"
+          "id": "82wdm8DcmaSeRH5G",
+          "name": "DeepSeek account"
         }
       }
     }
@@ -721,7 +721,7 @@
       }
     ]
   },
-  "versionId": "aea6d514-a3b8-45b1-8c2d-97b7a20159f0",
+  "versionId": "eacca72a-895e-4104-a44d-be1ff5a38535",
   "triggerCount": 0,
   "tags": []
 }
