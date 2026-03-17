@@ -1,9 +1,9 @@
 {
   "createdAt": "2026-02-03T21:23:54.450Z",
-  "updatedAt": "2026-02-16T13:24:09.897Z",
+  "updatedAt": "2026-02-19T16:37:48.787Z",
   "id": "azKZ4veUsiPiO2gk",
   "name": "Infografías V2 (2)",
-  "active": true,
+  "active": false,
   "isArchived": false,
   "nodes": [
     {
@@ -292,8 +292,8 @@
       "name": "Crear hoja de cálculo",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -326,8 +326,8 @@
       "name": "Mover hoja a infografías",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -418,8 +418,8 @@
       "name": "Agregar las filas al documento",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -505,8 +505,8 @@
       "name": "Obtener datos del Sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -594,8 +594,8 @@
       "name": "Adjuntar registros a la nueva hoja",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -621,8 +621,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -812,8 +812,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -826,7 +826,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        6960,
+        6976,
         800
       ],
       "id": "2188fe3a-bc60-4def-94e4-10637002ffc5",
@@ -918,8 +918,8 @@
       "name": "Obtener datos del Sheet para diagramación",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -1585,8 +1585,8 @@
       "name": "Create file from text",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -1625,8 +1625,8 @@
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
+          "id": "NE21aoPqOZ1dnzHF",
+          "name": "OpenAI"
         }
       }
     },
@@ -1650,8 +1650,8 @@
       "name": "OpenAI Chat Model1",
       "credentials": {
         "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
+          "id": "NE21aoPqOZ1dnzHF",
+          "name": "OpenAI"
         }
       }
     },
@@ -2016,8 +2016,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -2046,8 +2046,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -2135,8 +2135,8 @@
       "name": "Adjuntar registros a la nueva hoja1",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -2374,8 +2374,8 @@
       "notesInFlow": true,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -2453,8 +2453,8 @@
       "executeOnce": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -2638,8 +2638,8 @@
       "name": "OpenAI Chat Model4",
       "credentials": {
         "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
+          "id": "NE21aoPqOZ1dnzHF",
+          "name": "OpenAI"
         }
       }
     },
@@ -2663,8 +2663,8 @@
       "name": "OpenAI Chat Model5",
       "credentials": {
         "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
+          "id": "NE21aoPqOZ1dnzHF",
+          "name": "OpenAI"
         }
       }
     },
@@ -2723,8 +2723,8 @@
       "name": "OpenAI Chat Model6",
       "credentials": {
         "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
+          "id": "NE21aoPqOZ1dnzHF",
+          "name": "OpenAI"
         }
       }
     },
@@ -2770,8 +2770,8 @@
       "name": "Create file from text1",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       },
       "disabled": true
@@ -2812,8 +2812,8 @@
       "notesInFlow": true,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -2910,8 +2910,8 @@
       "name": "Share file",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       },
       "disabled": true
@@ -2945,8 +2945,8 @@
       "name": "Share file1",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -2999,8 +2999,8 @@
       "name": "OpenAI Chat Model7",
       "credentials": {
         "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
+          "id": "NE21aoPqOZ1dnzHF",
+          "name": "OpenAI"
         }
       }
     },
@@ -3072,8 +3072,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3102,8 +3102,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3193,8 +3193,8 @@
       "executeOnce": false,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3226,8 +3226,8 @@
       "name": "Create folder",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -3314,8 +3314,8 @@
       "name": "Create file from text2",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -3383,8 +3383,8 @@
       "notesInFlow": true,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -3466,8 +3466,8 @@
       "name": "Share file2",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "tKyXlrHxdPRzxNET",
-          "name": "Accounts Virtualpro"
+          "id": "HpkHDA52tPQfXvEw",
+          "name": "Accounts Drive"
         }
       }
     },
@@ -3490,8 +3490,8 @@
       "name": "OpenAI Chat Model8",
       "credentials": {
         "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
+          "id": "NE21aoPqOZ1dnzHF",
+          "name": "OpenAI"
         }
       }
     },
@@ -3533,8 +3533,8 @@
       "executeOnce": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3575,8 +3575,8 @@
       "name": "Obtener datos del Sheet1",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3602,8 +3602,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3632,8 +3632,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3734,8 +3734,8 @@
       "name": "Adjuntar registros a la nueva hoja3",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3777,8 +3777,8 @@
       "executeOnce": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3862,8 +3862,8 @@
       "name": "Obtener datos del Sheet2",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3951,8 +3951,8 @@
       "name": "Adjuntar registros a la nueva hoja4",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -3978,8 +3978,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -4008,8 +4008,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "DLJrnOoexWAgefO7",
-          "name": "Google Sheets account 2"
+          "id": "OZphxB9myNRYFBqO",
+          "name": "Accounts Sheets"
         }
       }
     },
@@ -4051,8 +4051,8 @@
       "name": "OpenAI Chat Model2",
       "credentials": {
         "openAiApi": {
-          "id": "nTZdnMbAhwXf9Dp6",
-          "name": "OpenAi account 2"
+          "id": "NE21aoPqOZ1dnzHF",
+          "name": "OpenAI"
         }
       }
     },
@@ -6179,7 +6179,7 @@
     ],
     "Webhook": []
   },
-  "versionId": "e72c725c-2551-4ea6-8f25-f4182c074690",
+  "versionId": "391f502c-2fe5-4ecb-b943-f51f41ac32cb",
   "triggerCount": 1,
   "tags": []
 }
