@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-12-15T20:53:57.251Z",
-  "updatedAt": "2026-02-10T02:16:46.259Z",
+  "updatedAt": "2026-02-19T20:48:57.751Z",
   "id": "qWION5qQh6pKp70E",
   "name": "Pruebas infografías",
   "active": false,
@@ -11,8 +11,8 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        320,
-        1056
+        288,
+        1456
       ],
       "id": "d9615727-57da-476c-beb3-736de402786e",
       "name": "When clicking ‘Execute workflow’"
@@ -584,7 +584,8 @@
           "id": "nTZdnMbAhwXf9Dp6",
           "name": "OpenAi account 2"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -599,7 +600,8 @@
         1056
       ],
       "id": "b1ae03e0-c365-4805-93e1-08f8cf429825",
-      "name": "AI Agent3"
+      "name": "AI Agent3",
+      "disabled": true
     },
     {
       "parameters": {
@@ -612,7 +614,8 @@
         1056
       ],
       "id": "2a1eb3ec-e63d-4797-bd4f-812d97115f11",
-      "name": "Contenido slides1"
+      "name": "Contenido slides1",
+      "disabled": true
     },
     {
       "parameters": {
@@ -761,7 +764,65 @@
         1056
       ],
       "id": "1029df5b-e68d-4852-8f57-b6020d2e8eb0",
-      "name": "Obtener campos del formulario"
+      "name": "Obtener campos del formulario",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const prompt = $json.prompt || `\nCREATE AN IMAGE (generate the image directly, do not describe how to create it).\n\nVISUAL STYLE:\n\nSemi-realistic illustration, high detail\nClean lines, soft shading, professional\nNo grainy texture, slightly stylized\nWhite background (mandatory)\n\nCONTENT CONTEXT:\n\nMain topic: Principios Fundamentales de SSDLC\nSubtopic: Principios de diseño seguro\nTarget audience: Estudiantes universitarios\nCONCEPTUAL SOURCE TEXT (for semantic guidance only — DO NOT reproduce literally and DO NOT attempt to represent every concept individually):\n\n\"\"\n\nIMAGE INTERPRETATION INSTRUCTIONS:\n\nSynthesize the main ideas into a cohesive didactic visual composition\nRepresent relationships, processes, or structures in a clear academic way\nFocus on a strong central concept rather than multiple scattered elements\nDo NOT create a dense infographic\nDo NOT attempt to visualize every concept mentioned in the source text\nPrioritize conceptual clarity over quantity of elements\n\nTEXT USAGE RULES (if Spanish text appears in the image):\n\nNo sentences\nNo paragraphs\nLabels must be understandable independently\nPerfect Spanish orthography following RAE standards\nCorrect capitalization and accent marks\n\nCRITICAL RESTRICTIONS:\n\nNo extensive text\nNo long explanations inside the image\nNo animation instructions\n\nFORMAT:\n\nHorizontal 16:9 image\nWhite background\n`;\n\nconst body = {\n  contents: [\n    {\n      parts: [\n        {\n          text: prompt\n        }\n      ]\n    }\n  ],\n  generationConfig: {\n    responseModalities: [\"TEXT\", \"IMAGE\"],\n    imageConfig: {\n      aspectRatio: \"16:9\",\n      imageSize: \"1K\"\n    }\n  }\n};\n\nreturn [{ gemini: body }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        1456
+      ],
+      "id": "cb7141bf-ce09-432b-93c1-cef9c2074f9d",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyAWyDcgnNAmtMh7WvmrvsDThtjUvrTvgiU"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.gemini }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        704,
+        1456
+      ],
+      "id": "c8dad4a6-81f8-42d2-bac3-19c7820282d9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidate = $json.candidates[0];\nconst imagePart = candidate.content.parts.find(p => p.inlineData);\n\nreturn [\n  {\n    binary: {\n      image: {\n        data: imagePart.inlineData.data,\n        mimeType: imagePart.inlineData.mimeType,\n        fileName: \"generated.jpg\"\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        1456
+      ],
+      "id": "5b44b1c2-54a0-47f9-bcc8-529bcd758ecb",
+      "name": "Code5"
     }
   ],
   "connections": {
@@ -769,7 +830,7 @@
       "main": [
         [
           {
-            "node": "Obtener campos del formulario",
+            "node": "Code3",
             "type": "main",
             "index": 0
           }
@@ -1071,6 +1132,28 @@
         [
           {
             "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code5",
             "type": "main",
             "index": 0
           }
@@ -2777,7 +2860,7 @@
       }
     ]
   },
-  "versionId": "7a0ad406-5f15-4b3b-99ac-9ec7e02925e5",
+  "versionId": "a54839b7-625f-46df-bd9f-6c9d8483f146",
   "triggerCount": 0,
   "tags": []
 }
