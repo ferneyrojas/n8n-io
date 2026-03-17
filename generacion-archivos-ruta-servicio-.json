@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-21T23:47:55.084Z",
-  "updatedAt": "2026-02-11T23:28:56.032Z",
+  "updatedAt": "2026-03-17T14:28:55.592Z",
   "id": "JuPhn9ORyJZuyN0v",
   "name": "Generacion Archivos Ruta Servicio",
   "active": true,
@@ -20,7 +20,7 @@
       "typeVersion": 1.2,
       "position": [
         0,
-        0
+        -144
       ],
       "id": "ac86f2e6-c773-49b8-9639-d4ec9dd57208",
       "name": "Schedule Trigger"
@@ -34,7 +34,7 @@
       "typeVersion": 4.2,
       "position": [
         224,
-        0
+        -144
       ],
       "id": "eb27c446-1124-4d0a-a0b5-032e4326d2bd",
       "name": "infoDocentesClientesGeneral"
@@ -48,7 +48,7 @@
       "typeVersion": 4.2,
       "position": [
         448,
-        0
+        -144
       ],
       "id": "5fc1b60e-6cd0-4b7c-a8b5-5c1cd7dad87c",
       "name": "infoCursosDocentesClientes"
@@ -62,7 +62,7 @@
       "typeVersion": 4.2,
       "position": [
         672,
-        0
+        -144
       ],
       "id": "aa0278b5-2f65-4d8b-99e2-55bfbc0b34c7",
       "name": "infoClientesGeneral"
@@ -76,10 +76,52 @@
       "typeVersion": 4.2,
       "position": [
         896,
-        0
+        -144
       ],
       "id": "f4a9a87f-b319-4eb9-b18d-1e6c69a1ec1f",
       "name": "infoDocentesIngresos"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=envioNPS",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -144
+      ],
+      "id": "cd4da60b-67da-44a6-ac94-32a9bdb8b6d1",
+      "name": "Envios de NPS"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=scl",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        -144
+      ],
+      "id": "481f44cf-478d-4aa1-9d64-760a174f46e3",
+      "name": "suscriptores_x_cliente"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=solicitudesCli",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        -144
+      ],
+      "id": "cae4ab1a-3f6a-49db-9674-b5d20b3617f8",
+      "name": "Solicitudes Cliente"
     }
   ],
   "connections": {
@@ -126,6 +168,39 @@
           }
         ]
       ]
+    },
+    "infoDocentesIngresos": {
+      "main": [
+        [
+          {
+            "node": "Envios de NPS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envios de NPS": {
+      "main": [
+        [
+          {
+            "node": "suscriptores_x_cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "suscriptores_x_cliente": {
+      "main": [
+        [
+          {
+            "node": "Solicitudes Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -138,7 +213,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "a58a821a-7300-4881-8586-e7d788939f51",
+  "versionId": "9a04e6c3-0515-4035-9827-9bcdd4888c25",
   "triggerCount": 1,
   "tags": []
 }
