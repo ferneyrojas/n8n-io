@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-28T00:22:47.315Z",
-  "updatedAt": "2026-02-19T16:06:22.995Z",
+  "updatedAt": "2026-03-26T17:07:56.257Z",
   "id": "q8OwZG2ENnbPlAXH",
   "name": "Gemini",
   "active": false,
@@ -91,7 +91,8 @@
         896
       ],
       "id": "0bcacab0-8658-4420-8168-afd592fe888d",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "retryOnFail": true
     },
     {
       "parameters": {
@@ -721,7 +722,7 @@
       }
     ]
   },
-  "versionId": "eacca72a-895e-4104-a44d-be1ff5a38535",
+  "versionId": "4e8cd255-683f-40dc-86d3-d5833da9677d",
   "triggerCount": 0,
   "tags": []
 }
