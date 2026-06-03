@@ -1,21 +1,56 @@
 {
-  "createdAt": "2025-12-10T20:50:21.112Z",
-  "updatedAt": "2026-01-22T13:35:33.125Z",
-  "id": "0Tdc9j5x1FZAys6M",
+  "createdAt": "2026-01-23T16:30:43.193Z",
+  "updatedAt": "2026-06-03T15:48:37.610Z",
+  "id": "GyXgHsSxu92ENsMQ",
   "name": "Pertinencia",
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
+      "parameters": {
+        "url": "https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/json/recursosLM-all.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        -464,
-        -992
+        112,
+        800
       ],
-      "id": "2e6c10db-a1bc-4908-bd3e-b7d616331e26",
-      "name": "When clicking ‘Execute workflow’"
+      "id": "4928f641-0851-45d0-abe4-3c7ef38ff09e",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "q8OwZG2ENnbPlAXH",
+          "mode": "list",
+          "cachedResultName": "Gemini"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        896
+      ],
+      "name": "Call Gemini",
+      "id": "dce257d0-f682-49b1-a10d-2e0e1d4bcd7e",
+      "alwaysOutputData": true,
+      "executeOnce": false
     },
     {
       "parameters": {
@@ -24,31 +59,67 @@
             {
               "id": "4e84038f-977f-4c4d-8c69-197c37503c0d",
               "name": "NOMBRE_MATERIA",
-              "value": "MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO",
+              "value": "={{$json[\"body\"][\"nombre_materia\"]}}",
               "type": "string"
             },
             {
               "id": "1dd1a115-391a-4795-8ea7-f965060c573f",
               "name": "DESCRIPCIÓN_GENERAL",
-              "value": "Materia fundamental que busca mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.",
+              "value": "={{$json[\"body\"][\"descripcion_general\"]}}",
               "type": "string"
             },
             {
               "id": "37c19c7e-321d-48c5-b0a6-ecab6632a099",
               "name": "COMPETENCIAS",
-              "value": "Analizar métodos y procesos productivos. Aplicar técnicas de medición del trabajo. Identificar mejoras en actividades repetitivas.",
+              "value": "={{$json[\"body\"][\"competencias\"]}}",
               "type": "string"
             },
             {
               "id": "f4b5f3aa-6574-469e-a9f8-4390d3b28f37",
               "name": "TEMARIO",
-              "value": "Introducción al estudio del trabajo\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\nAnálisis de métodos\nMedición del trabajo\nCronometraje y técnicas PMTS\nMuestreo del trabajo\nBalanceo de líneas\nErgonomía básica aplicada al estudio del trabajo\nImplementación de mejoras",
+              "value": "={{$json[\"body\"][\"temario\"]}}",
               "type": "string"
             },
             {
               "id": "c5a9233c-ff73-403f-81bf-324df4d72af5",
               "name": "PALABRAS_CLAVE_SYLLABUS",
-              "value": "métodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo.",
+              "value": "={{$json[\"body\"][\"palabras_clave_syllabus\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "873727e9-a1ad-4042-9bd3-4347d25a24ec",
+              "name": "id_usuario",
+              "value": "391684",
+              "type": "string"
+            },
+            {
+              "id": "f8c7ad4e-05fe-47e9-a2ec-cf8c9628a375",
+              "name": "id_institucion",
+              "value": "30500",
+              "type": "string"
+            },
+            {
+              "id": "3d2ab317-9367-4be9-b990-8b43c7db2358",
+              "name": "PROGRAMA_ACADEMICO",
+              "value": "={{$json[\"body\"][\"programa_academico\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "2df14413-980e-4cdc-9f1b-1f7eb6222fa2",
+              "name": "TERMINOS_EXCLUYENTES",
+              "value": "={{$json[\"body\"][\"terminos_excluyentes\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "fd87d898-2cfe-4fd9-9cec-48af0ddee407",
+              "name": "EMAIL_DOCENTE",
+              "value": "={{$json[\"body\"][\"email_docente\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "2ad39173-63ad-409e-9235-efac62050013",
+              "name": "ID_KEY",
+              "value": "={{$json[\"body\"][\"id_key\"]}}",
               "type": "string"
             }
           ]
@@ -58,510 +129,316 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -240,
-        -992
+        -336,
+        800
       ],
-      "id": "283ef735-c1c1-4b8c-ac0e-2c660e260248",
-      "name": "Edit Fields"
+      "id": "32be7167-7ba8-464b-8559-8176f6230379",
+      "name": "Edit Fields2"
     },
     {
       "parameters": {
-        "jsCode": "let raw = $input.first().json.content.parts[0].text || \"\";\n\n// Limpia los backticks y etiquetas ```json\nraw = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Convierte a JSON\nlet parsed = JSON.parse(raw);\n\nreturn parsed;"
+        "jsCode": "const BATCH_SIZE = 15;\n\n// 1. Los recursos SON los items\nconst resources = items.map(i => i.json);\n\nif (!Array.isArray(resources) || resources.length === 0) {\n  throw new Error(\"No se encontró un array de recursos\");\n}\n\nconsole.log(`=== CREANDO BATCHES ===`);\nconsole.log(`Total recursos: ${resources.length}`);\nconsole.log(`Tamaño de batch: ${BATCH_SIZE}`);\nconsole.log(`Batches esperados: ${Math.ceil(resources.length / BATCH_SIZE)}`);\n\n// 2. JSON → CSV\nfunction toCSV(arr) {\n  const headers = [\n    \"ID\", \"titulo\", \"resumen\", \"tipo\", \n    \"categoria\", \"subcategoria\", \"palabrasClaves\"\n  ];\n  \n  const rows = arr.map(o => \n    headers\n      .map(h => `\"${(o[h] ?? \"\").toString().replace(/\"/g, '\"\"')}\"`)\n      .join(',')\n  );\n  \n  return [headers.join(','), ...rows].join('\\n');\n}\n\n// 3. Crear array de objetos output\nconst output = [];\n\nfor (let i = 0; i < resources.length; i += BATCH_SIZE) {\n  const batch = resources.slice(i, i + BATCH_SIZE);\n  const batchNumber = Math.floor(i / BATCH_SIZE) + 1;\n  const batchCSV = toCSV(batch);\n  \n  // Obtener los valores del syllabus\n  const nombreMateria = $('Edit Fields2').item.json.NOMBRE_MATERIA;\n  const descripcionGeneral = $('Edit Fields2').item.json['DESCRIPCIÓN_GENERAL'];\n  const competencias = $('Edit Fields2').item.json.COMPETENCIAS;\n  const temario = $('Edit Fields2').item.json.TEMARIO;\n  const palabrasClave = $('Edit Fields2').item.json.PALABRAS_CLAVE_SYLLABUS;\n  const programaAcademico = $('Edit Fields2').item.json.PROGRAMA_ACADEMICO || \"No especificado\";\n  const terminosExcluyentes = $('Edit Fields2').item.json.TERMINOS_EXCLUYENTES || \"\";\n  \n  // Construir la sección de términos excluyentes solo si hay valores\n  const terminosExcluyentesSection = terminosExcluyentes && terminosExcluyentes.trim() !== \"\" \n    ? `## TÉRMINOS EXCLUYENTES ⛔\n**NO recomendes recursos que contengan estos términos en su título, resumen o palabras clave o que estén directamente relacionados con estos:**\n${terminosExcluyentes.split(',').map(t => `- ${t.trim()}`).join('\\n')}\n\nSi un recurso está relacionado con alguno de estos términos, su pertinencia debe ser 0 o máximo 2, y la justificación debe mencionar que está excluido por contener términos no deseados.\n\\n`\n    : \"\";\n  \n  const prompt = `Evalúa la pertinencia de ${batch.length} recursos educativos frente al syllabus.\n\n## SYLLABUS DE LA MATERIA\n\n**Nombre:** ${nombreMateria}\n**Descripción:** ${descripcionGeneral}\n**Competencias:** ${competencias}\n**Temario:** ${temario}\n**Palabras clave del curso:** ${palabrasClave}\n**Programa académico:** ${programaAcademico}\n\n## CONTEXTO DEL PROGRAMA ACADÉMICO 🎓\n\nEl curso pertenece al programa de **${programaAcademico}**. Este contexto es CRÍTICO para evaluar la profundidad y exigencia esperada:\n- Los recursos deben estar alineados con el nivel de rigor propio de este programa\n- La misma temática puede requerir mayor profundidad teórica o aplicada según la carrera\n- Considera si el recurso es apropiado para la formación específica de este programa\n\n${terminosExcluyentesSection}\n## CRITERIOS DE EVALUACIÓN (califica 0-10 cada uno)\n\n- **C1** (25%): Alineación con el objetivo general\n- **C2** (25%): Cobertura de competencias del curso\n- **C3** (20%): Correspondencia con el temario\n- **C4** (15%): Coincidencia semántica de palabras clave\n- **C5** (10%): Adecuación del tipo de recurso al aprendizaje práctico\n- **C6** (5%): Aplicabilidad en contextos productivos reales\n\n**Fórmula de pertinencia:**\nPertinencia = (C1×0.25) + (C2×0.25) + (C3×0.20) + (C4×0.15) + (C5×0.10) + (C6×0.05)\n\nRedondea el resultado final a un número entero del 0 al 10.\n\n## RECURSOS A EVALUAR (${batch.length} TOTAL)\n\n⚠️ **CRÍTICO: Debes evaluar EXACTAMENTE ${batch.length} recursos. No omitas ninguno.**\n\n\\`\\`\\`csv\n${batchCSV}\n\\`\\`\\`\n\n## CONSTRUCCIÓN DE LA JUSTIFICACIÓN\n\nCada justificación debe tener 40-60 palabras e incluir:\n1. Qué contenido específico aporta (conceptos, técnicas, herramientas)\n2. Conexión explícita con tema/unidad/competencia del syllabus\n3. Utilidad práctica en el contexto de la materia\n${terminosExcluyentes ? \"4. Si aplica, mención explícita de por qué fue excluido por términos no deseados\" : \"\"}\n\n## FORMATO DE RESPUESTA\n\nResponde con un objeto JSON que contenga EXACTAMENTE ${batch.length} recursos evaluados.\n\n**ESTRUCTURA EXACTA (no alteres nombres de llaves):**\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_DEL_RECURSO\",\n      \"titulo\": \"TÍTULO_DEL_RECURSO\",\n      \"tipo\": \"TIPO_DEL_RECURSO\",\n      \"palabraClave\": \"UNA_PALABRA_CLAVE\",\n      \"justificacion\": \"Texto de 40-60 palabras\",\n      \"pertinencia\": 8,\n      \"criterios\": {\n        \"c1\": 9,\n        \"c2\": 8,\n        \"c3\": 7,\n        \"c4\": 8,\n        \"c5\": 9,\n        \"c6\": 7\n      }\n    }\n  ]\n}\n\n## VALIDACIÓN ANTES DE RESPONDER\n\n✅ Cuenta que el array \"resultados\" tenga ${batch.length} elementos\n✅ Verifica que cada objeto tenga las 7 llaves: id, titulo, tipo, palabraClave, justificacion, pertinencia, criterios\n✅ Verifica que \"criterios\" tenga las 6 llaves: c1, c2, c3, c4, c5, c6\n✅ Verifica que \"pertinencia\" sea un número entero entre 0 y 10\n✅ Verifica que todos los c1-c6 sean números enteros entre 0 y 10\n✅ Verifica que no haya comas mal colocadas en el JSON\n\n## RESTRICCIONES OBLIGATORIAS\n\n- Devuelve ÚNICAMENTE JSON válido RFC 8259\n- NO incluyas markdown (\\`\\`\\`json), texto explicativo, ni comentarios\n- Comienza tu respuesta directamente con el carácter {\n- NO incluyas NADA antes ni después del JSON\n- Usa solo información del syllabus, no inventes datos\n- Cada recurso debe evaluarse de forma independiente\n${terminosExcluyentes ? \"- Si un recurso contiene términos excluyentes, su pertinencia NO debe superar 2\" : \"\"}\n\n**RECORDATORIO: Debes incluir exactamente ${batch.length} recursos evaluados.**`;\n  \n  // Envolver el objeto interno en un objeto con clave 'json' como n8n requiere\n  output.push({\n    json: {\n      numero_ejecucion: $('Crypto').first().json.data,\n      chatInput: prompt\n    }\n  });\n}\n\n// Retornar array de objetos envueltos en {json: ...}\nreturn output;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -240,
-        -320
+        352,
+        800
       ],
-      "id": "52c48302-68d8-4345-a434-8a922e9117a0",
-      "name": "Code"
+      "id": "24a356fe-872d-40cc-8bb2-fbb55ad3ce06",
+      "name": "Code2",
+      "executeOnce": false
     },
     {
       "parameters": {
-        "operation": "toJson",
-        "options": {}
+        "action": "generate"
       },
-      "type": "n8n-nodes-base.convertToFile",
-      "typeVersion": 1.1,
-      "position": [
-        -16,
-        -320
-      ],
-      "id": "bba452aa-2967-4bc7-966d-1f0b354d0a2d",
-      "name": "Convert to File2"
-    },
-    {
-      "parameters": {
-        "name": "pertinencia-lab-all.json",
-        "driveId": {
-          "__rl": true,
-          "value": "My Drive",
-          "mode": "list",
-          "cachedResultName": "My Drive",
-          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
-          "mode": "list",
-          "cachedResultName": "TMP",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        208,
-        -320
-      ],
-      "id": "7497ac86-b872-4eaf-a096-fe4f739e7fb1",
-      "name": "Upload file",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "X8Q7VA77D1tpqDJZ",
-          "name": "Auth Drive - ferneyrojas@gmail.com"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "let raw = $input.first().json.content.parts[0].text || \"\";\n\n// Limpia los backticks y etiquetas ```json\nraw = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Convierte a JSON\nlet parsed = JSON.parse(raw);\n\nreturn parsed;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -240,
-        -544
-      ],
-      "id": "8f6bf098-36f5-45f3-9aae-9483c6ab318b",
-      "name": "Code1"
-    },
-    {
-      "parameters": {
-        "operation": "toJson",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.convertToFile",
-      "typeVersion": 1.1,
-      "position": [
-        -16,
-        -544
-      ],
-      "id": "f8fbb833-6c60-4dda-9031-9e99096a8e7c",
-      "name": "Convert to File3"
-    },
-    {
-      "parameters": {
-        "name": "pertinencia-info.json",
-        "driveId": {
-          "__rl": true,
-          "value": "My Drive",
-          "mode": "list",
-          "cachedResultName": "My Drive",
-          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
-          "mode": "list",
-          "cachedResultName": "TMP",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        208,
-        -544
-      ],
-      "id": "6b958f81-b0c6-4024-b44b-e6ae73d68158",
-      "name": "Upload file1",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "X8Q7VA77D1tpqDJZ",
-          "name": "Auth Drive - ferneyrojas@gmail.com"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "let raw = $input.first().json.content.parts[0].text || \"\";\n\n// Limpia los backticks y etiquetas ```json\nraw = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Convierte a JSON\nlet parsed = JSON.parse(raw);\n\nreturn parsed;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -240,
-        -768
-      ],
-      "id": "dede64c3-03da-4cd8-a6c9-c7014421830b",
-      "name": "Code2"
-    },
-    {
-      "parameters": {
-        "operation": "toJson",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.convertToFile",
-      "typeVersion": 1.1,
-      "position": [
-        -16,
-        -768
-      ],
-      "id": "0c628fc7-1b31-4cf1-8f46-725ddf01fb30",
-      "name": "Convert to File"
-    },
-    {
-      "parameters": {
-        "name": "pertinencia-all.json",
-        "driveId": {
-          "__rl": true,
-          "value": "My Drive",
-          "mode": "list",
-          "cachedResultName": "My Drive",
-          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
-          "mode": "list",
-          "cachedResultName": "TMP",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        208,
-        -768
-      ],
-      "id": "876d2d82-f303-4abc-90f9-a09188035848",
-      "name": "Upload file2",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "X8Q7VA77D1tpqDJZ",
-          "name": "Auth Drive - ferneyrojas@gmail.com"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "document",
-        "modelId": {
-          "__rl": true,
-          "value": "models/gemini-flash-lite-latest",
-          "mode": "list",
-          "cachedResultName": "models/gemini-flash-lite-latest"
-        },
-        "text": "=Quiero que actúes como un evaluador académico experto en diseño instruccional. Debes analizar un archivo CSV que contiene recursos educativos con las columnas: ID, título, resumen, tipo, categoría, subcategoría, palabrasClaves.\n\nTu tarea es evaluar la pertinencia de cada recurso frente al SYLLABUS de una materia.\n\nEntradas del SYLLABUS\n\nNombre de la materia: {{ $('Edit Fields').item.json.NOMBRE_MATERIA }}\n\nDescripción general: {{ $json['DESCRIPCIÓN_GENERAL'] }}\n\nCompetencias: {{ $('Edit Fields').item.json.COMPETENCIAS }}\n\nTemario (temas y subtemas): {{ $('Edit Fields').item.json.TEMARIO }}\n\nPalabras clave del curso: {{ $('Edit Fields').item.json.PALABRAS_CLAVE_SYLLABUS }}\n\nInstrucciones de evaluación\n\nAnaliza cada fila del CSV usando:\n\ntítulo\n\nresumen\n\ncategoría / subcategoría\n\npalabrasClaves\n\nCompara cada recurso contra:\n\nobjetivo general de la materia\n\ncompetencias\n\ntemario\n\npalabras clave del SYLLABUS\n\nIncluye solo recursos pertinentes.\n\nAsigna una calificación de pertinencia de 1 a 10 (1 = baja, 10 = máxima).\n\nSelecciona una única palabra clave del recurso como la más representativa para justificar su pertinencia.\n\nFormato ESTRICTO de salida (JSON)\n\nDevuelve únicamente un JSON válido con esta estructura:\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_RECURSO\",\n      \"titulo\": \"TÍTULO\",\n      \"tipo\": \"TIPO\",\n      \"palabraClave\": \"PALABRA_CLAVE_SELECCIONADA\",\n      \"justificacion\": \"Texto breve de máximo 20 palabras que explique la pertinencia incluyendo la palabra clave.\",\n      \"pertinencia\": 1\n    }\n  ]\n}\n\n\nReglas obligatorias:\n\nNo incluyas texto adicional fuera del JSON.\n\nNo inventes datos.\n\nNo incluyas recursos irrelevantes con una pertinencia menor a 6.\n\nLa justificación debe ser clara, corta y contener la palabra clave seleccionada.",
-        "documentUrls": "https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/csv/recursosLM.csv",
-        "options": {
-          "maxOutputTokens": {}
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "type": "n8n-nodes-base.crypto",
       "typeVersion": 1,
       "position": [
-        -464,
-        -768
+        -112,
+        800
       ],
-      "id": "46f7491a-425b-4226-bde9-610e43bf7092",
-      "name": "Analyze All Recursos",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "yWbztL8O1z9zkmV3",
-          "name": "N8N-Lugnia-2"
-        }
-      }
+      "id": "bfc96994-fb27-48b3-a70b-27c81f4936e3",
+      "name": "Crypto",
+      "executeOnce": true
     },
     {
       "parameters": {
-        "resource": "document",
-        "modelId": {
-          "__rl": true,
-          "value": "models/gemini-flash-lite-latest",
-          "mode": "list",
-          "cachedResultName": "models/gemini-flash-lite-latest"
-        },
-        "text": "=Quiero que actúes como un evaluador académico experto en diseño instruccional. Debes analizar un archivo CSV que contiene recursos educativos con las columnas: ID, título, resumen, tipo, categoría, subcategoría, palabrasClaves.\n\nTu tarea es evaluar la pertinencia de cada recurso frente al SYLLABUS de una materia.\n\nEntradas del SYLLABUS\n\nNombre de la materia: {{ $('Edit Fields').item.json.NOMBRE_MATERIA }}\n\nDescripción general: {{ $json['DESCRIPCIÓN_GENERAL'] }}\n\nCompetencias: {{ $('Edit Fields').item.json.COMPETENCIAS }}\n\nTemario (temas y subtemas): {{ $('Edit Fields').item.json.TEMARIO }}\n\nPalabras clave del curso: {{ $('Edit Fields').item.json.PALABRAS_CLAVE_SYLLABUS }}\n\nInstrucciones de evaluación\n\nAnaliza cada fila del CSV usando:\n\ntítulo\n\nresumen\n\ncategoría / subcategoría\n\npalabrasClaves\n\nCompara cada recurso contra:\n\nobjetivo general de la materia\n\ncompetencias\n\ntemario\n\npalabras clave del SYLLABUS\n\nIncluye solo recursos pertinentes.\n\nAsigna una calificación de pertinencia de 1 a 10 (1 = baja, 10 = máxima).\n\nSelecciona una única palabra clave del recurso como la más representativa para justificar su pertinencia.\n\nFormato ESTRICTO de salida (JSON)\n\nDevuelve únicamente un JSON válido con esta estructura:\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_RECURSO\",\n      \"titulo\": \"TÍTULO\",\n      \"tipo\": \"TIPO\",\n      \"palabraClave\": \"PALABRA_CLAVE_SELECCIONADA\",\n      \"justificacion\": \"Texto breve de máximo 20 palabras que explique la pertinencia incluyendo la palabra clave.\",\n      \"pertinencia\": 1\n    }\n  ]\n}\n\n\nReglas obligatorias:\n\nNo incluyas texto adicional fuera del JSON.\n\nNo inventes datos.\n\nNo incluyas recursos irrelevantes con una pertinencia menor a 6.\n\nLa justificación debe ser clara, corta y contener la palabra clave seleccionada.",
-        "documentUrls": "https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/csv/recursosLM-info.csv",
-        "options": {
-          "maxOutputTokens": {}
-        }
+        "amount": 50
       },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
       "position": [
-        -464,
-        -544
+        1216,
+        800
       ],
-      "id": "6132ba7f-6ca7-4a40-98ee-210e78dc837f",
-      "name": "Analyze Infografias",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "yWbztL8O1z9zkmV3",
-          "name": "N8N-Lugnia-2"
-        }
-      }
+      "id": "f581d510-e031-4a49-9127-ded1c1db4b97",
+      "name": "Wait",
+      "webhookId": "9a28933c-bc0c-4dfa-b85c-91e5d9037cd5"
     },
     {
       "parameters": {
-        "resource": "document",
-        "modelId": {
-          "__rl": true,
-          "value": "models/gemini-2.5-flash",
-          "mode": "list",
-          "cachedResultName": "models/gemini-2.5-flash"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "53689e84-8f8c-47d3-a5ad-9f86385666ef",
+              "leftValue": "={{$runIndex}}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "17dd4038-5448-439c-92b3-bdd04d444659",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 715,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
         },
-        "text": "=Actúa como un evaluador académico experto en diseño instruccional y evaluación curricular.\nTu tarea es evaluar la pertinencia de recursos educativos contenidos en un archivo CSV frente al SYLLABUS de una materia, utilizando criterios ponderados para calcular un valor único de pertinencia.\n\nContexto y Rol\n\nEres responsable de analizar recursos educativos y determinar su alineación curricular con la asignatura MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO, garantizando coherencia pedagógica, relevancia temática y aplicabilidad práctica.\n\nEntrada 1: Archivo CSV\n\nEl archivo CSV contiene las siguientes columnas:\n\nID\n\ntitulo\n\nresumen\n\ntipo\n\ncategoria\n\nsubcategoria\n\npalabrasClaves\n\nCada fila representa un recurso educativo independiente.\n\nEntrada 2: SYLLABUS de la materia\n\nNombre: MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO\n\nDescripción general:\nMateria orientada a mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.\n\nCompetencias:\n\nAnalizar métodos y procesos productivos\n\nAplicar técnicas de medición del trabajo\n\nIdentificar mejoras en actividades repetitivas\n\nTemario:\n\nIntroducción al estudio del trabajo\n\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\n\nAnálisis de métodos\n\nMedición del trabajo\n\nCronometraje y técnicas PMTS\n\nMuestreo del trabajo\n\nBalanceo de líneas\n\nErgonomía básica aplicada\n\nImplementación de mejoras\n\nPalabras clave del curso:\nmétodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo\n\nCriterios de evaluación (con pesos)\n\nEvalúa cada recurso con una calificación de 0 a 10 en cada criterio:\n\n- Alineación con el objetivo general (25%)\n- Cobertura de competencias del curso (25%)\n- Correspondencia con el temario (20%)\n- Coincidencia semántica de palabras clave (15%)\n- Adecuación del tipo de recurso al aprendizaje práctico (10%)\n- Aplicabilidad en contextos productivos reales (5%)\n\nCálculo de pertinencia final\n\nCalcula el valor único de pertinencia usando la fórmula:\n\nPertinencia=(C1×0.25)+(C2×0.25)+(C3×0.20)+(C4×0.15)+(C5×0.10)+(C6×0.05)\n\nRedondea el resultado final a un número entero del 1 al 10.\n\nReglas de selección\n\nIncluye todos los recursos\n\nNo inventes información\n\nUsa únicamente datos presentes en el CSV\n\nSelecciona una única palabra clave del recurso como la más representativa de su pertinencia\n\nFormato ESTRICTO de salida (JSON)\n\nDevuelve únicamente un JSON válido con la siguiente estructura:\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_RECURSO\",\n      \"titulo\": \"TÍTULO\",\n      \"tipo\": \"TIPO\",\n      \"palabraClave\": \"PALABRA_CLAVE_SELECCIONADA\",\n      \"justificacion\": \"Texto breve (máx. 20 palabras) que explique la pertinencia e incluya la palabra clave.\",\n      \"pertinencia\": \"\"pertinencia\"\n      \"criterios\": \"c1,c2,c3,c4,c5,c6\"\n    }\n  ]\n}\n\nRestricciones obligatorias\n\nNo incluyas texto fuera del JSON\n\nIncluye todos los recursos\n\nLa justificación debe ser clara, concisa y contener la palabra clave seleccionada si aplica\n\nEl JSON debe ser sintácticamente válido\n\nEvalúa cada fila del CSV de forma independiente y objetiva siguiendo estrictamente estos criterios.",
-        "documentUrls": "https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/csv/recursosLM-lab.csv",
-        "options": {
-          "maxOutputTokens": {}
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
-      "typeVersion": 1,
-      "position": [
-        -464,
-        -320
-      ],
-      "id": "51a4a6e7-3186-477a-aa10-1b90656c02b6",
-      "name": "Analyze Labs",
-      "retryOnFail": false,
-      "credentials": {
-        "googlePalmApi": {
-          "id": "yWbztL8O1z9zkmV3",
-          "name": "N8N-Lugnia-2"
-        }
-      }
-    },
-    {
-      "parameters": {
         "options": {}
       },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
-        208,
-        -992
+        1712,
+        800
       ],
-      "id": "99ec16b9-f5fa-412c-870a-2627545ba993",
-      "name": "Loop Over Items"
+      "id": "2d4e902c-b9a7-48d3-b135-e0de416466b9",
+      "name": "If"
     },
     {
       "parameters": {
-        "url": "=https://api.virtualpro.co/api/bigquery/consultar_query?consulta=recursosLM-gen&param1={{ $json.type }}",
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1712,
+        1072
+      ],
+      "id": "d31c24a5-b1e1-47f6-8832-5613b1fffa6f",
+      "name": "Wait1",
+      "webhookId": "ba4dc568-374b-4d01-a4c3-a4ef4b1f7f13"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.virtualpro.co/api/prc-pertinencia/ejecucion/{{ $('Crypto').first().json.data }}/count",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        448,
-        -1056
+        1456,
+        800
       ],
-      "id": "6927072e-185b-4bd3-89d3-ffbc6adafc3d",
-      "name": "HTTP Request",
-      "disabled": true
+      "id": "731c4fdd-d73e-41a5-9d9e-634ab41d4da2",
+      "name": "HTTP Request5"
     },
     {
       "parameters": {
-        "jsCode": "const miArreglo = ['show'];\nreturn miArreglo.map(item => ({ json: { type: item } }));"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0500f5e5-ff18-435c-beba-2a8def55f4e7",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 715,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1984,
+        624
+      ],
+      "id": "a88915d7-aadd-4647-bb9c-81e180609e94",
+      "name": "If1",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomamos el JSON completo (ya agregado)\nconst data = items[0].json;\n\n// Obtenemos el nombre de la materia\nlet nombreMateria = $('Edit Fields2').first().json.NOMBRE_MATERIA;\n\n// Normalizamos el nombre:\n// - minúsculas\n// - sin acentos\n// - espacios a \"_\"\n// - solo letras, números y \"_\"\nconst safeName = nombreMateria\n  .toLowerCase()\n  .normalize('NFD')                  // separa acentos\n  .replace(/[\\u0300-\\u036f]/g, '')   // elimina acentos\n  .replace(/\\s+/g, '_')              // espacios → _\n  .replace(/[^a-z0-9_]/g, '');       // limpia caracteres raros\n\n// Convertimos el JSON a string\nconst jsonString = JSON.stringify(data, null, 2);\n\n// Creamos el archivo binario\nconst buffer = Buffer.from(jsonString, 'utf8');\n\n// Nombre final del archivo\nconst fileName = `${safeName}.json`;\n\nreturn [\n  {\n    json: {\n      filename: fileName\n    },\n    binary: {\n      file: {\n        data: buffer,\n        mimeType: 'application/json',\n        fileName\n      }\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -16,
-        -992
+        2640,
+        432
       ],
-      "id": "a1e078ed-e83d-460e-ae28-aa8ed59e7678",
-      "name": "DefineTypes"
+      "id": "2a27150f-e272-4b5e-aac6-481be0f5fb4c",
+      "name": "Code7",
+      "executeOnce": false
     },
     {
       "parameters": {
-        "operation": "toJson",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.convertToFile",
-      "typeVersion": 1.1,
-      "position": [
-        1104,
-        -1056
-      ],
-      "id": "e1eb44e4-3653-40ff-9160-2819b31ac528",
-      "name": "Convert to File4"
-    },
-    {
-      "parameters": {
-        "name": "=pertinencia-{{ $('Loop Over Items').item.json.type }}-all.json ",
-        "driveId": {
-          "__rl": true,
-          "value": "My Drive",
-          "mode": "list",
-          "cachedResultName": "My Drive",
-          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM",
-          "mode": "list",
-          "cachedResultName": "TMP",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1rsgMbG5Mh2fAWahwJkO4auJwZpWTa6TM"
+        "method": "POST",
+        "url": "https://api.virtualpro.co/api/uploadFile",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "bucket",
+              "value": "bucketvirtualpro"
+            },
+            {
+              "name": "directory",
+              "value": "=pertinencia/{{ $('Edit Fields2').first().json.id_institucion }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "file"
+            }
+          ]
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        1328,
-        -992
+        2880,
+        432
       ],
-      "id": "8c46717a-65f3-412f-892c-aa7e826ab061",
-      "name": "Upload file3",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "X8Q7VA77D1tpqDJZ",
-          "name": "Auth Drive - ferneyrojas@gmail.com"
-        }
-      }
+      "id": "8378e773-da13-430b-9645-65d3e55ed0fc",
+      "name": "HTTP Request6"
     },
     {
       "parameters": {
-        "resource": "document",
-        "modelId": {
-          "__rl": true,
-          "value": "models/gemini-2.5-flash",
-          "mode": "list",
-          "cachedResultName": "models/gemini-2.5-flash"
-        },
-        "text": "=Actúa como un evaluador académico experto en diseño instruccional y evaluación curricular.\nTu tarea es evaluar la pertinencia de recursos educativos contenidos en un archivo CSV frente al SYLLABUS de una materia, utilizando criterios ponderados para calcular un valor único de pertinencia.\n\nContexto y Rol\n\nEres responsable de analizar recursos educativos y determinar su alineación curricular con la asignatura MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO, garantizando coherencia pedagógica, relevancia temática y aplicabilidad práctica.\n\nEntrada 1: Archivo CSV\n\nEl archivo CSV contiene las siguientes columnas:\n\nID\n\ntitulo\n\nresumen\n\ntipo\n\ncategoria\n\nsubcategoria\n\npalabrasClaves\n\nCada fila representa un recurso educativo independiente.\n\nEntrada 2: SYLLABUS de la materia\n\nNombre: MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO\n\nDescripción general:\nMateria orientada a mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.\n\nCompetencias:\n\nAnalizar métodos y procesos productivos\n\nAplicar técnicas de medición del trabajo\n\nIdentificar mejoras en actividades repetitivas\n\nTemario:\n\nIntroducción al estudio del trabajo\n\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\n\nAnálisis de métodos\n\nMedición del trabajo\n\nCronometraje y técnicas PMTS\n\nMuestreo del trabajo\n\nBalanceo de líneas\n\nErgonomía básica aplicada\n\nImplementación de mejoras\n\nPalabras clave del curso:\nmétodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo\n\nCriterios de evaluación (con pesos)\n\nEvalúa cada recurso con una calificación de 0 a 10 en cada criterio:\n\n- Alineación con el objetivo general (25%)\n- Cobertura de competencias del curso (25%)\n- Correspondencia con el temario (20%)\n- Coincidencia semántica de palabras clave (15%)\n- Adecuación del tipo de recurso al aprendizaje práctico (10%)\n- Aplicabilidad en contextos productivos reales (5%)\n\nCálculo de pertinencia final\n\nCalcula el valor único de pertinencia usando la fórmula:\n\nPertinencia=(C1×0.25)+(C2×0.25)+(C3×0.20)+(C4×0.15)+(C5×0.10)+(C6×0.05)\n\nRedondea el resultado final a un número entero del 1 al 10.\n\nReglas de selección\n\nIncluye todos los recursos\n\nNo inventes información\n\nUsa únicamente datos presentes en el CSV\n\nSelecciona una única palabra clave del recurso como la más representativa de su pertinencia\n\nFormato ESTRICTO de salida (JSON)\n\nDevuelve únicamente un JSON válido con la siguiente estructura:\n\n{\n  \"resultados\": [\n    {\n      \"id\": \"ID_RECURSO\",\n      \"titulo\": \"TÍTULO\",\n      \"tipo\": \"TIPO\",\n      \"palabraClave\": \"PALABRA_CLAVE_SELECCIONADA\",\n      \"justificacion\": \"Texto breve (máx. 20 palabras) que explique la pertinencia e incluya la palabra clave.\",\n      \"pertinencia\": \"\"pertinencia\"\n      \"criterios\": \"c1,c2,c3,c4,c5,c6\"\n    }\n  ]\n}\n\nRestricciones obligatorias\n\nNo incluyas texto fuera del JSON\n\nIncluye todos los recursos\n\nLa justificación debe ser clara, concisa y contener la palabra clave seleccionada si aplica\n\nEl JSON debe ser sintácticamente válido\n\nEvalúa cada fila del CSV de forma independiente y objetiva siguiendo estrictamente estos criterios.",
-        "documentUrls": "=https://bucketvirtualpropublic.s3.us-east-1.amazonaws.com/data/csv/recursosLM-{{ $('DefineTypes').item.json.type }}.csv ",
+        "jsCode": "// Datos fijos desde otro nodo\nconst nombre_materia = $('Edit Fields2').first().json.NOMBRE_MATERIA;\nconst descripcion_general = $('Edit Fields2').first().json[\"DESCRIPCIÓN_GENERAL\"];\nconst competencias = $('Edit Fields2').first().json.COMPETENCIAS;\nconst temario = $('Edit Fields2').first().json.TEMARIO;\nconst palabras_clave = $('Edit Fields2').first().json.PALABRAS_CLAVE_SYLLABUS;\nconst id_usuario = $('Edit Fields2').first().json.id_usuario;\nconst id_institucion = $('Edit Fields2').first().json.id_institucion;\nconst programa_academico = $('Edit Fields2').first().json.PROGRAMA_ACADEMICO || \"\";\nconst terminos_excluyentes = $('Edit Fields2').first().json.TERMINOS_EXCLUYENTES || \"\";\nconst email_docente = $('Edit Fields2').first().json.EMAIL_DOCENTE || \"\";\n\n// Procesar todos los items de entrada\nconst processedItems = items.map(item => {\n  const {\n    c1, c2, c3, c4, c5, c6,\n    palabra_clave,\n    ...rest\n  } = item.json;\n\n  return {\n    ...rest,\n    palabraClave: palabra_clave,\n    criterios: {\n      c1,\n      c2,\n      c3,\n      c4,\n      c5,\n      c6\n    },\n    _processedAt: new Date().toISOString()\n  };\n});\n\n// Retornar UN solo item agregado\nreturn [\n  {\n    json: {\n      nombre_materia,\n      descripcion_general,\n      competencias,\n      temario,\n      palabras_clave,\n      id_usuario,\n      id_institucion,\n      programa_academico,\n      terminos_excluyentes,\n      email_docente,\n      items: processedItems\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2416,
+        432
+      ],
+      "id": "ce7d6e7c-8e92-4de1-a996-c29ebd0cede4",
+      "name": "Code",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "pertinencia",
+        "responseMode": "responseNode",
         "options": {
-          "maxOutputTokens": null
+          "allowedOrigins": "*"
         }
       },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        784
+      ],
+      "id": "ec343995-e03c-4297-b073-cddf5d6b509e",
+      "name": "Webhook",
+      "webhookId": "0d172027-1038-41ae-b780-5a92d34bfa89"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Formulario Syllabus</title>\n<script src=\"https://cdn.tailwindcss.com\"></script>\n\n<style>\n.spinner {\n  border: 2px solid transparent;\n  border-top-color: white;\n  border-radius: 9999px;\n  width: 1rem;\n  height: 1rem;\n  animation: spin 1s linear infinite;\n}\n\n@keyframes spin {\n  to { transform: rotate(360deg); }\n}\n\n/* Estilos para mensajes de error */\n.error-message {\n  color: #dc2626;\n  font-size: 0.875rem;\n  margin-top: 0.25rem;\n}\n\n.input-error {\n  border-color: #dc2626 !important;\n  background-color: #fef2f2 !important;\n}\n\n/* Estilo para tooltip de validación */\n.validation-hint {\n  font-size: 0.75rem;\n  color: #6b7280;\n  margin-top: 0.25rem;\n}\n</style>\n</head>\n\n<body class=\"bg-gray-100 min-h-screen flex items-center justify-center p-6\">\n\n<form\n  id=\"syllabusForm\"\n  method=\"POST\"\n  action=\"https://hpa.lugnia.com/webhook/pertinencia\"\n  class=\"w-full max-w-xl bg-white p-6 rounded-xl shadow space-y-4\"\n>\n\n<h1 class=\"text-xl font-bold text-gray-800\">\n  Recomendación de recursos con IA\n</h1>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Programa académico</label>\n  <input type=\"text\" name=\"programa_academico\" placeholder=\"Ej: Ingeniería de Sistemas, Tecnología en Desarrollo de Software\" class=\"w-full border rounded px-3 py-2\" required>\n</div>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Nombre de la materia</label>\n  <input type=\"text\" name=\"nombre_materia\" placeholder=\"Ej: Fundamentos de Programación\" class=\"w-full border rounded px-3 py-2\" required>\n</div>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Descripción general</label>\n  <textarea name=\"descripcion_general\" placeholder=\"Descripción de la asignatura\" class=\"w-full border rounded px-3 py-2\" rows=\"3\" required></textarea>\n</div>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Competencias / Resultados de aprendizaje <span class=\"text-gray-500 text-xs\">(opcional)</span></label>\n  <textarea name=\"competencias\" placeholder=\"Competencias y/o resultados de aprendizaje de la asignatura\" class=\"w-full border rounded px-3 py-2\" rows=\"3\"></textarea>\n</div>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Temario</label>\n  <textarea name=\"temario\" placeholder=\"Temas incluidos en la asignatura\" class=\"w-full border rounded px-3 py-2\" rows=\"4\" required></textarea>\n</div>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Palabras clave del syllabus</label>\n  <input type=\"text\" id=\"palabrasClave\" name=\"palabras_clave_syllabus\" placeholder=\"Ej: programación, algoritmos, estructuras de datos, POO, Java, variables, funciones, arrays\" class=\"w-full border rounded px-3 py-2\" required>\n  <div class=\"validation-hint\">Mínimo 8 palabras separadas por comas. Ej: palabra1, palabra2, palabra3...</div>\n  <div id=\"palabrasClaveError\" class=\"error-message\"></div>\n</div>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Términos excluyentes <span class=\"text-gray-500 text-xs\">(opcional)</span></label>\n  <input type=\"text\" id=\"terminosExcluyentes\" name=\"terminos_excluyentes\" placeholder=\"Ej: conceptos básicos, introducción, fundamentos\" class=\"w-full border rounded px-3 py-2\">\n  <div class=\"validation-hint\">Separar por comas si se incluyen varios términos</div>\n  <div id=\"terminosExcluyentesError\" class=\"error-message\"></div>\n</div>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Email docente</label>\n  <input type=\"email\" id=\"emailDocente\" name=\"email_docente\" placeholder=\"ejemplo@universidad.edu.co\" class=\"w-full border rounded px-3 py-2\" required>\n  <div id=\"emailDocenteError\" class=\"error-message\"></div>\n</div>\n\n<div>\n  <label class=\"block text-sm font-medium mb-1\">Llave del agente</label>\n  <input type=\"text\" id=\"idKey\" name=\"id_key\" placeholder=\"abc-123\" class=\"w-full border rounded px-3 py-2\" required>\n  <div id=\"idKeyError\" class=\"error-message\"></div>\n</div>\n\n<button\n  id=\"submitBtn\"\n  type=\"submit\"\n  class=\"w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg flex items-center justify-center gap-2\"\n>\n  <span id=\"btnText\">Analizar syllabus</span>\n  <span id=\"btnLoader\" class=\"hidden items-center gap-2\">\n    <span class=\"spinner\"></span>\n    Analizando...\n  </span>\n</button>\n\n</form>\n\n<script>\nconst form = document.getElementById(\"syllabusForm\");\nconst button = document.getElementById(\"submitBtn\");\nconst text = document.getElementById(\"btnText\");\nconst loader = document.getElementById(\"btnLoader\");\nconst palabrasClaveInput = document.getElementById(\"palabrasClave\");\nconst terminosExcluyentesInput = document.getElementById(\"terminosExcluyentes\");\nconst emailDocenteInput = document.getElementById(\"emailDocente\");\n\n// Función para validar palabras clave (mínimo 8, separadas por comas)\nfunction validarPalabrasClave(valor) {\n  if (!valor || valor.trim() === \"\") {\n    return { valido: false, mensaje: \"Las palabras clave son obligatorias\" };\n  }\n  \n  // Separar por comas y limpiar espacios\n  const palabras = valor.split(\",\").map(p => p.trim()).filter(p => p !== \"\");\n  \n  if (palabras.length < 8) {\n    return { valido: false, mensaje: `Debe ingresar mínimo 8 palabras clave. Actualmente tiene ${palabras.length}.` };\n  }\n  \n  // Verificar que no haya comas al inicio o final\n  if (valor.startsWith(\",\") || valor.endsWith(\",\")) {\n    return { valido: false, mensaje: \"No debe comenzar o terminar con coma\" };\n  }\n  \n  // Verificar que no haya comas seguidas\n  if (valor.includes(\",,\")) {\n    return { valido: false, mensaje: \"No debe tener comas consecutivas\" };\n  }\n  \n  return { valido: true, mensaje: \"\", palabras: palabras };\n}\n\n// Función para validar términos excluyentes (formato de comas)\nfunction validarTerminosExcluyentes(valor) {\n  if (!valor || valor.trim() === \"\") {\n    return { valido: true, mensaje: \"\" }; // Es opcional\n  }\n  \n  // Verificar que no haya comas al inicio o final\n  if (valor.startsWith(\",\") || valor.endsWith(\",\")) {\n    return { valido: false, mensaje: \"Los términos excluyentes no deben comenzar o terminar con coma\" };\n  }\n  \n  // Verificar que no haya comas seguidas\n  if (valor.includes(\",,\")) {\n    return { valido: false, mensaje: \"Los términos excluyentes no deben tener comas consecutivas\" };\n  }\n  \n  // Verificar que tenga al menos un término válido\n  const terminos = valor.split(\",\").map(t => t.trim()).filter(t => t !== \"\");\n  if (terminos.length === 0 && valor.trim() !== \"\") {\n    return { valido: false, mensaje: \"Formato inválido. Separe los términos con comas\" };\n  }\n  \n  return { valido: true, mensaje: \"\", terminos: terminos };\n}\n\n// Función para validar email\nfunction validarEmail(email) {\n  if (!email || email.trim() === \"\") {\n    return { valido: false, mensaje: \"El email del docente es obligatorio\" };\n  }\n  \n  // Expresión regular para validar email\n  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n  if (!emailRegex.test(email)) {\n    return { valido: false, mensaje: \"Ingrese un email válido (ejemplo@dominio.com)\" };\n  }\n  \n  return { valido: true, mensaje: \"\" };\n}\n\n// Función para mostrar error en un campo\nfunction mostrarError(input, mensaje, elementoError) {\n  if (mensaje) {\n    input.classList.add(\"input-error\");\n    elementoError.textContent = mensaje;\n  } else {\n    input.classList.remove(\"input-error\");\n    elementoError.textContent = \"\";\n  }\n}\n\n// Función para validar todos los campos\nfunction validarFormulario() {\n  let esValido = true;\n  \n  // Validar palabras clave\n  const palabrasClave = palabrasClaveInput.value;\n  const resultadoPalabras = validarPalabrasClave(palabrasClave);\n  mostrarError(palabrasClaveInput, resultadoPalabras.mensaje, document.getElementById(\"palabrasClaveError\"));\n  if (!resultadoPalabras.valido) esValido = false;\n  \n  // Validar términos excluyentes\n  const terminosExcluyentes = terminosExcluyentesInput.value;\n  const resultadoTerminos = validarTerminosExcluyentes(terminosExcluyentes);\n  mostrarError(terminosExcluyentesInput, resultadoTerminos.mensaje, document.getElementById(\"terminosExcluyentesError\"));\n  if (!resultadoTerminos.valido) esValido = false;\n  \n  // Validar email docente\n  const email = emailDocenteInput.value;\n  const resultadoEmail = validarEmail(email);\n  mostrarError(emailDocenteInput, resultadoEmail.mensaje, document.getElementById(\"emailDocenteError\"));\n  if (!resultadoEmail.valido) esValido = false;\n  \n  return esValido;\n}\n\n// Agregar validación en tiempo real para palabras clave\npalabrasClaveInput.addEventListener(\"input\", function() {\n  const valor = this.value;\n  const resultado = validarPalabrasClave(valor);\n  if (!resultado.valido && valor !== \"\") {\n    mostrarError(this, resultado.mensaje, document.getElementById(\"palabrasClaveError\"));\n  } else {\n    mostrarError(this, \"\", document.getElementById(\"palabrasClaveError\"));\n  }\n});\n\n// Agregar validación en tiempo real para términos excluyentes\nterminosExcluyentesInput.addEventListener(\"input\", function() {\n  const valor = this.value;\n  const resultado = validarTerminosExcluyentes(valor);\n  if (!resultado.valido && valor !== \"\") {\n    mostrarError(this, resultado.mensaje, document.getElementById(\"terminosExcluyentesError\"));\n  } else {\n    mostrarError(this, \"\", document.getElementById(\"terminosExcluyentesError\"));\n  }\n});\n\n// Agregar validación en tiempo real para email\nemailDocenteInput.addEventListener(\"input\", function() {\n  const valor = this.value;\n  const resultado = validarEmail(valor);\n  if (!resultado.valido && valor !== \"\") {\n    mostrarError(this, resultado.mensaje, document.getElementById(\"emailDocenteError\"));\n  } else {\n    mostrarError(this, \"\", document.getElementById(\"emailDocenteError\"));\n  }\n});\n\n// Validación antes de enviar el formulario\nform.addEventListener(\"submit\", (event) => {\n  // Validar el formulario\n  if (!validarFormulario()) {\n    event.preventDefault(); // Evitar envío si hay errores\n    return;\n  }\n  \n  // Bloquear botón\n  button.disabled = true;\n  button.classList.add(\"opacity-70\", \"cursor-not-allowed\");\n  \n  // Cambiar contenido\n  text.classList.add(\"hidden\");\n  loader.classList.remove(\"hidden\");\n  loader.classList.add(\"flex\");\n  \n  // Limpiar los valores de los campos de error visual antes de enviar\n  mostrarError(palabrasClaveInput, \"\", document.getElementById(\"palabrasClaveError\"));\n  mostrarError(terminosExcluyentesInput, \"\", document.getElementById(\"terminosExcluyentesError\"));\n  mostrarError(emailDocenteInput, \"\", document.getElementById(\"emailDocenteError\"));\n});\n\n// También validar al intentar enviar con Enter en cualquier campo\nconst todosLosInputs = form.querySelectorAll(\"input, textarea\");\ntodosLosInputs.forEach(input => {\n  input.addEventListener(\"keypress\", (event) => {\n    if (event.key === \"Enter\" && input.tagName !== \"TEXTAREA\") {\n      event.preventDefault();\n      if (validarFormulario()) {\n        form.dispatchEvent(new Event(\"submit\"));\n      }\n    }\n  });\n});\n\n// Validación adicional antes de enviar si se usa el botón con click\nbutton.addEventListener(\"click\", (event) => {\n  if (!validarFormulario()) {\n    event.preventDefault();\n    // Mostrar mensaje de error general\n    const primerError = document.querySelector(\".input-error\");\n    if (primerError) {\n      primerError.scrollIntoView({ behavior: \"smooth\", block: \"center\" });\n      primerError.focus();\n    }\n  }\n});\n</script>\n\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -336,
+        496
+      ],
+      "id": "dbdd0a14-a79d-4266-919b-552d7ff69e6f",
+      "name": "Formularios"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Infografía creada</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n\n<body class=\"bg-gray-100 flex items-center justify-center h-screen\">\n\n    <div class=\"bg-white p-8 rounded-xl shadow max-w-lg text-center\">\n\n        <h1 class=\"text-2xl font-bold text-green-700 mb-4\">\n             Syllabus analizado\n        </h1>\n\n        <p class=\"text-gray-700 mb-6\">\n            El análisis del Syllabus se ha completado exitosamente.  \n            Puedes acceder al análisis en el siguiente enlace:\n        </p>\n\n        <div class=\"flex justify-center gap-4\">\n            <a href=\"https://main.djwveruef4662.amplifyapp.com/?id_institucion={{$('Edit Fields2').first().json.id_institucion}}&syllabus={{ $('Code7').item.json.filename.replace('.json','') }}\"\n               target=\"_blank\" \n               rel=\"noopener noreferrer\"\n               class=\"bg-blue-600 text-white px-5 py-3 rounded-lg inline-block hover:bg-blue-700 transition\">\n               Ver análisis\n            </a>\n        </div>\n\n    </div>\n\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        3104,
+        432
+      ],
+      "id": "790c47a0-ed8a-4b2b-8df2-0a0036bf1afd",
+      "name": "Página de respuesta"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.virtualpro.co/api/pre-pertinencia-encabezado",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"pre_numero_ejecucion\": \"{{ $('Crypto').first().json.data }}\",\n  \"pre_email_docente\": \"{{ $json.email_docente }}\",\n  \"pre_programa_academico\": \"{{ $json.programa_academico }}\",\n  \"pre_nombre_materia\": \"{{ $json.nombre_materia }}\",\n  \"pre_descripcion\": \"{{ $json.descripcion_general }}\",\n  \"pre_competenencias\": {{ JSON.stringify($json.competencias) }},\n  \"pre_temario\": {{ JSON.stringify($json.temario) }},\n  \"pre_palabras_clave\": \"{{ $json.palabras_clave }}\",\n  \"pre_terminos_excluyentes\": \"{{ $json.terminos_excluyentes }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        240
+      ],
+      "id": "e7a718f9-ffac-4cf0-a11c-13c8c09bf8d1",
+      "name": "Insertar información en BD"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.virtualpro.co/api/prc-pertinencia/ejecucion/{{ $('Crypto').first().json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2208,
+        432
+      ],
+      "id": "47eb07ec-e249-4bb7-b2d8-55efe1def334",
+      "name": "HTTP Request4",
+      "executeOnce": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        656,
-        -1056
+        -608,
+        992
       ],
-      "id": "4fdcbded-518a-4fee-a847-9fdbf478a7df",
-      "name": "Analyze CSV",
-      "retryOnFail": false,
-      "credentials": {
-        "googlePalmApi": {
-          "id": "yWbztL8O1z9zkmV3",
-          "name": "N8N-Lugnia-2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "let raw = $input.first().json.content.parts[0].text || \"\";\n\n// Limpia los backticks y etiquetas ```json\nraw = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Convierte a JSON\nlet parsed = JSON.parse(raw);\n\nreturn parsed;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        880,
-        -1056
-      ],
-      "id": "aadbdd99-cd52-4898-bfc3-180b5a5030c1",
-      "name": "Convert Json"
+      "id": "a1d5fa8c-3600-4545-a62d-cab42c82d85a",
+      "name": "When clicking ‘Execute workflow’"
     }
   ],
   "connections": {
-    "When clicking ‘Execute workflow’": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields": {
-      "main": [
-        [
-          {
-            "node": "DefineTypes",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code": {
-      "main": [
-        [
-          {
-            "node": "Convert to File2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Convert to File2": {
-      "main": [
-        [
-          {
-            "node": "Upload file",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code1": {
-      "main": [
-        [
-          {
-            "node": "Convert to File3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Convert to File3": {
-      "main": [
-        [
-          {
-            "node": "Upload file1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code2": {
-      "main": [
-        [
-          {
-            "node": "Convert to File",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Convert to File": {
-      "main": [
-        [
-          {
-            "node": "Upload file2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Analyze All Recursos": {
+    "HTTP Request2": {
       "main": [
         [
           {
@@ -572,18 +449,163 @@
         ]
       ]
     },
-    "Analyze Infografias": {
+    "Call Gemini": {
       "main": [
         [
           {
-            "node": "Code1",
+            "node": "Wait",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Analyze Labs": {
+    "Edit Fields2": {
+      "main": [
+        []
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Call Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insertar información en BD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Formularios",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Página de respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
       "main": [
         [
           {
@@ -594,82 +616,9 @@
         ]
       ]
     },
-    "Loop Over Items": {
+    "When clicking ‘Execute workflow’": {
       "main": [
-        [],
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request": {
-      "main": [
-        [
-          {
-            "node": "Analyze CSV",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "DefineTypes": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Convert to File4": {
-      "main": [
-        [
-          {
-            "node": "Upload file3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Upload file3": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Analyze CSV": {
-      "main": [
-        [
-          {
-            "node": "Convert Json",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Convert Json": {
-      "main": [
-        [
-          {
-            "node": "Convert to File4",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     }
   },
@@ -681,19 +630,25 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {
-    "Edit Fields": [
+    "Webhook": [],
+    "Edit Fields2": [
       {
         "json": {
           "NOMBRE_MATERIA": "MÉTODOS Y TIEMPOS / ESTUDIO DEL TRABAJO",
           "DESCRIPCIÓN_GENERAL": "Materia fundamental que busca mejorar la productividad mediante el análisis del trabajo, medición de tiempos y optimización de procesos.",
-          "COMPETENCIAS": "Analizar métodos y procesos productivos. Aplicar técnicas de medición del trabajo. Identificar mejoras en actividades repetitivas.",
-          "TEMARIO": "Introducción al estudio del trabajo\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\nAnálisis de métodos\nMedición del trabajo\nCronometraje y técnicas PMTS\nMuestreo del trabajo\nBalanceo de líneas\nErgonomía básica aplicada al estudio del trabajo\nImplementación de mejoras",
-          "PALABRAS_CLAVE_SYLLABUS": "métodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo."
+          "COMPETENCIAS": "Analizar métodos y procesos productivos.\r\nAplicar técnicas de medición del trabajo.\r\nIdentificar mejoras en actividades repetitivas.\r\n",
+          "TEMARIO": "Introducción al estudio del trabajo\r\nDiagramas de procesos (ASME, cursograma, hombre-máquina)\r\nAnálisis de métodos\r\nMedición del trabajo\r\nCronometraje y técnicas PMTS\r\nMuestreo del trabajo\r\nBalanceo de líneas\r\nErgonomía básica aplicada al estudio del trabajo\r\nImplementación de mejoras\r\n",
+          "PALABRAS_CLAVE_SYLLABUS": "métodos, tiempos, productividad, diagrama de procesos, muestreo, ciclo de trabajo, balanceo, mejora",
+          "id_usuario": "391684",
+          "id_institucion": "30500",
+          "PROGRAMA_ACADEMICO": "Ingeniería industrial",
+          "TERMINOS_EXCLUYENTES": "Física",
+          "EMAIL_DOCENTE": "julian@hotmail.com"
         }
       }
     ]
   },
-  "versionId": "3db82cf9-144b-465b-b96a-441c1881ff4a",
-  "triggerCount": 0,
+  "versionId": "e46f6c86-0983-4035-8dff-463b7129da46",
+  "triggerCount": 1,
   "tags": []
 }
