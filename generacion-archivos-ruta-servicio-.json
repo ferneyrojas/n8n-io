@@ -1,6 +1,6 @@
 {
   "createdAt": "2026-01-21T23:47:55.084Z",
-  "updatedAt": "2026-03-17T14:28:55.592Z",
+  "updatedAt": "2026-06-04T23:19:14.271Z",
   "id": "JuPhn9ORyJZuyN0v",
   "name": "Generacion Archivos Ruta Servicio",
   "active": true,
@@ -117,11 +117,25 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1440,
+        1568,
         -144
       ],
       "id": "cae4ab1a-3f6a-49db-9674-b5d20b3617f8",
       "name": "Solicitudes Cliente"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=sp5423",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1776,
+        -144
+      ],
+      "id": "2f8057d7-01a6-407d-a2a5-c08da2d5c8fb",
+      "name": "HTTP Request"
     }
   ],
   "connections": {
@@ -201,6 +215,17 @@
           }
         ]
       ]
+    },
+    "Solicitudes Cliente": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -213,7 +238,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "9a04e6c3-0515-4035-9827-9bcdd4888c25",
+  "versionId": "cb1043b9-1ef1-41f5-89e4-a4ba93b80e13",
   "triggerCount": 1,
   "tags": []
 }
