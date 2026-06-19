@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-30T13:56:55.310Z",
-  "updatedAt": "2025-10-31T16:58:05.039Z",
+  "updatedAt": "2026-06-19T16:14:08.005Z",
   "id": "NGhqOp17qlA668om",
   "name": "Genera all JSON",
   "active": true,
@@ -27,7 +27,22 @@
     },
     {
       "parameters": {
-        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=show,info,lab,esc,proc,vid,per,not,bv,lib",
+        "content": "Genera los encabezados y json de los diferentes módulos ",
+        "height": 240,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "54d67ced-37c3-4363-ab08-9b9ee5ca9986",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=show",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -37,26 +52,261 @@
         0
       ],
       "id": "781aa325-d6f9-4568-90d7-0d4b9c95fabb",
-      "name": "HTTP Request"
+      "name": "Gen Show"
     },
     {
       "parameters": {
-        "content": "Genera los encabezados y json de los diferentes módulos ",
-        "height": 240,
-        "width": 496
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=info",
+        "options": {}
       },
-      "type": "n8n-nodes-base.stickyNote",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        -88,
-        -80
+        448,
+        0
       ],
-      "typeVersion": 1,
-      "id": "54d67ced-37c3-4363-ab08-9b9ee5ca9986",
-      "name": "Sticky Note"
+      "id": "ed26937d-84d8-4cf3-9159-70f691c65fb6",
+      "name": "Gen Info"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=lab",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "6ac4d96a-fd13-43e4-be30-856d8dd43df8",
+      "name": "Gen Lab"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=esc",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "abadf36d-356a-4f03-bfb7-754d5b0f6c79",
+      "name": "Gen Esc"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=proc",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "0840567f-3f1c-4553-9e77-c091f384e936",
+      "name": "Gen proc"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=vid",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "a3d40f45-093a-4dbe-ab45-48f674deb3f1",
+      "name": "Gen Vid"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=per",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        0
+      ],
+      "id": "6e57eafc-33f9-4325-9008-e9f77c706ad3",
+      "name": "Gen Per"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=not",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        0
+      ],
+      "id": "a86f5ae2-1abe-49a2-8bae-7bcfb543a2fc",
+      "name": "Gen not"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=bv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        0
+      ],
+      "id": "3c3d9bd5-5cbd-4a20-8295-7a655cf80667",
+      "name": "Gen Bv"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/generate?type=biblioteca&bv=lib",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        0
+      ],
+      "id": "fead6654-a590-4ec2-bb41-611d7d24a58b",
+      "name": "Gen Lib"
+    },
+    {
+      "parameters": {
+        "url": "https://api.virtualpro.co/api/bigquery/consultar_query?consulta=allRecs",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2448,
+        0
+      ],
+      "id": "bbc1f3dd-a5f1-487a-bbd0-dc791ce235f7",
+      "name": "HTTP Request"
     }
   ],
   "connections": {
     "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gen Show",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Show": {
+      "main": [
+        [
+          {
+            "node": "Gen Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Info": {
+      "main": [
+        [
+          {
+            "node": "Gen Lab",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Lab": {
+      "main": [
+        [
+          {
+            "node": "Gen Esc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Esc": {
+      "main": [
+        [
+          {
+            "node": "Gen proc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen proc": {
+      "main": [
+        [
+          {
+            "node": "Gen Vid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Vid": {
+      "main": [
+        [
+          {
+            "node": "Gen Per",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Per": {
+      "main": [
+        [
+          {
+            "node": "Gen not",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen not": {
+      "main": [
+        [
+          {
+            "node": "Gen Bv",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Bv": {
+      "main": [
+        [
+          {
+            "node": "Gen Lib",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Lib": {
       "main": [
         [
           {
@@ -78,7 +328,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "7acc21d9-3d74-46ac-b98e-7ff5a96f06b4",
+  "versionId": "af247079-7da3-40ba-aac4-2905cd788f02",
   "triggerCount": 1,
   "tags": [
     {
