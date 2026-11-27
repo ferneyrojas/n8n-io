@@ -1,9 +1,9 @@
 {
-  "createdAt": "2025-11-07T00:45:59.838Z",
-  "updatedAt": "2025-11-10T12:59:37.778Z",
-  "id": "piMbPXB5oM5cjjmk",
+  "createdAt": "2026-09-15T16:09:20.065Z",
+  "updatedAt": "2026-09-15T16:09:22.432Z",
+  "id": "lHe9OqhsVqIw4frw",
   "name": "resetArtisan",
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
@@ -11,8 +11,7 @@
         "rule": {
           "interval": [
             {
-              "field": "minutes",
-              "minutesInterval": 15
+              "field": "hours"
             }
           ]
         }
@@ -23,7 +22,7 @@
         0,
         0
       ],
-      "id": "f0406038-0e10-4d27-88e2-3cc688965988",
+      "id": "31288e52-3471-444a-94ca-f7bb8f551e79",
       "name": "Schedule Trigger"
     },
     {
@@ -37,7 +36,7 @@
         208,
         0
       ],
-      "id": "946368f3-670c-4803-bc1e-4fcb904ebecb",
+      "id": "26e0ac17-3a29-482f-8167-27a29e98a7ac",
       "name": "HTTP Request"
     }
   ],
@@ -64,7 +63,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "2982cfbe-818d-4dcd-b8a4-43cd5ef75dbd",
+  "versionId": "d85ddf7d-df8d-41a0-8017-7844f83ff7cd",
   "triggerCount": 1,
   "tags": []
 }
